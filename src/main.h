@@ -5,6 +5,8 @@
 #include "util/misc.h"
 #include "ProcessUnit_FX.h"
 
+// We don't really care about this file, it's just compat with android API
+
 typedef struct intf {
     int32_t (*process)(effect_handle_t self,
                        audio_buffer_t *inBuffer,

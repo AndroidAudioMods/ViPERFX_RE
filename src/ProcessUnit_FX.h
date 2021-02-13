@@ -5,8 +5,28 @@
 #ifndef VIPER_PROCESSUNIT_FX_H
 #define VIPER_PROCESSUNIT_FX_H
 
-
-#include "main.h"
+#include "effects/Effect.h"
+#include "data.h"
+#include "util/AdaptiveBuffer_FPI32.h"
+#include "util/WaveBuffer_R32.h"
+#include "effects/ViPERDDC.h"
+#include "effects/Convolver.h"
+#include "effects/VHE.h"
+#include "effects/SpectrumExtend.h"
+#include "effects/IIRFilter.h"
+#include "effects/ColorfulMusic.h"
+#include "effects/Reverberation.h"
+#include "effects/PlaybackGain.h"
+#include "effects/FETCompressor.h"
+#include "effects/DynamicSystem.h"
+#include "effects/ViPERBass.h"
+#include "effects/ViPERClarity.h"
+#include "effects/DiffSurround.h"
+#include "effects/Cure.h"
+#include "effects/TubeSimulator.h"
+#include "effects/AnalogX.h"
+#include "effects/SpeakerCorrection.h"
+#include "util/SoftwareLimiter.h"
 
 class ProcessUnit_FX {
 public:
@@ -101,23 +121,23 @@ public:
     AdaptiveBuffer_FPI32 * floatIntBuffer;
     WaveBuffer_R32 * waveBuffer;
     undefined4 field_0x88;
-    Convolver;
-    VHE;
+    Convolver * convolver;
+    VHE * vhe;
     ViPERDDC * vddc;
-    SpectrumExtend;
-    IIRFilter;
+    SpectrumExtend * spectrumExtend;
+    IIRFilter * iirFilter;
     ColorfulMusic colorful;
     Reverberation * reverb;
-    PlaybackGain;
-    FETCompressor;
-    DynamicSystem;
+    PlaybackGain * playbackGain;
+    FETCompressor * fetCompressor;
+    DynamicSystem * dynamicSystem;
     ViPERBass * vbass;
     ViPERClarity * vclarity;
-    DiffSurround;
-    Cure;
+    DiffSurround * diffSurround;
+    Cure * cure;
     TubeSimulator * tubeSim;
-    AnalogX;
-    SpeakerCorrection;
+    AnalogX * analogx;
+    SpeakerCorrection * speakerCorrection;
     SoftwareLimiter * softLimit1;
     SoftwareLimiter * softLimit2;
     undefined4 field_0xd8;

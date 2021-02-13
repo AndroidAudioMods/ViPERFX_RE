@@ -6,7 +6,7 @@
 #define VIPER_DEPTHSURROUND_H
 
 
-#include "Stereo3DSurround.h"
+#include "../util/Stereo3DSurround.h"
 
 class DepthSurround {
     short field_0x0;

@@ -6,7 +6,7 @@
 #define VIPER_COLORFULMUSIC_H
 
 
-#include "Stereo3DSurround.h"
+#include "../util/Stereo3DSurround.h"
 
 class ColorfulMusic {
     undefined field_0x0;

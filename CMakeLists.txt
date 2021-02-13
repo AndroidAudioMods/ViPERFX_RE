@@ -24,7 +24,6 @@ add_library( # Sets the name of the library.
              SHARED
 
              # Provides a relative path to your source file(s).
-            src/main.cpp
             src/ProcessUnit_FX.cpp
             ${EFFECTS}
             ${UTIL} src/data.h)

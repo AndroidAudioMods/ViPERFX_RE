@@ -31,18 +31,14 @@ ProcessUnit_FX::ProcessUnit_FX() {
     float fVar4;
     float extraout_s0;
 
-    Effect::Effect((Effect *)this);
-    this->field_0x0 = &PTR_command_000d0cf8;
+    Effect::Effect((Effect *)this);  // Parent class?
+    this->field_0x0 = &PTR_command_000d0cf8;  // ?
     __android_log_print(4,"ViPER4Android_v2","Welcome to ViPER4Android driver[SQ]");
     __android_log_print(4,"ViPER4Android_v2","Current version is %d.%d.%d.%d %s",2,5,0,4,"Beautiful");
     this->field_0x68 = (undefined *)this;
     this->field_0x88 = 0;
-    this_00 = (AdaptiveBuffer_FPI32 *)operator_new(0x20);
-    this_00 = new AdaptiveBuffer_FPI32(2,0x1000);
-    this->floatIntBuffer = this_00;
-    this_01 = (WaveBuffer_R32 *)operator_new(0x20);
-    WaveBuffer_R32::WaveBuffer_R32(this_01,2,0x1000);
-    this->waveBuffer = this_01;
+    this->floatIntBuffer = new AdaptiveBuffer_FPI32(2,0x1000);
+    this->waveBuffer = new WaveBuffer_R32(2,0x1000);
     this_02 = (Convolver *)operator_new(0x174);
     Convolver::Convolver(this_02);
     this->convolver = this_02;
