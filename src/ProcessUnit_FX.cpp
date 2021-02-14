@@ -908,166 +908,122 @@ void ProcessUnit_FX::DispatchCommand(int param_1,int param_2,int param_3,int par
                 this->vhe = nullptr;
             }
 
-            pVVar12 = this->vddc;
-            if (pVVar12 != nullptr) {
-                ViPERDDC::~ViPERDDC(pVVar12);
-                operator_delete(pVVar12);
+            if (this->vddc != nullptr) {
+                delete this->vddc;
+                this->vddc = nullptr;
             }
-            pSVar13 = this->spectrumExtend;
-            this->vddc = nullptr;
-            if (pSVar13 != nullptr) {
-                SpectrumExtend::~SpectrumExtend(pSVar13);
-                operator_delete(pSVar13);
+
+            if (this->spectrumExtend != nullptr) {
+                delete this->spectrumExtend;
+                this->spectrumExtend = nullptr;
             }
-            pIVar14 = this->iirFilter;
-            this->spectrumExtend = nullptr;
-            if (pIVar14 != nullptr) {
-                IIRFilter::~IIRFilter(pIVar14);
-                operator_delete(pIVar14);
+
+            if (this->iirFilter != nullptr) {
+                delete this->iirFilter;
+                this->iirFilter = nullptr;
             }
-            pCVar15 = this->colorful;
-            this->iirFilter = nullptr;
-            if (pCVar15 != nullptr) {
-                TimeConstDelay::~TimeConstDelay((TimeConstDelay *)&pCVar15->field_0x34);
-                TimeConstDelay::~TimeConstDelay((TimeConstDelay *)&pCVar15->field_0x28);
-                operator_delete(pCVar15);
+
+            if (this->colorful != nullptr) {
+                TimeConstDelay::~TimeConstDelay((TimeConstDelay *)&this->colorful->field_0x34);
+                TimeConstDelay::~TimeConstDelay((TimeConstDelay *)&this->colorful->field_0x28);
+                delete this->colorful;
+                this->colorful = nullptr;
             }
-            pRVar16 = this->reverb;
-            this->colorful = nullptr;
-            if (pRVar16 != nullptr) {
-                CRevModel::~CRevModel(&pRVar16->field_0x14);
-                operator_delete(pRVar16);
+
+            if (this->reverb != nullptr) {
+                CRevModel::~CRevModel(&this->reverb->field_0x14);
+                delete this->reverb;
+                this->reverb = nullptr;
             }
-            this->reverb = nullptr;
+
             if (this->playbackGain != nullptr) {
-                operator_delete(this->playbackGain);
+                delete this->playbackGain;
+                this->playbackGain = nullptr;
             }
-            pFVar17 = this->fetCompressor;
-            this->playbackGain = nullptr;
-            if (pFVar17 != nullptr) {
-                FETCompressor::~FETCompressor(pFVar17);
-                operator_delete(pFVar17);
+
+            if (this->fetCompressor != nullptr) {
+                delete this->fetCompressor;
+                this->fetCompressor = nullptr;
             }
-            this->fetCompressor = nullptr;
+
             if (this->dynamicSystem != nullptr) {
-                operator_delete(this->dynamicSystem);
+                delete this->dynamicSystem;
+                this->dynamicSystem = nullptr;
             }
-            pVVar18 = this->vbass;
-            this->dynamicSystem = nullptr;
-            if (pVVar18 != nullptr) {
-                ViPERBass::~ViPERBass(pVVar18);
-                operator_delete(pVVar18);
+
+            if (this->vbass != nullptr) {
+                delete this->vbass;
+                this->vbass = nullptr;
             }
-            pVVar19 = this->vclarity;
-            this->vbass = nullptr;
-            if (pVVar19 != nullptr) {
-                ViPERClarity::~ViPERClarity(pVVar19);
-                operator_delete(pVVar19);
+
+            if (this->vclarity != nullptr) {
+                delete this->vclarity;
+                this->vclarity = nullptr;
             }
-            pDVar20 = this->diffSurround;
-            this->vclarity = nullptr;
-            if (pDVar20 != nullptr) {
-                DiffSurround::~DiffSurround(pDVar20);
-                operator_delete(pDVar20);
+
+            if (this->diffSurround != nullptr) {
+                delete this->diffSurround;
+                this->diffSurround = nullptr;
             }
-            pCVar21 = this->cure;
-            this->diffSurround = nullptr;
-            if (pCVar21 != nullptr) {
-                Cure::~Cure(pCVar21);
-                operator_delete(pCVar21);
+
+            if (this->cure != nullptr) {
+                delete this->cure;
+                this->cure = nullptr;
             }
-            this->cure = nullptr;
+
             if (this->tubeSim != nullptr) {
-                operator_delete(this->tubeSim);
+                delete this->tubeSim;
+                this->tubeSim = nullptr;
             }
-            pAVar23 = this->analogx;
-            this->tubeSim = nullptr;
-            if (pAVar23 != nullptr) {
-                pHVar22 = (Harmonic *)&pAVar23->field_0xc0;
+
+
+            if (this->analogx != nullptr) {
+                pHVar22 = (Harmonic *)&this->analogx->field_0xc0;
                 do {
                     pHVar22 = pHVar22 + -1;
                     Harmonic::~Harmonic(pHVar22);
-                } while (&pAVar23->field_0x48 != pHVar22);
-                operator_delete(pAVar23);
+                } while (&this->analogx->field_0x48 != pHVar22);
+                delete this->analogx;
+                this->analogx = nullptr;
             }
-            this->analogx = nullptr;
+
             if (this->speakerCorrection != nullptr) {
-                operator_delete(this->speakerCorrection);
+                delete this->speakerCorrection;
+                this->speakerCorrection = nullptr;
             }
-            this->speakerCorrection = nullptr;
+
             if (this->softLimit1 != nullptr) {
-                operator_delete(this->softLimit1);
+                delete this->softLimit1;
+                this->softLimit1 = nullptr;
             }
-            this->softLimit1 = nullptr;
+
             if (this->softLimit2 != nullptr) {
-                operator_delete(this->softLimit2);
+                delete this->softLimit2;
+                this->softLimit2 = nullptr;
             }
-            this->softLimit2 = nullptr;
-            pAVar8 = (AdaptiveBuffer_FPI32 *)operator_new(0x20);
-            AdaptiveBuffer_FPI32::AdaptiveBuffer_FPI32(pAVar8,2,0x1000);
-            this->floatIntBuffer = pAVar8;
-            pWVar9 = (WaveBuffer_R32 *)operator_new(0x20);
-            WaveBuffer_R32::WaveBuffer_R32(pWVar9,2,0x1000);
-            this->waveBuffer = pWVar9;
-            pCVar10 = (Convolver *)operator_new(0x174);
-            Convolver::Convolver(pCVar10);
-            this->convolver = pCVar10;
-            pVVar11 = (VHE *)operator_new(0x38);
-            VHE::VHE(pVVar11);
-            this->vhe = pVVar11;
-            pVVar12 = (ViPERDDC *)operator_new(0x34);
-            ViPERDDC::ViPERDDC(pVVar12);
-            this->vddc = pVVar12;
-            pSVar13 = (SpectrumExtend *)operator_new(0x118);
-            SpectrumExtend::SpectrumExtend(pSVar13);
-            this->spectrumExtend = pSVar13;
-            pIVar14 = (IIRFilter *)operator_new(0x860);
-            IIRFilter::IIRFilter(pIVar14,10);
-            this->iirFilter = pIVar14;
-            pCVar15 = (ColorfulMusic *)operator_new(0x6c);
-            ColorfulMusic::ColorfulMusic(pCVar15);
-            this->colorful = pCVar15;
-            pRVar16 = (Reverberation *)operator_new(0x2ec);
-            Reverberation::Reverberation(pRVar16);
-            this->reverb = pRVar16;
-            this_00 = (PlaybackGain *)operator_new(0x78);
-            PlaybackGain::PlaybackGain(this_00);
-            this->playbackGain = this_00;
-            pFVar17 = (FETCompressor *)operator_new(0xb0);
-            FETCompressor::FETCompressor(pFVar17);
-            this->fetCompressor = pFVar17;
-            this_01 = (DynamicSystem *)operator_new(0x138);
-            DynamicSystem::DynamicSystem(this_01);
-            this->dynamicSystem = this_01;
-            pVVar18 = (ViPERBass *)operator_new(0x2c);
-            ViPERBass::ViPERBass(pVVar18);
-            this->vbass = pVVar18;
-            pVVar19 = (ViPERClarity *)operator_new(0xe0);
-            ViPERClarity::ViPERClarity(pVVar19);
-            this->vclarity = pVVar19;
-            pDVar20 = (DiffSurround *)operator_new(0x14);
-            DiffSurround::DiffSurround(pDVar20);
-            this->diffSurround = pDVar20;
-            pCVar21 = (Cure *)operator_new(0x50);
-            Cure::Cure(pCVar21);
-            this->cure = pCVar21;
-            pTVar3 = (TubeSimulator *)operator_new(0xc);
-            TubeSimulator::TubeSimulator(pTVar3);
-            this->tubeSim = pTVar3;
-            pAVar23 = (AnalogX *)operator_new(0x164);
-            AnalogX::AnalogX(pAVar23);
-            this->analogx = pAVar23;
-            this_02 = (SpeakerCorrection *)operator_new(0xe0);
-            SpeakerCorrection::SpeakerCorrection(this_02);
-            this->speakerCorrection = this_02;
-            pSVar4 = (SoftwareLimiter *)operator_new(0xc28);
-            SoftwareLimiter::SoftwareLimiter(pSVar4);
-            this->softLimit1 = pSVar4;
-            pSVar4 = (SoftwareLimiter *)operator_new(0xc28);
-            SoftwareLimiter::SoftwareLimiter(pSVar4);
-            pAVar8 = this->floatIntBuffer;
-            this->softLimit2 = pSVar4;
-            if (pAVar8 != nullptr) {
+
+            this->floatIntBuffer = new AdaptiveBuffer_FPI32(2,0x1000);
+            this->waveBuffer = new WaveBuffer_R32(2,0x1000);
+            this->convolver = new Convolver();
+            this->vhe = new VHE();
+            this->vddc = new ViPERDDC();
+            this->spectrumExtend = new SpectrumExtend();
+            this->iirFilter = new IIRFilter(10);
+            this->colorful = new ColorfulMusic();
+            this->reverb = new Reverberation();
+            this->playbackGain = new PlaybackGain();
+            this->fetCompressor = new FETCompressor();
+            this->dynamicSystem = new DynamicSystem();
+            this->vbass = new ViPERBass();
+            this->vclarity = new ViPERClarity();
+            this->diffSurround = new DiffSurround();
+            this->cure = new Cure();
+            this->analogx = new AnalogX();
+            this->tubeSim = new TubeSimulator();
+            this->speakerCorrection = new SpeakerCorrection();
+            this->softLimit1 = new SoftwareLimiter();
+            this->softLimit2 = new SoftwareLimiter();
+            if (this->floatIntBuffer != nullptr) {
                 if (((((((this->waveBuffer != nullptr) && (this->softLimit1 != nullptr)) && (pSVar4 != nullptr)) &&
                        ((this->convolver != nullptr && (this->vhe != nullptr)))) &&
                       (((this->vddc != nullptr && ((this->spectrumExtend != nullptr && (this->iirFilter != nullptr))))
@@ -1085,9 +1041,10 @@ void ProcessUnit_FX::DispatchCommand(int param_1,int param_2,int param_3,int par
                                         "[DN] *Memory pool is OK and all sub effects re-initialized");
                     goto LAB_000710f8;
                 }
-                AdaptiveBuffer_FPI32::~AdaptiveBuffer_FPI32(pAVar8);
-                operator_delete(pAVar8);
+                delete this->floatIntBuffer;
             }
+
+            // Fuck this shit
             pWVar9 = this->waveBuffer;
             this->floatIntBuffer = nullptr;
             if (pWVar9 != nullptr) {
