@@ -6,6 +6,8 @@
 #define VIPER_HARMONIC_H
 
 
+#include "misc.h"
+
 class Harmonic {
     float field_0x0[11];
     undefined4 field_0x2c;

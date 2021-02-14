@@ -126,7 +126,7 @@ public:
     ViPERDDC * vddc;
     SpectrumExtend * spectrumExtend;
     IIRFilter * iirFilter;
-    ColorfulMusic colorful;
+    ColorfulMusic * colorful;
     Reverberation * reverb;
     PlaybackGain * playbackGain;
     FETCompressor * fetCompressor;

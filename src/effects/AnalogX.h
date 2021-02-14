@@ -6,15 +6,19 @@
 #define VIPER_ANALOGX_H
 
 
+#include "../util/Harmonic.h"
+#include "../util/MultiBiquad.h"
+#include "../data.h"
+
 class AnalogX {
-    struct MultiBiquad field_0x0;
-    struct MultiBiquad field_0x24;
-    struct Harmonic field_0x48;
-    struct Harmonic field_0x84;
-    struct MultiBiquad field_0xc0;
-    struct MultiBiquad field_0xe4;
-    struct MultiBiquad field_0x108;
-    struct MultiBiquad field_0x12c;
+    MultiBiquad field_0x0;
+    MultiBiquad field_0x24;
+    Harmonic field_0x48;
+    Harmonic field_0x84;
+    MultiBiquad field_0xc0;
+    MultiBiquad field_0xe4;
+    MultiBiquad field_0x108;
+    MultiBiquad field_0x12c;
     undefined field_0x150;
     undefined field_0x151;
     undefined field_0x152;

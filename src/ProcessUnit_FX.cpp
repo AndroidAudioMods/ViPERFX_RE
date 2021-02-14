@@ -39,158 +39,118 @@ ProcessUnit_FX::ProcessUnit_FX() {
     this->field_0x88 = 0;
     this->floatIntBuffer = new AdaptiveBuffer_FPI32(2,0x1000);
     this->waveBuffer = new WaveBuffer_R32(2,0x1000);
-    this_02 = (Convolver *)operator_new(0x174);
-    Convolver::Convolver(this_02);
-    this->convolver = this_02;
-    this_03 = (VHE *)operator_new(0x38);
-    VHE::VHE(this_03);
-    this->vhe = this_03;
-    this_04 = (ViPERDDC *)operator_new(0x34);
-    ViPERDDC::ViPERDDC(this_04);
-    this->vddc = this_04;
-    this_05 = (SpectrumExtend *)operator_new(0x118);
-    SpectrumExtend::SpectrumExtend(this_05);
-    this->spectrumExtend = this_05;
-    this_06 = (IIRFilter *)operator_new(0x860);
-    IIRFilter::IIRFilter(this_06,10);
-    this->iirFilter = this_06;
-    this_07 = (ColorfulMusic *)operator_new(0x6c);
-    ColorfulMusic::ColorfulMusic(this_07);
-    this->colorful = this_07;
-    this_08 = (Reverberation *)operator_new(0x2ec);
-    Reverberation::Reverberation(this_08);
-    this->reverb = this_08;
-    this_09 = (PlaybackGain *)operator_new(0x78);
-    PlaybackGain::PlaybackGain(this_09);
-    this->playbackGain = this_09;
-    this_10 = (FETCompressor *)operator_new(0xb0);
-    FETCompressor::FETCompressor(this_10);
-    this->fetCompressor = this_10;
-    this_11 = (DynamicSystem *)operator_new(0x138);
-    DynamicSystem::DynamicSystem(this_11);
-    this->dynamicSystem = this_11;
-    this_12 = (ViPERBass *)operator_new(0x2c);
-    ViPERBass::ViPERBass(this_12);
-    this->vbass = this_12;
-    this_13 = (ViPERClarity *)operator_new(0xe0);
-    ViPERClarity::ViPERClarity(this_13);
-    this->vclarity = this_13;
-    this_14 = (DiffSurround *)operator_new(0x14);
-    DiffSurround::DiffSurround(this_14);
-    this->diffSurround = this_14;
-    this_15 = (Cure *)operator_new(0x50);
-    Cure::Cure(this_15);
-    this->cure = this_15;
-    pAVar1 = (AnalogX *)operator_new(0x164);
-    AnalogX::AnalogX(pAVar1);
-    this->analogx = pAVar1;
-    pTVar2 = (TubeSimulator *)operator_new(0xc);
-    TubeSimulator::TubeSimulator(pTVar2);
-    this->tubeSim = pTVar2;
-    this_16 = (SpeakerCorrection *)operator_new(0xe0);
-    SpeakerCorrection::SpeakerCorrection(this_16);
-    this->speakerCorrection = this_16;
-    pSVar3 = (SoftwareLimiter *)operator_new(0xc28);
-    SoftwareLimiter::SoftwareLimiter(pSVar3);
-    this->softLimit1 = pSVar3;
-    pSVar3 = (SoftwareLimiter *)operator_new(0xc28);
-    fVar4 = (float)SoftwareLimiter::SoftwareLimiter(pSVar3);
-    this->softLimit2 = pSVar3;
+    this->convolver = new Convolver();
+    this->vhe = new VHE();
+    this->vddc = new ViPERDDC();
+    this->spectrumExtend = new SpectrumExtend();
+    this->iirFilter = new IIRFilter(10);
+    this->colorful = new ColorfulMusic();
+    this->reverb = new Reverberation();
+    this->playbackGain = new PlaybackGain();
+    this->fetCompressor = new FETCompressor();
+    this->dynamicSystem = new DynamicSystem();
+    this->vbass = new ViPERBass();
+    this->vclarity = new ViPERClarity();
+    this->diffSurround = new DiffSurround();
+    this->cure = new Cure();
+    this->analogx = new AnalogX();
+    this->tubeSim = new TubeSimulator();
+    this->speakerCorrection = new SpeakerCorrection();
+    this->softLimit1 = new SoftwareLimiter();
+    this->softLimit2 = new SoftwareLimiter();
     if (this->convolver != nullptr) {
-        Convolver::SetEnable(this->convolver,false);
-        Convolver::SetSamplingRate(this->convolver,this->samplerate);
-        fVar4 = (float)Convolver::Reset(this->convolver);
+        this->convolver->SetEnable(false);
+        this->convolver->SetSamplingRate(this->samplerate);
+        fVar4 = (float)this->convolver->Reset();
     }
     if (this->vhe != nullptr) {
-        VHE::SetEnable(this->vhe,false);
-        VHE::SetSamplingRate(this->vhe,this->samplerate);
-        fVar4 = (float)VHE::Reset(this->vhe);
+        this->vhe->SetEnable(false);
+        this->vhe->SetSamplingRate(this->samplerate);
+        fVar4 = (float)this->vhe->Reset();
     }
     if (this->vddc != nullptr) {
-        ViPERDDC::SetEnable(this->vddc,false);
-        ViPERDDC::SetSamplingRate(this->vddc,this->samplerate);
-        fVar4 = (float)ViPERDDC::Reset(this->vddc);
+        this->vddc->SetEnable(false);
+        this->vddc->SetSamplingRate(this->samplerate);
+        fVar4 = (float)this->vddc->Reset();
     }
     if (this->spectrumExtend != nullptr) {
-        SpectrumExtend::SetEnable(this->spectrumExtend,false);
-        SpectrumExtend::SetSamplingRate(this->spectrumExtend,this->samplerate);
-        fVar4 = (float)SpectrumExtend::SetReferenceFrequency(this->spectrumExtend,0x1db0);
-        SpectrumExtend::SetExciter(this->spectrumExtend,fVar4);
+        this->spectrumExtend->SetEnable(false);
+        this->spectrumExtend->SetSamplingRate(this->samplerate);
+        fVar4 = (float)this->spectrumExtend->SetReferenceFrequency(7600);
+        this->spectrumExtend->SetExciter(fVar4);
         fVar4 = (float)SpectrumExtend::Reset();
     }
     if (this->iirFilter != nullptr) {
-        IIRFilter::SetEnable(this->iirFilter,false);
-        IIRFilter::SetSamplingRate(this->iirFilter,this->samplerate);
-        fVar4 = (float)IIRFilter::Reset(this->iirFilter);
+        this->iirFilter->SetEnable(false);
+        this->iirFilter->SetSamplingRate(this->samplerate);
+        fVar4 = (float)this->iirFilter->Reset();
     }
     if (this->colorful != nullptr) {
-        ColorfulMusic::SetEnable(this->colorful,false);
-        ColorfulMusic::SetSamplingRate(this->colorful,this->samplerate);
-        fVar4 = (float)ColorfulMusic::Reset(this->colorful);
+        this->colorful->SetEnable(false);
+        this->colorful->SetSamplingRate(this->samplerate);
+        fVar4 = (float)this->colorful->Reset();
     }
     if (this->reverb != nullptr) {
-        Reverberation::SetEnable(this->reverb,false);
-        Reverberation::SetSamplingRate(this->reverb,this->samplerate);
-        fVar4 = (float)Reverberation::Reset(this->reverb);
+        this->reverb->SetEnable(false);
+        this->reverb->SetSamplingRate(this->samplerate);
+        fVar4 = (float)this->reverb->Reset();
     }
     if (this->playbackGain != nullptr) {
-        PlaybackGain::SetEnable(this->playbackGain,false);
-        PlaybackGain::SetSamplingRate(this->playbackGain,this->samplerate);
-        PlaybackGain::Reset(this->playbackGain);
+        this->playbackGain->SetEnable(false);
+        this->playbackGain->SetSamplingRate(this->samplerate);
+        this->playbackGain->Reset();
         fVar4 = extraout_s0;
     }
     if (this->fetCompressor != nullptr) {
-        FETCompressor::SetParameter((int)this->fetCompressor,fVar4);
-        FETCompressor::SetSamplingRate(this->fetCompressor,this->samplerate);
-        FETCompressor::Reset(this->fetCompressor);
+        this->fetCompressor->SetParameter(fVar4);
+        this->fetCompressor->SetSamplingRate(this->samplerate);
+        this->fetCompressor->Reset();
     }
     if (this->dynamicSystem != nullptr) {
-        DynamicSystem::SetEnable(this->dynamicSystem,false);
-        DynamicSystem::SetSamplingRate(this->dynamicSystem,this->samplerate);
-        DynamicSystem::Reset(this->dynamicSystem);
+        this->dynamicSystem->SetEnable(false);
+        this->dynamicSystem->SetSamplingRate(this->samplerate);
+        this->dynamicSystem->Reset();
     }
     if (this->vbass != nullptr) {
-        ViPERBass::SetEnable(this->vbass,false);
-        ViPERBass::SetSamplingRate(this->vbass,this->samplerate);
+        this->vbass->SetEnable(false);
+        this->vbass->SetSamplingRate(this->samplerate);
         ViPERBass::Reset();
     }
     if (this->vclarity != nullptr) {
-        ViPERClarity::SetEnable(this->vclarity,false);
-        ViPERClarity::SetSamplingRate(this->vclarity,this->samplerate);
-        ViPERClarity::Reset(this->vclarity);
+        this->vclarity->SetEnable(false);
+        this->vclarity->SetSamplingRate(this->samplerate);
+        this->vclarity->Reset();
     }
     if (this->diffSurround != nullptr) {
-        DiffSurround::SetEnable(this->diffSurround,false);
-        DiffSurround::SetSamplingRate(this->diffSurround,this->samplerate);
-        DiffSurround::Reset(this->diffSurround);
+        this->diffSurround->SetEnable(false);
+        this->diffSurround->SetSamplingRate(this->samplerate);
+        this->diffSurround->Reset();
     }
     if (this->cure != nullptr) {
-        Cure::SetEnable(this->cure,false);
-        Cure::SetSamplingRate(this->cure,this->samplerate);
-        Cure::Reset(this->cure);
+        this->cure->SetEnable(false);
+        this->cure->SetSamplingRate(this->samplerate);
+        this->cure->Reset();
     }
-    pTVar2 = this->tubeSim;
-    if (pTVar2 != nullptr) {
-        pTVar2->field_0x8 = false;
-        TubeSimulator::Reset(pTVar2);
+    if (this->tubeSim != nullptr) {
+        this->tubeSim->field_0x8 = false;
+        this->tubeSim->Reset();
     }
-    pAVar1 = this->analogx;
-    if (pAVar1 != nullptr) {
-        pAVar1->enabled = false;
-        AnalogX::SetSamplingRate(pAVar1,this->samplerate);
-        AnalogX::SetProcessingModel(this->analogx,0);
-        AnalogX::Reset(this->analogx);
+    if (this->analogx != nullptr) {
+        this->analogx->enabled = false;
+        this->analogx->SetSamplingRate(this->samplerate);
+        this->analogx->SetProcessingModel(0);
+        this->analogx->Reset();
     }
     if (this->speakerCorrection != nullptr) {
-        SpeakerCorrection::SetEnable(this->speakerCorrection,false);
-        SpeakerCorrection::SetSamplingRate(this->speakerCorrection,this->samplerate);
-        SpeakerCorrection::Reset(this->speakerCorrection);
+        this->speakerCorrection->SetEnable(false);
+        this->speakerCorrection->SetSamplingRate(this->samplerate);
+        this->speakerCorrection->Reset();
     }
     if (this->softLimit1 != nullptr) {
-        SoftwareLimiter::ResetLimiter(this->softLimit1);
+        this->softLimit1->ResetLimiter();
     }
     if (this->softLimit2 != nullptr) {
-        SoftwareLimiter::ResetLimiter(this->softLimit2);
+        this->softLimit2->ResetLimiter();
     }
     if (((((((this->floatIntBuffer == nullptr) || (this->waveBuffer == nullptr)) ||
             (this->softLimit1 == nullptr)) ||
@@ -223,121 +183,79 @@ ProcessUnit_FX::ProcessUnit_FX() {
 // ProcessUnit_FX::~ProcessUnit_FX()
 
 ProcessUnit_FX::~ProcessUnit_FX() {
-    AdaptiveBuffer_FPI32 *this_00;
-    WaveBuffer_R32 *this_01;
-    Convolver *this_02;
-    VHE *this_03;
-    ViPERDDC *this_04;
-    SpectrumExtend *this_05;
-    IIRFilter *this_06;
-    ColorfulMusic *pCVar1;
-    Reverberation *pRVar2;
-    FETCompressor *this_07;
-    ViPERBass *this_08;
-    ViPERClarity *this_09;
-    DiffSurround *this_10;
-    Cure *this_11;
     Harmonic *this_12;
-    AnalogX *pAVar3;
 
-    this_00 = this->floatIntBuffer;
     this->field_0x0 = &PTR_command_000d0cf8;
-    if (this_00 != nullptr) {
-        AdaptiveBuffer_FPI32::~AdaptiveBuffer_FPI32(this_00);
-        operator_delete(this_00);
+    if (this->floatIntBuffer != nullptr) {
+        delete this->floatIntBuffer;
     }
-    this_01 = this->waveBuffer;
-    if (this_01 != nullptr) {
-        WaveBuffer_R32::~WaveBuffer_R32(this_01);
-        operator_delete(this_01);
+    if (this->waveBuffer != nullptr) {
+        delete this->waveBuffer;
     }
-    this_02 = this->convolver;
-    if (this_02 != nullptr) {
-        Convolver::~Convolver(this_02);
-        operator_delete(this_02);
+    if (this->convolver != nullptr) {
+        delete this->convolver;
     }
-    this_03 = this->vhe;
-    if (this_03 != nullptr) {
-        VHE::~VHE(this_03);
-        operator_delete(this_03);
+    if (this->vhe != nullptr) {
+        delete this->vhe;
     }
-    this_04 = this->vddc;
-    if (this_04 != nullptr) {
-        ViPERDDC::~ViPERDDC(this_04);
-        operator_delete(this_04);
+    if (this->vddc != nullptr) {
+        delete this->vddc;
     }
-    this_05 = this->spectrumExtend;
-    if (this_05 != nullptr) {
-        SpectrumExtend::~SpectrumExtend(this_05);
-        operator_delete(this_05);
+    if (this->spectrumExtend != nullptr) {
+        delete this->spectrumExtend;
     }
-    this_06 = this->iirFilter;
-    if (this_06 != nullptr) {
-        IIRFilter::~IIRFilter(this_06);
-        operator_delete(this_06);
+    if (this->iirFilter != nullptr) {
+        delete this->iirFilter;
     }
-    pCVar1 = this->colorful;
-    if (pCVar1 != nullptr) {
-        TimeConstDelay::~TimeConstDelay((TimeConstDelay *)&pCVar1->field_0x34);
-        TimeConstDelay::~TimeConstDelay((TimeConstDelay *)&pCVar1->field_0x28);
-        operator_delete(pCVar1);
+    if (this->colorful != nullptr) {
+        TimeConstDelay::~TimeConstDelay((TimeConstDelay *)&this->colorful->field_0x34);
+        TimeConstDelay::~TimeConstDelay((TimeConstDelay *)&this->colorful->field_0x28);
+        delete this->colorful;
     }
-    pRVar2 = this->reverb;
-    if (pRVar2 != nullptr) {
-        CRevModel::~CRevModel(&pRVar2->field_0x14);
-        operator_delete(pRVar2);
+    if (this->reverb != nullptr) {
+        CRevModel::~CRevModel(&this->reverb->field_0x14);
+        delete this->reverb;
     }
     if (this->playbackGain != nullptr) {
-        operator_delete(this->playbackGain);
+        delete this->playbackGain;
     }
-    this_07 = this->fetCompressor;
-    if (this_07 != nullptr) {
-        FETCompressor::~FETCompressor(this_07);
-        operator_delete(this_07);
+    if (this->fetCompressor != nullptr) {
+        delete this->fetCompressor;
     }
     if (this->dynamicSystem != nullptr) {
         operator_delete(this->dynamicSystem);
     }
-    this_08 = this->vbass;
-    if (this_08 != nullptr) {
-        ViPERBass::~ViPERBass(this_08);
-        operator_delete(this_08);
+    if (this->vbass != nullptr) {
+        delete this->vbass;
     }
-    this_09 = this->vclarity;
-    if (this_09 != nullptr) {
-        ViPERClarity::~ViPERClarity(this_09);
-        operator_delete(this_09);
+    if (this->vclarity != nullptr) {
+        delete this->vclarity;
     }
-    this_10 = this->diffSurround;
-    if (this_10 != nullptr) {
-        DiffSurround::~DiffSurround(this_10);
-        operator_delete(this_10);
+    if (this->diffSurround != nullptr) {
+        delete this->diffSurround;
     }
-    this_11 = this->cure;
-    if (this_11 != nullptr) {
-        Cure::~Cure(this_11);
-        operator_delete(this_11);
+    if (this->cure != nullptr) {
+        delete this->cure;
     }
     if (this->tubeSim != nullptr) {
-        operator_delete(this->tubeSim);
+        delete this->tubeSim;
     }
-    pAVar3 = this->analogx;
-    if (pAVar3 != nullptr) {
-        this_12 = (Harmonic *)&pAVar3->field_0xc0;
+    if (this->analogx != nullptr) {
+        this_12 = (Harmonic *)&this->analogx->field_0xc0;
         do {
             this_12 = this_12 + -1;
             Harmonic::~Harmonic(this_12);
-        } while (&pAVar3->field_0x48 != this_12);
-        operator_delete(pAVar3);
+        } while (&this->analogx->field_0x48 != this_12);
+        delete this->analogx;
     }
     if (this->speakerCorrection != nullptr) {
-        operator_delete(this->speakerCorrection);
+        delete this->speakerCorrection;
     }
     if (this->softLimit1 != nullptr) {
-        operator_delete(this->softLimit1);
+        delete this->softLimit1;
     }
     if (this->softLimit2 != nullptr) {
-        operator_delete(this->softLimit2);
+        delete this->softLimit1;
     }
     Effect::~Effect((Effect *)this);
     return this;
@@ -349,117 +267,116 @@ ProcessUnit_FX::~ProcessUnit_FX() {
 
 void ProcessUnit_FX::ResetAllEffects() {
     if (this->convolver != nullptr) {
-        Convolver::SetSamplingRate(this->convolver,this->samplerate);
+        this->convolver->SetSamplingRate(this->samplerate);
     }
     if (this->vhe != nullptr) {
-        VHE::SetSamplingRate(this->vhe,this->samplerate);
+        this->vhe->SetSamplingRate(this->samplerate);
     }
     if (this->vddc != nullptr) {
-        ViPERDDC::SetSamplingRate(this->vddc,this->samplerate);
+        this->vddc->SetSamplingRate(this->samplerate);
     }
     if (this->spectrumExtend != nullptr) {
-        SpectrumExtend::SetSamplingRate(this->spectrumExtend,this->samplerate);
+        this->spectrumExtend->SetSamplingRate(this->samplerate);
     }
     if (this->iirFilter != nullptr) {
-        IIRFilter::SetSamplingRate(this->iirFilter,this->samplerate);
+        this->iirFilter->SetSamplingRate(this->samplerate);
     }
     if (this->colorful != nullptr) {
-        ColorfulMusic::SetSamplingRate(this->colorful,this->samplerate);
+        this->colorful->SetSamplingRate(this->samplerate);
     }
     if (this->reverb != nullptr) {
-        Reverberation::SetSamplingRate(this->reverb,this->samplerate);
+        this->reverb->SetSamplingRate(this->samplerate);
     }
     if (this->playbackGain != nullptr) {
-        PlaybackGain::SetSamplingRate(this->playbackGain,this->samplerate);
+        this->playbackGain->SetSamplingRate(this->samplerate);
     }
     if (this->fetCompressor != nullptr) {
-        FETCompressor::SetSamplingRate(this->fetCompressor,this->samplerate);
+        this->fetCompressor->SetSamplingRate(this->samplerate);
     }
     if (this->dynamicSystem != nullptr) {
-        DynamicSystem::SetSamplingRate(this->dynamicSystem,this->samplerate);
+        this->dynamicSystem->SetSamplingRate(this->samplerate);
     }
     if (this->vbass != nullptr) {
-        ViPERBass::SetSamplingRate(this->vbass,this->samplerate);
+        this->vbass->SetSamplingRate(this->samplerate);
     }
     if (this->vclarity != nullptr) {
-        ViPERClarity::SetSamplingRate(this->vclarity,this->samplerate);
+        this->vclarity->SetSamplingRate(this->samplerate);
     }
     if (this->diffSurround != nullptr) {
-        DiffSurround::SetSamplingRate(this->diffSurround,this->samplerate);
+        this->diffSurround->SetSamplingRate(this->samplerate);
     }
     if (this->cure != nullptr) {
-        Cure::SetSamplingRate(this->cure,this->samplerate);
+        this->cure->SetSamplingRate(this->samplerate);
     }
     if (this->analogx != nullptr) {
-        AnalogX::SetSamplingRate(this->analogx,this->samplerate);
+        this->analogx->SetSamplingRate(this->samplerate);
     }
     if (this->speakerCorrection != nullptr) {
-        SpeakerCorrection::SetSamplingRate(this->speakerCorrection,this->samplerate);
+        this->speakerCorrection->SetSamplingRate(this->samplerate);
     }
     if (this->floatIntBuffer != nullptr) {
-        AdaptiveBuffer_FPI32::FlushBuffer(this->floatIntBuffer);
+        this->floatIntBuffer->FlushBuffer();
     }
     if (this->waveBuffer != nullptr) {
-        WaveBuffer_R32::Reset(this->waveBuffer);
+        this->waveBuffer->Reset();
     }
     if (this->convolver != nullptr) {
-        Convolver::Reset(this->convolver);
+        this->convolver->Reset();
     }
     if (this->vhe != nullptr) {
-        VHE::Reset(this->vhe);
+        this->vhe->Reset();
     }
     if (this->vddc != nullptr) {
-        ViPERDDC::Reset(this->vddc);
+        this->vddc->Reset();
     }
     if (this->spectrumExtend != nullptr) {
-        SpectrumExtend::Reset();
+        this->spectrumExtend->Reset();
     }
     if (this->iirFilter != nullptr) {
-        IIRFilter::Reset(this->iirFilter);
+        this->iirFilter->Reset();
     }
     if (this->colorful != nullptr) {
-        ColorfulMusic::Reset(this->colorful);
+        this->colorful->Reset();
     }
     if (this->reverb != nullptr) {
-        Reverberation::Reset(this->reverb);
+        this->reverb->Reset();
     }
     if (this->playbackGain != nullptr) {
-        PlaybackGain::Reset(this->playbackGain);
+        this->playbackGain->Reset();
     }
     if (this->fetCompressor != nullptr) {
-        FETCompressor::Reset(this->fetCompressor);
+        this->fetCompressor->Reset();
     }
     if (this->dynamicSystem != nullptr) {
-        DynamicSystem::Reset(this->dynamicSystem);
+        this->dynamicSystem->Reset();
     }
     if (this->vbass != nullptr) {
-        ViPERBass::Reset();
+        this->vbass->Reset();
     }
     if (this->vclarity != nullptr) {
-        ViPERClarity::Reset(this->vclarity);
+        this->vclarity->Reset();
     }
     if (this->diffSurround != nullptr) {
-        DiffSurround::Reset(this->diffSurround);
+        this->diffSurround->Reset();
     }
     if (this->cure != nullptr) {
-        Cure::Reset(this->cure);
+        this->cure->Reset();
     }
     if (this->tubeSim != nullptr) {
-        TubeSimulator::Reset(this->tubeSim);
+        this->tubeSim->Reset();
     }
     if (this->analogx != nullptr) {
-        AnalogX::Reset(this->analogx);
+        this->analogx->Reset();
     }
     if (this->speakerCorrection != nullptr) {
-        SpeakerCorrection::Reset(this->speakerCorrection);
+        this->speakerCorrection->Reset();
     }
     if (this->softLimit1 != nullptr) {
-        SoftwareLimiter::ResetLimiter(this->softLimit1);
+        this->softLimit1->ResetLimiter();
     }
-    if (this->softLimit2 == nullptr) {
-        return;
+    if (this->softLimit2 != nullptr) {
+        this->softLimit2->ResetLimiter();
     }
-    SoftwareLimiter::ResetLimiter(this->softLimit2);
     return;
 }
 
@@ -531,7 +448,7 @@ void ProcessUnit_FX::DispatchCommand(int param_1,int param_2,int param_3,int par
     if (param_1 < 0x10034) {
         if (param_1 == 0x10016) {
             if (this->diffSurround != nullptr) {
-                DiffSurround::SetDelayTime(this->diffSurround,in_s0);
+                this->diffSurround->SetDelayTime(in_s0);
             }
             goto LAB_00071250;
         }
@@ -547,14 +464,14 @@ void ProcessUnit_FX::DispatchCommand(int param_1,int param_2,int param_3,int par
             if (0x10024 < param_1) {
                 if (param_1 == 0x1002b) {
                     if (this->vclarity != nullptr) {
-                        ViPERClarity::SetProcessMode(this->vclarity,param_2);
+                        this->vclarity->SetProcessMode(param_2);
                     }
                     goto LAB_00071250;
                 }
                 if (param_1 < 0x1002c) {
                     if (param_1 == 0x10027) {
                         if (this->vbass != nullptr) {
-                            ViPERBass::SetProcessMode(this->vbass,param_2);
+                            this->vbass->SetProcessMode(param_2);
                         }
                     }
                     else {
@@ -568,7 +485,7 @@ void ProcessUnit_FX::DispatchCommand(int param_1,int param_2,int param_3,int par
                             }
                             else {
                                 if ((param_1 == 0x10026) && (this->vbass != nullptr)) {
-                                    ViPERBass::SetEnable(this->vbass,bVar1);
+                                    this->vbass->SetEnable(bVar1);
                                 }
                             }
                         }
@@ -586,7 +503,7 @@ void ProcessUnit_FX::DispatchCommand(int param_1,int param_2,int param_3,int par
                                 }
                                 else {
                                     if (this->vclarity != nullptr) {
-                                        ViPERClarity::SetEnable(this->vclarity,bVar1);
+                                        this->vclarity->SetEnable(bVar1);
                                     }
                                 }
                             }
@@ -607,13 +524,13 @@ void ProcessUnit_FX::DispatchCommand(int param_1,int param_2,int param_3,int par
                 if (param_1 < 0x10030) {
                     if (param_1 == 0x1002d) {
                         if (this->cure != nullptr) {
-                            Cure::SetEnable(this->cure,bVar1);
+                            this->cure->SetEnable(bVar1);
                         }
                     }
                     else {
                         if (param_1 < 0x1002e) {
                             if (this->vclarity != nullptr) {
-                                ViPERClarity::SetClarity(this->vclarity,in_s0);
+                                this->vclarity->SetClarity(in_s0);
                             }
                         }
                         else {
@@ -678,7 +595,7 @@ void ProcessUnit_FX::DispatchCommand(int param_1,int param_2,int param_3,int par
             if (param_1 == 0x1001d) {
                 LAB_00071f48:
                 if (this->playbackGain != nullptr) {
-                    PlaybackGain::SetEnable(this->playbackGain,bVar1);
+                    this->playbackGain->SetEnable(bVar1);
                 }
                 goto LAB_00071250;
             }
@@ -686,7 +603,7 @@ void ProcessUnit_FX::DispatchCommand(int param_1,int param_2,int param_3,int par
                 if (param_1 == 0x10020) {
                     LAB_00071644:
                     if (this->playbackGain != nullptr) {
-                        PlaybackGain::SetMaxGainFactor(this->playbackGain,in_s0);
+                        this->playbackGain->SetMaxGainFactor(in_s0);
                     }
                     goto LAB_00071250;
                 }
@@ -700,7 +617,7 @@ void ProcessUnit_FX::DispatchCommand(int param_1,int param_2,int param_3,int par
                     else {
                         if (param_1 < 0x10023) {
                             if (this->dynamicSystem != nullptr) {
-                                DynamicSystem::SetEnable(this->dynamicSystem,bVar1);
+                                this->dynamicSystem->SetEnable(bVar1);
                             }
                         }
                         else {
@@ -715,21 +632,21 @@ void ProcessUnit_FX::DispatchCommand(int param_1,int param_2,int param_3,int par
                 if (param_1 == 0x1001e) {
                     LAB_00071b1c:
                     if (this->playbackGain != nullptr) {
-                        PlaybackGain::SetRatio(this->playbackGain,in_s0);
+                        this->playbackGain->SetRatio(in_s0);
                     }
                     goto LAB_00071250;
                 }
                 if (param_1 != 0x1001f) goto LAB_00071250;
                 LAB_00071564:
                 if (this->playbackGain != nullptr) {
-                    PlaybackGain::SetVolume(this->playbackGain,in_s0);
+                    this->playbackGain->SetVolume(in_s0);
                 }
                 goto LAB_00071250;
             }
             if (param_1 == 0x10019) {
                 LAB_00071918:
                 if (this->reverb != nullptr) {
-                    Reverberation::SetWidth(this->reverb,(int)((float)(longlong)param_2 / 100.0));
+                    this->reverb->SetWidth((int)((float)(longlong)param_2 / 100.0));
                 }
                 goto LAB_00071250;
             }
@@ -748,7 +665,7 @@ void ProcessUnit_FX::DispatchCommand(int param_1,int param_2,int param_3,int par
         }
         if (param_1 == 0x10008) {
             if (this->vhe != nullptr) {
-                VHE::SetEnable(this->vhe,bVar1);
+                this->vhe->SetEnable(bVar1);
             }
             goto LAB_00071250;
         }
@@ -756,14 +673,14 @@ void ProcessUnit_FX::DispatchCommand(int param_1,int param_2,int param_3,int par
             if (param_1 == 0x1000f) {
                 LAB_00071d64:
                 if (this->iirFilter != nullptr) {
-                    IIRFilter::SetEnable(this->iirFilter,bVar1);
+                    this->iirFilter->SetEnable(bVar1);
                 }
                 goto LAB_00071250;
             }
             if (param_1 < 0x10010) {
                 if (param_1 == 0x1000b) {
                     if (((this->vddc != nullptr) && (param_6 - 1U < 0x7f)) && (param_7 != nullptr)) {
-                        ViPERDDC::SetCoeffs(this->vddc,param_6,(float *)param_7,(float *)(param_7 + param_6 * 4)
+                        this->vddc->SetCoeffs(param_6,(float *)param_7,(float *)(param_7 + param_6 * 4)
                         );
                     }
                 }
@@ -771,30 +688,30 @@ void ProcessUnit_FX::DispatchCommand(int param_1,int param_2,int param_3,int par
                     if (param_1 < 0x1000c) {
                         if (param_1 == 0x10009) {
                             if (this->vhe != nullptr) {
-                                VHE::SetEffectLevel(this->vhe,param_2);
+                                this->vhe->SetEffectLevel(param_2);
                             }
                         }
                         else {
                             if ((param_1 == 0x1000a) && (this->vddc != nullptr)) {
-                                ViPERDDC::SetEnable(this->vddc,bVar1);
+                                this->vddc->SetEnable(bVar1);
                             }
                         }
                     }
                     else {
                         if (param_1 == 0x1000d) {
                             if (this->spectrumExtend != nullptr) {
-                                SpectrumExtend::SetReferenceFrequency(this->spectrumExtend,param_2);
+                                this->spectrumExtend->SetReferenceFrequency(param_2);
                             }
                         }
                         else {
                             if (param_1 < 0x1000e) {
                                 if (this->spectrumExtend != nullptr) {
-                                    SpectrumExtend::SetEnable(this->spectrumExtend,bVar1);
+                                    this->spectrumExtend->SetEnable(bVar1);
                                 }
                             }
                             else {
                                 if (this->spectrumExtend != nullptr) {
-                                    SpectrumExtend::SetExciter(this->spectrumExtend,in_s0);
+                                    this->spectrumExtend->SetExciter(in_s0);
                                 }
                             }
                         }
@@ -812,7 +729,7 @@ void ProcessUnit_FX::DispatchCommand(int param_1,int param_2,int param_3,int par
             if (0x10012 < param_1) {
                 if (param_1 == 0x10014) {
                     if (this->colorful != nullptr) {
-                        ColorfulMusic::SetDepthValue(this->colorful,(short)param_2);
+                        this->colorful->SetDepthValue((short)param_2);
                     }
                 }
                 else {
@@ -824,7 +741,7 @@ void ProcessUnit_FX::DispatchCommand(int param_1,int param_2,int param_3,int par
                     }
                     else {
                         if (this->diffSurround != nullptr) {
-                            DiffSurround::SetEnable(this->diffSurround,bVar1);
+                            this->diffSurround->SetEnable(bVar1);
                         }
                     }
                 }
@@ -832,7 +749,7 @@ void ProcessUnit_FX::DispatchCommand(int param_1,int param_2,int param_3,int par
             }
             if (param_1 != 0x10010) {
                 if ((param_1 == 0x10011) && (this->colorful != nullptr)) {
-                    ColorfulMusic::SetEnable(this->colorful,bVar1);
+                    this->colorful->SetEnable(bVar1);
                 }
                 goto LAB_00071250;
             }
@@ -853,7 +770,7 @@ void ProcessUnit_FX::DispatchCommand(int param_1,int param_2,int param_3,int par
             if (param_1 == 0x10004) {
                 LAB_00071de0:
                 if (this->convolver != nullptr) {
-                    Convolver::PrepareKernelBuffer(this->convolver,param_2,param_3,param_4);
+                    this->convolver->PrepareKernelBuffer(param_2,param_3,param_4);
                 }
                 goto LAB_00071250;
             }
@@ -865,7 +782,7 @@ void ProcessUnit_FX::DispatchCommand(int param_1,int param_2,int param_3,int par
             if (param_1 == 0x10006) {
                 LAB_00071384:
                 if (this->convolver != nullptr) {
-                    Convolver::CommitKernelBuffer(this->convolver,param_2,param_3,param_4);
+                    this->convolver->CommitKernelBuffer(param_2,param_3,param_4);
                 }
                 goto LAB_00071250;
             }
@@ -970,31 +887,28 @@ void ProcessUnit_FX::DispatchCommand(int param_1,int param_2,int param_3,int par
                                 "[DN] *Memory pool corrupted, this may caused by lacking of memory");
             __android_log_print(4,"ViPER4Android_v2",
                                 "[DN] *Rebuilding memory pool and re-initialize all sub effects");
-            pAVar8 = this->floatIntBuffer;
-            if (pAVar8 != nullptr) {
-                AdaptiveBuffer_FPI32::~AdaptiveBuffer_FPI32(pAVar8);
-                operator_delete(pAVar8);
+
+            if (this->floatIntBuffer != nullptr) {
+                delete this->floatIntBuffer;
+                this->floatIntBuffer = nullptr;
             }
-            pWVar9 = this->waveBuffer;
-            this->floatIntBuffer = nullptr;
-            if (pWVar9 != nullptr) {
-                WaveBuffer_R32::~WaveBuffer_R32(pWVar9);
-                operator_delete(pWVar9);
+
+            if (this->waveBuffer != nullptr) {
+                delete this->waveBuffer;
+                this->waveBuffer = nullptr;
             }
-            pCVar10 = this->convolver;
-            this->waveBuffer = nullptr;
-            if (pCVar10 != nullptr) {
-                Convolver::~Convolver(pCVar10);
-                operator_delete(pCVar10);
+
+            if (this->convolver != nullptr) {
+                delete this->convolver;
+                this->convolver = nullptr;
             }
-            pVVar11 = this->vhe;
-            this->convolver = nullptr;
-            if (pVVar11 != nullptr) {
-                VHE::~VHE(pVVar11);
-                operator_delete(pVVar11);
+
+            if (this->vhe != nullptr) {
+                delete this->vhe;
+                this->vhe = nullptr;
             }
+
             pVVar12 = this->vddc;
-            this->vhe = nullptr;
             if (pVVar12 != nullptr) {
                 ViPERDDC::~ViPERDDC(pVVar12);
                 operator_delete(pVVar12);
@@ -1315,7 +1229,7 @@ void ProcessUnit_FX::DispatchCommand(int param_1,int param_2,int param_3,int par
                 if (param_1 == 0x1003a) {
                     LAB_000715b8:
                     if (this->convolver != nullptr) {
-                        Convolver::SetCrossChannel(this->convolver,in_s0);
+                        this->convolver->SetCrossChannel(in_s0);
                     }
                     goto LAB_00071250;
                 }
@@ -1323,7 +1237,7 @@ void ProcessUnit_FX::DispatchCommand(int param_1,int param_2,int param_3,int par
                     if (param_1 == 0x1003d) {
                         LAB_00071900:
                         if (this->reverb != nullptr) {
-                            Reverberation::SetEnable(this->reverb,bVar1);
+                            this->reverb->SetEnable(bVar1);
                         }
                         goto LAB_00071250;
                     }
@@ -1332,13 +1246,13 @@ void ProcessUnit_FX::DispatchCommand(int param_1,int param_2,int param_3,int par
                             if (0x1003f < param_1) {
                                 LAB_000707e4:
                                 if (this->reverb != nullptr) {
-                                    Reverberation::SetDamp(this->reverb,(int)((float)(longlong)param_2 / 100.0));
+                                    this->reverb->SetDamp((int)((float)(longlong)param_2 / 100.0));
                                 }
                                 goto LAB_00071250;
                             }
                             LAB_00071840:
                             if (this->reverb != nullptr) {
-                                Reverberation::SetRoomSize(this->reverb,(int)((float)(longlong)param_2 / 100.0));
+                                this->reverb->SetRoomSize((int)((float)(longlong)param_2 / 100.0));
                             }
                             goto LAB_00071250;
                         }
@@ -1354,7 +1268,7 @@ void ProcessUnit_FX::DispatchCommand(int param_1,int param_2,int param_3,int par
                         memset(acStack292,0,0x100);
                         memcpy(acStack292,param_7,param_6);
                         if (this->convolver != nullptr) {
-                            Convolver::SetKernel(this->convolver,acStack292);
+                            this->convolver->SetKernel(acStack292);
                         }
                     }
                     goto LAB_00071250;
@@ -1368,7 +1282,7 @@ void ProcessUnit_FX::DispatchCommand(int param_1,int param_2,int param_3,int par
                         }
                         if (((param_7 != nullptr && param_6 != 0) && -1 < (int)psVar2) && (this->convolver != nullptr)
                                 ) {
-                            Convolver::SetKernelBuffer(this->convolver,param_2,(float *)param_7,param_6);
+                            this->convolver->SetKernelBuffer(param_2,(float *)param_7,param_6);
                         }
                         goto LAB_00071250;
                     }
@@ -1379,7 +1293,7 @@ void ProcessUnit_FX::DispatchCommand(int param_1,int param_2,int param_3,int par
                     if (param_1 != 0x10035) goto LAB_00071250;
                     LAB_000717e4:
                     if (this->convolver != nullptr) {
-                        Convolver::SetEnable(this->convolver,bVar1);
+                        this->convolver->SetEnable(bVar1);
                     }
                     goto LAB_00071250;
                 }
@@ -1391,13 +1305,13 @@ void ProcessUnit_FX::DispatchCommand(int param_1,int param_2,int param_3,int par
                         if (param_1 < 0x10045) {
                             if (param_1 != 0x10042) {
                                 if ((param_1 == 0x10043) && (this->speakerCorrection != nullptr)) {
-                                    SpeakerCorrection::SetEnable(this->speakerCorrection,bVar1);
+                                    this->speakerCorrection->SetEnable(bVar1);
                                 }
                                 goto LAB_00071250;
                             }
                             LAB_00071608:
                             if (this->reverb != nullptr) {
-                                Reverberation::SetDry(this->reverb,(int)((float)(longlong)param_2 / 100.0));
+                                this->reverb->SetDry((int)((float)(longlong)param_2 / 100.0));
                             }
                             goto LAB_00071250;
                         }
@@ -1436,7 +1350,7 @@ void ProcessUnit_FX::DispatchCommand(int param_1,int param_2,int param_3,int par
         }
         LAB_00071b78:
         if (this->reverb != nullptr) {
-            Reverberation::SetWet(this->reverb,(int)((float)(longlong)param_2 / 100.0));
+            this->reverb->SetWet((int)((float)(longlong)param_2 / 100.0));
         }
         goto LAB_00071250;
     }
@@ -1475,7 +1389,7 @@ void ProcessUnit_FX::DispatchCommand(int param_1,int param_2,int param_3,int par
                         else {
                             if (this->field_0x88 == 0) {
                                 FETCompressor::SetParameter((int)pFVar17,in_s0);
-                                FETCompressor::Reset(this->fetCompressor);
+                                this->fetCompressor->Reset();
                                 this->field_0x88 = 1;
                             }
                             else {
@@ -1640,7 +1554,7 @@ int ProcessUnit_FX::processBuffer(short *param_1,int param_2) {
         *(int *)((int)&this->field_0x70 + 4) = iVar8 >> 0x1f;
     }
     if (iVar5 == 2) {
-        iVar5 = Convolver::GetEnabled(this->convolver);
+        iVar5 = this->convolver->GetEnabled();
         if (iVar5 == 0) {
             iVar5 = this->field_0x7c;
             goto LAB_000724c0;
@@ -1651,36 +1565,36 @@ int ProcessUnit_FX::processBuffer(short *param_1,int param_2) {
             iVar8 = 1;
         }
         LAB_00072624:
-        iVar5 = WaveBuffer_R32::PushSamples(this->waveBuffer,param_1,param_2);
+        iVar5 = this->waveBuffer->PushSamples(param_1,param_2);
         if (iVar5 == 0) {
-            WaveBuffer_R32::Reset(this->waveBuffer);
+            this->waveBuffer->Reset();
             return 0;
         }
-        pfVar3 = (float *)WaveBuffer_R32::GetCurrentBufferR32Ptr(this->waveBuffer);
-        uVar4 = Convolver::Process(this->convolver,pfVar3,pfVar3,param_2);
+        pfVar3 = (float *)this->waveBuffer->GetCurrentBufferR32Ptr();
+        uVar4 = this->convolver->Process(pfVar3,pfVar3,param_2);
         if (iVar8 != 0) {
-            uVar4 = VHE::Process(this->vhe,pfVar3,pfVar3,uVar4);
+            uVar4 = this->vhe->Process(pfVar3,pfVar3,uVar4);
         }
-        WaveBuffer_R32::SetBufferOffset(this->waveBuffer,uVar4);
-        iVar5 = AdaptiveBuffer_FPI32::PushZero(this->floatIntBuffer,uVar4);
+        this->waveBuffer->SetBufferOffset(uVar4);
+        iVar5 = this->floatIntBuffer->PushZero(uVar4);
         if (iVar5 == 0) {
-            WaveBuffer_R32::Reset(this->waveBuffer);
-            AdaptiveBuffer_FPI32::FlushBuffer(this->floatIntBuffer);
+            this->waveBuffer->Reset();
+            this->floatIntBuffer->FlushBuffer();
             return 0;
         }
         this_01 = this->waveBuffer;
-        piVar2 = (int *)AdaptiveBuffer_FPI32::GetBufferPointer(this->floatIntBuffer);
+        piVar2 = (int *)this->floatIntBuffer->GetBufferPointer();
         uVar4 = WaveBuffer_R32::PopSamples(this_01,piVar2,uVar4,true);
-        AdaptiveBuffer_FPI32::SetBufferOffset(this->floatIntBuffer,uVar4);
-        piVar2 = (int *)AdaptiveBuffer_FPI32::GetBufferPointer(this->floatIntBuffer);
+        this->floatIntBuffer->SetBufferOffset(uVar4);
+        piVar2 = (int *)this->floatIntBuffer->GetBufferPointer();
         if (uVar4 == 0) goto LAB_000726cc;
     }
     else {
         LAB_000724c0:
         if (iVar5 == 1) {
-            iVar5 = Convolver::GetEnabled(this->convolver);
+            iVar5 = this->convolver->GetEnabled();
             if (iVar5 != 0) goto LAB_00072618;
-            iVar5 = VHE::GetEnabled(this->vhe);
+            iVar5 = this->vhe->GetEnabled();
             iVar8 = this->field_0x7c + -2;
             if (iVar8 != 0) {
                 iVar8 = 1;
@@ -1689,48 +1603,48 @@ int ProcessUnit_FX::processBuffer(short *param_1,int param_2) {
             goto LAB_00072624;
         }
         LAB_000724c8:
-        iVar5 = AdaptiveBuffer_FPI32::PushFrames(this->floatIntBuffer,param_1,param_2);
+        iVar5 = this->floatIntBuffer->PushFrames(param_1,param_2);
         this_00 = this->floatIntBuffer;
         if (iVar5 == 0) goto LAB_0007270c;
         AdaptiveBuffer_FPI32::SetBufferOffset(this_00,param_2);
-        piVar2 = (int *)AdaptiveBuffer_FPI32::GetBufferPointer(this->floatIntBuffer);
+        piVar2 = (int *)this->floatIntBuffer->GetBufferPointer();
         uVar4 = param_2;
     }
     if (this->field_0x7c == 1) {
-        ViPERDDC::Process(this->vddc,piVar2,param_2);
-        SpectrumExtend::Process(this->spectrumExtend,piVar2,param_2);
-        IIRFilter::Process(this->iirFilter,piVar2,uVar4);
-        ColorfulMusic::Process(this->colorful,piVar2,uVar4);
-        DiffSurround::Process(this->diffSurround,piVar2,uVar4);
-        Reverberation::Process(this->reverb,piVar2,uVar4);
-        PlaybackGain::Process(this->playbackGain,piVar2,uVar4);
+        this->vddc->Process(piVar2,param_2);
+        this->spectrumExtend->Process(piVar2,param_2);
+        this->iirFilter->Process(piVar2,uVar4);
+        this->colorful->Process(piVar2,uVar4);
+        this->diffSurround->Process(piVar2,uVar4);
+        this->reverb->Process(piVar2,uVar4);
+        this->playbackGain->Process(piVar2,uVar4);
         if (this->field_0x88 != 0) {
-            FETCompressor::Process(this->fetCompressor,piVar2,uVar4);
+            this->fetCompressor->Process(piVar2,uVar4);
         }
-        DynamicSystem::Process(this->dynamicSystem,piVar2,uVar4);
-        ViPERBass::Process(this->vbass,piVar2,uVar4);
-        ViPERClarity::Process(this->vclarity,piVar2,uVar4);
-        Cure::Process(this->cure,piVar2,uVar4);
-        TubeSimulator::TubeProcess(this->tubeSim,piVar2,param_2);
-        AnalogX::Process(this->analogx,piVar2,uVar4);
+        this->dynamicSystem->Process(piVar2,uVar4);
+        this->vbass->Process(piVar2,uVar4);
+        this->vclarity->Process(piVar2,uVar4);
+        this->cure->Process(piVar2,uVar4);
+        this->tubeSim->TubeProcess(piVar2,param_2);
+        this->analogx->Process(piVar2,uVar4);
     }
     else {
         if (this->field_0x7c == 2) {
-            IIRFilter::Process(this->iirFilter,piVar2,uVar4);
-            Reverberation::Process(this->reverb,piVar2,uVar4);
-            SpeakerCorrection::Process(this->speakerCorrection,piVar2,uVar4);
-            PlaybackGain::Process(this->playbackGain,piVar2,uVar4);
+            this->iirFilter->Process(piVar2,uVar4);
+            this->reverb->Process(piVar2,uVar4);
+            this->speakerCorrection->Process(piVar2,uVar4);
+            this->playbackGain->Process(piVar2,uVar4);
             if (this->field_0x88 != 0) {
-                FETCompressor::Process(this->fetCompressor,piVar2,uVar4);
+                this->fetCompressor->Process(piVar2,uVar4);
             }
         }
     }
     if (this->field_0xd8 != 0x2000000) {
-        AdaptiveBuffer_FPI32::ScaleFrames(this->floatIntBuffer,this->field_0xd8);
+        this->floatIntBuffer->ScaleFrames(this->field_0xd8);
     }
     if ((((int)this->field_0xdc < 0x2000000) || ((int)this->field_0xe0 < 0x2000000)) &&
         (this->field_0x7c == 1)) {
-        AdaptiveBuffer_FPI32::PanFrames(this->floatIntBuffer,this->field_0xdc,this->field_0xe0);
+        this->floatIntBuffer->PanFrames(this->field_0xdc,this->field_0xe0);
     }
     if (uVar4 << 1 != 0) {
         uVar7 = 0;
@@ -1745,7 +1659,7 @@ int ProcessUnit_FX::processBuffer(short *param_1,int param_2) {
             piVar6 = piVar6 + 2;
         } while (uVar7 < uVar4 << 1);
     }
-    iVar5 = AdaptiveBuffer_FPI32::PopFrames(this->floatIntBuffer,param_1,uVar4);
+    iVar5 = this->floatIntBuffer->PopFrames(param_1,uVar4);
     if (iVar5 == 0) {
         this_00 = this->floatIntBuffer;
         LAB_0007270c:
