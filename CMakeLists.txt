@@ -5,7 +5,12 @@ project("ViPER4Android Reworked")
 set(CMAKE_CXX_COMPILER_VERSION 20)
 
 include_directories(include/)
-message(${ANDROID_NDK}/include/)
+
+add_compile_definitions(VERSION_MAJOR=1)
+add_compile_definitions(VERSION_MINOR=0)
+add_compile_definitions(VERSION_REVISION=0)
+add_compile_definitions(VERSION_BUILD=0)
+add_compile_definitions(VERSION_CODENAME="Reworked")
 
 set(FILES
         # Main
@@ -39,3 +44,7 @@ add_library(
         # Provides a relative path to your source file(s).
         ${FILES})
 
+target_link_libraries(
+        v4afx_r
+        log
+)

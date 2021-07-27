@@ -4,9 +4,11 @@
 
 #include "ProcessUnit_FX.h"
 #include "Effect.h"
+#include "constants.h"
 
 ProcessUnit_FX::ProcessUnit_FX() {
-
+    v4a_print(ANDROID_LOG_INFO, "Welcome to ViPER4Android Reworked driver[SQ]");
+    v4a_printf(ANDROID_LOG_INFO, "Current version is %s %s", VERSION_STRING, VERSION_CODENAME);
 }
 
 ProcessUnit_FX::~ProcessUnit_FX() {

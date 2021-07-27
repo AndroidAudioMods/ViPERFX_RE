@@ -136,7 +136,7 @@ static inline audio_unique_id_use_t audio_unique_id_get_use(audio_unique_id_t id
  */
 typedef uint32_t audio_channel_mask_t;
 
-/* log(2) of maximum number of representations, not part of public API */
+/* v4a_print(2) of maximum number of representations, not part of public API */
 #define AUDIO_CHANNEL_REPRESENTATION_LOG2   2
 
 /* The return value is undefined if the channel mask is invalid. */

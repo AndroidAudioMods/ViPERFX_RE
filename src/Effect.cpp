@@ -70,40 +70,45 @@ int32_t Effect::command(uint32_t cmdCode, uint32_t cmdSize, void *pCmdData, uint
     return 0;
 }
 
-#define ERROR this->configureOk = false;\
-return -EINVAL;
+#define DO_ERROR() this->configureOk = false;\
+return -EINVAL
 
 int32_t Effect::configure(effect_config_t *newConfig) {
+    v4a_print(ANDROID_LOG_INFO, "Begin audio configure ...");
+    v4a_print(ANDROID_LOG_INFO, "Checking input and output configuration ...");
+    
     if (newConfig->inputCfg.samplingRate != newConfig->outputCfg.samplingRate) {
-        // __android_log_print(4,"ViPER4Android_v2","ViPER4Android disabled, reason [in.SR = %d, out.SR = %d]",inSamplingRate,outSamplingRate);
-        ERROR
+        v4a_printf(ANDROID_LOG_ERROR, "ViPER4Android disabled, reason [in.SR = %d, out.SR = %d]", newConfig->inputCfg.samplingRate, newConfig->outputCfg.samplingRate);
+        DO_ERROR();
     }
 
     if (newConfig->inputCfg.samplingRate > 48000) {
-        // __android_log_print(4,"ViPER4Android_v2","ViPER4Android disabled, reason [SR out of range]");
-        ERROR
+        v4a_print(ANDROID_LOG_ERROR, "ViPER4Android disabled, reason [SR out of range]");
+        DO_ERROR();
     }
 
     if (newConfig->inputCfg.channels != newConfig->outputCfg.channels) {
-        // __android_log_print(4,"ViPER4Android_v2","ViPER4Android disabled, reason [in.CH = %d, out.CH = %d]",inChannels,outChannels);
-        ERROR
+        v4a_printf(ANDROID_LOG_ERROR, "ViPER4Android disabled, reason [in.CH = %d, out.CH = %d]", newConfig->inputCfg.channels, newConfig->outputCfg.channels);
+        DO_ERROR();
     }
 
     if (newConfig->inputCfg.channels != AUDIO_CHANNEL_OUT_STEREO) {
-        // __android_log_print(4,"ViPER4Android_v2","ViPER4Android disabled, reason [CH != 2]");
-        ERROR
+        v4a_print(ANDROID_LOG_ERROR, "ViPER4Android disabled, reason [CH != 2]");
+        DO_ERROR();
     }
+    
+    v4a_print(ANDROID_LOG_INFO, "Input and output configuration checked.");
 
 //    if (((inFormat & 0x80000) != 0) && ((outFormat & 0x80000) != 0)) {
 //        if ((inFormat & 0xfd) != 1) {
-//            __android_log_print(4,"ViPER4Android_v2","ViPER4Android disabled, reason [in.FMT = %d]");
-//            __android_log_print(4,"ViPER4Android_v2","We only accept s16 and fixed.31 format");
+//            v4a_printf(ANDROID_LOG_ERROR, "ViPER4Android disabled, reason [in.FMT = %d]");
+//            v4a_printf(ANDROID_LOG_ERROR, "We only accept s16 and fixed.31 format");
 //            this->configureOk = false;
 //            return 0xffffffea;
 //        }
 //        if ((outFormat & 0xfd) != 1) {
-//            __android_log_print(4,"ViPER4Android_v2","ViPER4Android disabled, reason [out.FMT = %d]");
-//            __android_log_print(4,"ViPER4Android_v2","We only accept s16 and fixed.31 format");
+//            v4a_printf(ANDROID_LOG_ERROR, "ViPER4Android disabled, reason [out.FMT = %d]");
+//            v4a_printf(ANDROID_LOG_ERROR, "We only accept s16 and fixed.31 format");
 //            this->configureOk = false;
 //            return 0xffffffea;
 //        }
@@ -111,6 +116,9 @@ int32_t Effect::configure(effect_config_t *newConfig) {
 
     memcpy(&this->config, newConfig, sizeof(effect_config_t));
     this->configureOk = true;
+    
+    v4a_print(ANDROID_LOG_INFO, "Audio configure finished");
+    
     return 0;
 }
 
