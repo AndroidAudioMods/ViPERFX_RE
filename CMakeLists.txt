@@ -4,7 +4,8 @@ project("ViPER4Android Reworked")
 
 set(CMAKE_CXX_COMPILER_VERSION 20)
 
-include_directories("include/")
+include_directories(include/)
+message(${ANDROID_NDK}/include/)
 
 set(FILES
         # Main

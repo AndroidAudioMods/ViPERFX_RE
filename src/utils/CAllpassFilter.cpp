@@ -13,7 +13,7 @@ CAllpassFilter::CAllpassFilter() {
 }
 
 void CAllpassFilter::Mute() {
-    memset(this->buffer, 0, this->bufsize * sizeof(float))
+    memset(this->buffer, 0, this->bufsize * sizeof(float));
 }
 
 float CAllpassFilter::Process(float sample) {

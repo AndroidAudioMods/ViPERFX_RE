@@ -6,7 +6,14 @@
 
 
 enum FilterType {
-
+    LOWPASS,
+    HIGHPASS,
+    BANDPASS,
+    BANDSTOP,
+    ALLPASS,
+    PEAK,
+    LOWSHELF,
+    HIGHSHELF
 };
 
 

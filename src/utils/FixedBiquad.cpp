@@ -69,7 +69,7 @@ void FixedBiquad::SetHighPassParameter(float frequency, uint32_t samplerate, flo
               fVar9 + fVar9,
               fVar11 - (fVar7 + fVar7) * fVar6,
               (fVar12 + (fVar7 + fVar7) * fVar6) * x * fVar2,
-              x * -2.0 * (fVar8 + fVar10 * fVar5) * fVar2,
+              x * -2.f * (fVar8 + fVar10 * fVar5) * fVar2,
               (fVar12 - (fVar7 + fVar7) * fVar6) * x * fVar2);
 }
 

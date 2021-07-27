@@ -12,7 +12,7 @@ IIR_1st::IIR_1st() {
     this->b0 = 0.f;
     this->b1 = 0.f;
     this->a1 = 0.f;
-    Mute()
+    Mute();
 }
 
 

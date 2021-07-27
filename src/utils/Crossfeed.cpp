@@ -50,7 +50,7 @@ void Crossfeed::Reset() {
 
 void Crossfeed::ProcessFrames(float* buffer, uint32_t size) {
     for (int x = 0; x < size; x+=2) {
-        FilterSample(&buffer[x])
+        FilterSample(&buffer[x]);
     }
 }
 
