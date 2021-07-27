@@ -15,6 +15,7 @@ public:
     void Mute();
     void ProcessReplace(float *bufL, float *bufR, uint32_t size);
     void UpdateCoeffs();
+    void Reset();
 
     void SetRoomSize(float value);
     void SetDamp(float value);

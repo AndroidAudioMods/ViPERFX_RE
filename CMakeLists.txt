@@ -20,6 +20,7 @@ set(FILES
 
         # Effects
         src/effects/Cure.cpp
+        src/effects/Reverberation.cpp
         src/effects/TubeSimulator.cpp
 
         # Utils

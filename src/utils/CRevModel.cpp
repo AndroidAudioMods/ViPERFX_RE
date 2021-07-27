@@ -144,6 +144,18 @@ void CRevModel::UpdateCoeffs() {
     }
 }
 
+void CRevModel::Reset() {
+    for (int i=0; i<8; i++) {
+        combL[i].Mute();
+        combR[i].Mute();
+    }
+
+    for(int i=0; i<4; i++) {
+        allpassL[i].Mute();
+        allpassR[i].Mute();
+    }
+}
+
 void CRevModel::SetRoomSize(float value) {
     roomsize = (value*0.28f) + 0.7f;
     UpdateCoeffs();
@@ -193,7 +205,7 @@ float CRevModel::GetWidth() {
     return width;
 }
 
-float CRevModel::GetMode() {
+int CRevModel::GetMode() {
     if (mode == 1) {
         return 1.f;
     } else {
