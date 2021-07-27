@@ -753,7 +753,7 @@ enum effect_command_e
 //--------------------------------------------------------------------------------------------------
 // description:
 //  1.indicate if the playback thread the effect is attached to is offloaded or not
-//  2.update the io handle of the playback thread the effect is attached to
+//  2.UpdateCoeffs the io handle of the playback thread the effect is attached to
 //--------------------------------------------------------------------------------------------------
 // command format:
 //  size: sizeof(effect_offload_param_t)

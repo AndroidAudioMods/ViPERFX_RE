@@ -24,6 +24,8 @@ set(FILES
 
         # Utils
         src/utils/CAllpassFilter.cpp
+        src/utils/CCombFilter.cpp
+        src/utils/CRevModel.cpp
         src/utils/Crossfeed.cpp
         src/utils/FixedBiquad.cpp
         src/utils/IIR_1st.cpp
