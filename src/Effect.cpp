@@ -96,23 +96,22 @@ int32_t Effect::configure(effect_config_t *newConfig) {
         v4a_print(ANDROID_LOG_ERROR, "ViPER4Android disabled, reason [CH != 2]");
         DO_ERROR();
     }
-    
-    v4a_print(ANDROID_LOG_INFO, "Input and output configuration checked.");
 
-//    if (((inFormat & 0x80000) != 0) && ((outFormat & 0x80000) != 0)) {
-//        if ((inFormat & 0xfd) != 1) {
-//            v4a_printf(ANDROID_LOG_ERROR, "ViPER4Android disabled, reason [in.FMT = %d]");
-//            v4a_printf(ANDROID_LOG_ERROR, "We only accept s16 and fixed.31 format");
-//            this->configureOk = false;
-//            return 0xffffffea;
-//        }
-//        if ((outFormat & 0xfd) != 1) {
-//            v4a_printf(ANDROID_LOG_ERROR, "ViPER4Android disabled, reason [out.FMT = %d]");
-//            v4a_printf(ANDROID_LOG_ERROR, "We only accept s16 and fixed.31 format");
-//            this->configureOk = false;
-//            return 0xffffffea;
-//        }
-//    }
+    // TODO: Allow multiple formats by converting before/after processing
+
+    if (newConfig->inputCfg.format != AUDIO_FORMAT_PCM_FLOAT) {
+        v4a_printf(ANDROID_LOG_ERROR, "ViPER4Android disabled, reason [in.FMT = %d]", newConfig->inputCfg.format);
+        v4a_print(ANDROID_LOG_ERROR, "We only accept f32 format");
+        DO_ERROR();
+    }
+
+    if (newConfig->outputCfg.format != AUDIO_FORMAT_PCM_FLOAT) {
+        v4a_printf(ANDROID_LOG_ERROR, "ViPER4Android disabled, reason [out.FMT = %d]", newConfig->outputCfg.format);
+        v4a_print(ANDROID_LOG_ERROR, "We only accept f32 format");
+        DO_ERROR();
+    }
+
+    v4a_print(ANDROID_LOG_INFO, "Input and output configuration checked.");
 
     memcpy(&this->config, newConfig, sizeof(effect_config_t));
     this->configureOk = true;

@@ -28,6 +28,7 @@ set(FILES
         src/utils/CCombFilter.cpp
         src/utils/CRevModel.cpp
         src/utils/Crossfeed.cpp
+        src/utils/DepthSurround.cpp
         src/utils/FixedBiquad.cpp
         src/utils/IIR_1st.cpp
         src/utils/IIR_NOrder_BW_BP.cpp
