@@ -32,6 +32,7 @@ set(FILES
         src/utils/DepthSurround.cpp
         src/utils/DynamicBass.cpp
         src/utils/FixedBiquad.cpp
+        src/utils/HighShelf.cpp
         src/utils/IIR_1st.cpp
         src/utils/IIR_NOrder_BW_BP.cpp
         src/utils/IIR_NOrder_BW_LH.cpp
