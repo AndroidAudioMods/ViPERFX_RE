@@ -29,24 +29,24 @@ void PolesFilter::UpdateCoeff() {
 }
 
 inline void DoFilterSide(channel* side, float sample, float* out1, float* out2, float* out3) {
-    float oldestSampleIn = this->in[2];
-    this->in[2] = this->in[1];
-    this->in[1] = this->in[0];
-    this->in[0] = sample;
+    float oldestSampleIn = side->in[2];
+    side->in[2] = side->in[1];
+    side->in[1] = side->in[0];
+    side->in[0] = sample;
 
-    channel->x[0] += channel->lower_angle * (sample - channel->x[0]);
-    channel->x[1] += channel->lower_angle * (channel->x[0] - channel->x[1]);
-    channel->x[2] += channel->lower_angle * (channel->x[1] - channel->x[2]);
-    channel->x[3] += channel->lower_angle * (channel->x[2] - channel->x[3]);
+    side->x[0] += side->lower_angle * (sample - side->x[0]);
+    side->x[1] += side->lower_angle * (side->x[0] - side->x[1]);
+    side->x[2] += side->lower_angle * (side->x[1] - side->x[2]);
+    side->x[3] += side->lower_angle * (side->x[2] - side->x[3]);
 
-    channel->y[0] += channel->upper_angle * (sample - channel->y[0]);
-    channel->y[1] += channel->upper_angle * (channel->y[0] - channel->y[1]);
-    channel->y[2] += channel->upper_angle * (channel->y[1] - channel->y[2]);
-    channel->y[3] += channel->upper_angle * (channel->y[2] - channel->y[3]);
+    side->y[0] += side->upper_angle * (sample - side->y[0]);
+    side->y[1] += side->upper_angle * (side->y[0] - side->y[1]);
+    side->y[2] += side->upper_angle * (side->y[1] - side->y[2]);
+    side->y[3] += side->upper_angle * (side->y[2] - side->y[3]);
 
-    *out1 = channel->x[3];
-    *out2 = oldestSampleIn - channel->y[3];
-    *out3 = channel->y[3] - channel->x[3];
+    *out1 = side->x[3];
+    *out2 = oldestSampleIn - side->y[3];
+    *out3 = side->y[3] - side->x[3];
 }
 
 void PolesFilter::DoFilterLeft(float sample, float *out1, float *out2, float *out3) {

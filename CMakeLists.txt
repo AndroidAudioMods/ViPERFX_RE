@@ -20,6 +20,7 @@ set(FILES
 
         # Effects
         src/effects/Cure.cpp
+        src/effects/DynamicSystem.cpp
         src/effects/Reverberation.cpp
         src/effects/TubeSimulator.cpp
 
@@ -29,6 +30,7 @@ set(FILES
         src/utils/CRevModel.cpp
         src/utils/Crossfeed.cpp
         src/utils/DepthSurround.cpp
+        src/utils/DynamicBass.cpp
         src/utils/FixedBiquad.cpp
         src/utils/IIR_1st.cpp
         src/utils/IIR_NOrder_BW_BP.cpp
