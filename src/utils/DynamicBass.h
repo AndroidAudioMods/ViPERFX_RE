@@ -23,7 +23,7 @@ public:
     uint32_t lowFreqX, highFreqX;
     uint32_t lowFreqY, highFreqY;
     uint32_t samplerate;
-    uint32_t qPeak;
+    float qPeak;
     float bassGain;
     float sideGainX, sideGainY;
 

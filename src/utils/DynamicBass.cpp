@@ -14,25 +14,25 @@ DynamicBass::DynamicBass() {
     this->lowFreqX = 120;
     this->highFreqX = 80;
     this->lowFreqY = 40;
-    this->highFreqY = this->samplerate / 4.f;
+    this->highFreqY = (float)this->samplerate / 4.f;
 
     this->filterX.SetPassFilter(this->lowFreqX, this->highFreqX);
     this->filterY.SetPassFilter(this->lowFreqY, this->highFreqY);
-    this->lowPass.SetLowPassParameter(55.f, this->samplerate, this->qPeak / 666.f + 0.5f)
+    this->lowPass.SetLowPassParameter(55.f, this->samplerate, this->qPeak / 666.f + 0.5f);
 }
 
 void DynamicBass::Reset() {
     this->filterX.Reset();
     this->filterY.Reset();
-    this->lowPass.SetLowPassParameter(55.f, this->samplerate, this->qPeak / 666.f + 0.5f)
+    this->lowPass.SetLowPassParameter(55.f, this->samplerate, this->qPeak / 666.f + 0.5f);
 }
 
 void DynamicBass::FilterSamples(float *samples, uint32_t size) {
     if (this->lowFreqX <= 120) {
         for (int i = 0; i < size; i++) {
-            int left = samples[2*i];
-            int right = samples[2*i+1];
-            int avg = this->lowPass.ProcessSample(left + right);
+            float left = samples[2*i];
+            float right = samples[2*i+1];
+            float avg = this->lowPass.ProcessSample(left + right);
             samples[2*i] = left + avg;
             samples[2*i+1] = right + avg;
         }
