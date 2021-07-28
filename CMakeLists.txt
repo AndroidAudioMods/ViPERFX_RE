@@ -36,6 +36,7 @@ set(FILES
         src/utils/IIR_NOrder_BW_BP.cpp
         src/utils/IIR_NOrder_BW_LH.cpp
         src/utils/MultiBiquad.cpp
+        src/utils/NoiseSharpening.cpp
         src/utils/PassFilter.cpp
         src/utils/PolesFilter.cpp
         src/utils/TimeConstDelay.cpp
