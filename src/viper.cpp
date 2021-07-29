@@ -100,7 +100,7 @@ extern "C" {
     }
 
     audio_effect_library_t AUDIO_EFFECT_LIBRARY_INFO_SYM = {
-        .tag =  ((('A') << 24) | (('E') << 16) | (('L') << 8) | ('I')),
+        .tag = AUDIO_EFFECT_LIBRARY_TAG,
         .version = 0x30000,
         .name = "ViPER4Android FX Reworked",
         .implementor = "ViPER.WYF, Martmists, Iscle",

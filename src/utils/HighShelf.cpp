@@ -23,7 +23,7 @@ void HighShelf::SetGain(float gain) {
 }
 
 void HighShelf::SetQuality(float q) {
-    this->quality = q
+    this->quality = q;
 }
 
 void HighShelf::SetSamplingRate(uint32_t samplerate) {
