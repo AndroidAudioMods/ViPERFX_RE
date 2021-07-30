@@ -19,9 +19,11 @@ set(FILES
         src/viper.cpp
 
         # Effects
+        src/effects/AnalogX.cpp
         src/effects/Cure.cpp
         src/effects/DynamicSystem.cpp
         src/effects/Reverberation.cpp
+        src/effects/SpectrumExtend.cpp
         src/effects/TubeSimulator.cpp
 
         # Utils
@@ -32,6 +34,7 @@ set(FILES
         src/utils/DepthSurround.cpp
         src/utils/DynamicBass.cpp
         src/utils/FixedBiquad.cpp
+        src/utils/Harmonic.cpp
         src/utils/HighShelf.cpp
         src/utils/IIR_1st.cpp
         src/utils/IIR_NOrder_BW_BP.cpp
