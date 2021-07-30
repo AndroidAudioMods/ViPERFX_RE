@@ -19,7 +19,7 @@ public:
     bool enabled;
     bool configureOk;
     uint32_t sampleRate;
-    effect_config_t config{};
+    effect_config_t config;
     // Misc data here?
 
     // TODO: Figure out what buffer is used for
