@@ -11,6 +11,11 @@ To view the progress, see [Issue #2](https://github.com/AndroidAudioMods/ViPERFX
 - Run `make`
 - You should now find a `libv4afx_r.so` file in your project root.
 
+# CLion
+
+In CLion, make sure to set the following custom arguments: `-DCMAKE_TOOLCHAIN_FILE=<NDKROOT>/build/cmake/android.toolchain.cmake -DANDROID_ABI=<ABI> -G Ninja`
+Then you can build the project with `ninja` instead of `make`
+
 # Credits
 
 Zhuhang and ViPER520 for making ViPER4Android
