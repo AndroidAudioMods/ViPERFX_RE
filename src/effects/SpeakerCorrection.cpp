@@ -38,7 +38,9 @@ void SpeakerCorrection::Reset() {
 
 void SpeakerCorrection::SetEnable(bool enabled) {
     this->enabled = enabled;
-    Reset();
+    if (this->enabled) {
+        Reset();
+    }
 }
 
 void SpeakerCorrection::SetSamplingRate(uint32_t samplerate) {

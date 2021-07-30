@@ -21,6 +21,7 @@ set(FILES
         # Effects
         src/effects/AnalogX.cpp
         src/effects/Cure.cpp
+        src/effects/DiffSurround.cpp
         src/effects/DynamicSystem.cpp
         src/effects/Reverberation.cpp
         src/effects/SpeakerCorrection.cpp
@@ -46,6 +47,7 @@ set(FILES
         src/utils/PolesFilter.cpp
         src/utils/Subwoofer.cpp
         src/utils/TimeConstDelay.cpp
+        src/utils/WaveBuffer_I32.cpp
 )
 
 add_library(
