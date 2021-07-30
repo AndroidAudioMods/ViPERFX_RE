@@ -13,6 +13,7 @@ To view the progress, see [Issue #2](https://github.com/AndroidAudioMods/ViPERFX
 
 # CLion
 
+Make sure to install `ninja`
 In CLion, make sure to set the following custom arguments: `-DCMAKE_TOOLCHAIN_FILE=<NDKROOT>/build/cmake/android.toolchain.cmake -DANDROID_ABI=<ABI> -G Ninja`
 Then you can build the project with `ninja` instead of `make`
 

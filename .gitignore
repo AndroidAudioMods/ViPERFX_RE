@@ -4,6 +4,7 @@
 
 # User-specific stuff
 .idea/
+.cmake/
 .ninja_deps
 .ninja_log
 build.ninja

@@ -23,6 +23,7 @@ set(FILES
         src/effects/Cure.cpp
         src/effects/DynamicSystem.cpp
         src/effects/Reverberation.cpp
+        src/effects/SpeakerCorrection.cpp
         src/effects/SpectrumExtend.cpp
         src/effects/TubeSimulator.cpp
 
@@ -43,6 +44,7 @@ set(FILES
         src/utils/NoiseSharpening.cpp
         src/utils/PassFilter.cpp
         src/utils/PolesFilter.cpp
+        src/utils/Subwoofer.cpp
         src/utils/TimeConstDelay.cpp
 )
 
