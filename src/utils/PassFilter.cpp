@@ -40,23 +40,15 @@ void PassFilter::Reset() {
     this->filters[3]->Mute();
 }
 
-#define do_filter(filt, sample) \
-for (int idx = 0; idx < (filt)->order; idx++) {\
-    IIR_1st filter = this->filters[2]->filters[idx];\
-    float hist = (sample) * filter.b1;\
-    left = filter.prevSample + (sample) * filter.b0;\
-    filter.prevSample = (sample) * filter.a1 + hist;\
-}
-
 void PassFilter::ProcessFrames(float *buffer, uint32_t size) {
     for (int x = 0; x < size; x++) {
         float left = buffer[2*x];
         float right = buffer[2*x+1];
 
-        do_filter(this->filters[2], left)
-        do_filter(this->filters[0], left)
-        do_filter(this->filters[3], right)
-        do_filter(this->filters[1], right)
+        left = do_filter_lh(this->filters[2], left);
+        left = do_filter_lh(this->filters[0], left);
+        right = do_filter_lh(this->filters[3], right);
+        right = do_filter_lh(this->filters[1], right);
 
         buffer[2*x] = left;
         buffer[2*x+1] = right;

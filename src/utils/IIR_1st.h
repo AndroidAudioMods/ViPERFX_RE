@@ -30,3 +30,10 @@ public:
     float b0, b1, a1;
     float prevSample;
 };
+
+inline float do_filter(IIR_1st* filter, float sample) {
+    float hist = sample * filter->b1;
+    sample = filter->prevSample + sample * filter->b0;
+    filter->prevSample = sample * filter->a1 + hist;
+    return sample;
+}

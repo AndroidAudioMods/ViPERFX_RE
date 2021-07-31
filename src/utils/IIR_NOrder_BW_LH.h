@@ -18,3 +18,10 @@ public:
     IIR_1st* filters;
     uint32_t order;
 };
+
+inline float do_filter_lh(IIR_NOrder_BW_LH* filt, float sample) {
+    for (int idx = 0; idx < filt->order; idx++) {
+        sample = do_filter(&filt->filters[idx], sample);
+    }
+    return sample;
+}

@@ -27,6 +27,7 @@ set(FILES
         src/effects/SpeakerCorrection.cpp
         src/effects/SpectrumExtend.cpp
         src/effects/TubeSimulator.cpp
+        src/effects/ViPERClarity.cpp
 
         # Utils
         src/utils/CAllpassFilter.cpp
@@ -37,6 +38,7 @@ set(FILES
         src/utils/DynamicBass.cpp
         src/utils/FixedBiquad.cpp
         src/utils/Harmonic.cpp
+        src/utils/HiFi.cpp
         src/utils/HighShelf.cpp
         src/utils/IIR_1st.cpp
         src/utils/IIR_NOrder_BW_BP.cpp

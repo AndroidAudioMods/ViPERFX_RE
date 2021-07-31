@@ -19,3 +19,20 @@ public:
     uint32_t order;
 };
 
+inline float do_filter_bplp(IIR_NOrder_BW_BP* filt, float sample) {
+    for (int idx = 0; idx < filt->order; idx++) {
+        sample = do_filter(&filt->lowpass[idx], sample);
+    }
+    return sample;
+}
+
+inline float do_filter_bphp(IIR_NOrder_BW_BP* filt, float sample) {
+    for (int idx = 0; idx < filt->order; idx++) {
+        sample = do_filter(&filt->highpass[idx], sample);
+    }
+    return sample;
+}
+
+inline float do_filter_bp(IIR_NOrder_BW_BP* filt, float sample) {
+    return do_filter_bphp(filt, do_filter_bplp(filt, sample));
+}
