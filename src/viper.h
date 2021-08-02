@@ -7,14 +7,12 @@
 // Source: https://github.com/vipersaudio/viperfx_core_binary/blob/master/viperfx_intf.h
 
 extern "C" {
-    enum
-    {
+    enum ParamsMode {
         COMMAND_CODE_GET = 0x01,
         COMMAND_CODE_SET,
     };
 
-    enum
-    {
+    enum ParamsGet {
         PARAM_GET_STATUS_BEGIN = 0x08000,
         PARAM_GET_DRIVER_VERSION,
         PARAM_GET_NEONENABLED,
@@ -26,8 +24,7 @@ extern "C" {
         PARAM_GET_STATUS_END
     };
 
-    enum
-    {
+    enum ParamsSet {
         PARAM_SET_STATUS_BEGIN = 0x09000,
         PARAM_SET_RESET_STATUS,
         PARAM_SET_SAMPLINGRATE,
@@ -35,8 +32,7 @@ extern "C" {
         PARAM_SET_STATUS_END
     };
 
-    enum
-    {
+    enum ParamsConfigure {
         PARAM_PROCESSUNIT_FX_BEGIN = 0x10000,
 
         PARAM_FX_TYPE_SWITCH,
@@ -152,8 +148,7 @@ extern "C" {
         PARAM_PROCESSUNIT_FX_END
     };
 
-    enum
-    {
+    enum FxMode {
         ViPER_FX_TYPE_NONE = 0,
 
         ViPER_FX_TYPE_HEADPHONE = 1,

@@ -14,7 +14,7 @@ ViPERClarity::ViPERClarity() {
     }
 
     this->enabled = false;
-    this->processMode = 0;
+    this->processMode = ClarityMode::NATURAL;
     this->clarityGainPercent = 0.f;
     this->samplerate = DEFAULT_SAMPLERATE;
     Reset();
@@ -22,13 +22,14 @@ ViPERClarity::ViPERClarity() {
 
 void ViPERClarity::Process(float *samples, uint32_t size) {
     if (this->enabled) {
-        if (this->processMode == 0) {
+        if (this->processMode == ClarityMode::NATURAL) {
             this->sharp.Process(samples, size);
-        } else if (this->processMode == 1) {
+        } else if (this->processMode == ClarityMode::OZONE) {
             for (int i = 0; i < size * 2; i++) {
                 samples[i] = this->hiShelf[i % 2].Process(samples[i]);
             }
         } else {
+            // ClarityMode::XHIFI
             this->hifi.Process(samples, size);
         }
     }
@@ -49,7 +50,7 @@ void ViPERClarity::Reset() {
 
 void ViPERClarity::SetClarity(float gainPercent) {
     this->clarityGainPercent = gainPercent;
-    if (this->processMode != 1) {
+    if (this->processMode != ClarityMode::OZONE) {
         SetClarityToFilter();
     } else {
         Reset();
@@ -70,7 +71,7 @@ void ViPERClarity::SetEnable(bool enabled) {
     }
 }
 
-void ViPERClarity::SetProcessMode(int mode) {
+void ViPERClarity::SetProcessMode(ClarityMode mode) {
     this->processMode = mode;
     Reset();
 }
