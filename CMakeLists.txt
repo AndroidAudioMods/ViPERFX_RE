@@ -27,6 +27,7 @@ set(FILES
         src/effects/SpeakerCorrection.cpp
         src/effects/SpectrumExtend.cpp
         src/effects/TubeSimulator.cpp
+        src/effects/VHE.cpp
         src/effects/ViPERClarity.cpp
 
         # Utils
@@ -46,11 +47,11 @@ set(FILES
         src/utils/MultiBiquad.cpp
         src/utils/NoiseSharpening.cpp
         src/utils/PassFilter.cpp
+        src/utils/PConvSingle_F32.cpp
         src/utils/PolesFilter.cpp
         src/utils/Subwoofer.cpp
         src/utils/TimeConstDelay.cpp
-        src/utils/WaveBuffer_I32.cpp
-)
+        src/utils/WaveBuffer_I32.cpp)
 
 add_library(
         # Sets the name of the library.

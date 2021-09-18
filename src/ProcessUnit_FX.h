@@ -15,6 +15,7 @@
 #include "effects/TubeSimulator.h"
 #include "effects/Cure.h"
 #include "effects/DiffSurround.h"
+#include "effects/VHE.h"
 
 class ProcessUnit_FX : public Effect {
 public:
@@ -35,7 +36,7 @@ public:
 //    AdaptiveBuffer_F32* adaptiveBuffer;
     WaveBuffer_I32* waveBuffer;
 //    Convolver* convolver;
-//    VHE* vhe;
+    VHE* vhe;
 //    ViPERDDC* vddc;
     SpectrumExtend* spectrumExtend;
 //    IIRFilter* iirfilter;
