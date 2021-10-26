@@ -27,5 +27,5 @@ void HighShelf::SetQuality(float q) {
 }
 
 void HighShelf::SetSamplingRate(uint32_t samplerate) {
-    // TODO
+    this->samplerate = samplerate;
 }

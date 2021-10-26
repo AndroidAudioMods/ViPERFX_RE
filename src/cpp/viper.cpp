@@ -1,5 +1,4 @@
 #include <cstring>
-#include <hardware/audio_effect.h>
 #include <cstdlib>
 
 #include "Effect.h"

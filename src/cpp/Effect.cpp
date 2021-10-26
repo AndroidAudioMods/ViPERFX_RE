@@ -3,6 +3,7 @@
 //
 
 #include <cstdlib>
+#include <cstring>
 #include "Effect.h"
 #include "constants.h"
 

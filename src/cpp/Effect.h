@@ -5,7 +5,7 @@
 #pragma once
 
 #include <cstdint>
-#include <hardware/audio_effect.h>
+#include "essential.h"
 
 class Effect {
 public:

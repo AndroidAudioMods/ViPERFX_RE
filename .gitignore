@@ -141,3 +141,9 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 *.cbp
+
+### Gradle
+local.properties
+.gradle/
+build/
+.cxx/
