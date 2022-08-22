@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.18.1)
+cmake_minimum_required(VERSION 3.16.3)
 
 project("ViPER4Android Reworked")
 
@@ -67,4 +67,5 @@ add_library(
         ${FILES})
 
 find_library(log-lib log)
+
 target_link_libraries(v4afx_r ${log-lib})

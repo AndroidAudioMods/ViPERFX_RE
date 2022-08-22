@@ -1,3 +1,5 @@
+// Source: https://android.googlesource.com/platform/system/media/+/master/audio/include/system
+
 typedef struct effect_uuid_s
 {
     uint32_t timeLow;
