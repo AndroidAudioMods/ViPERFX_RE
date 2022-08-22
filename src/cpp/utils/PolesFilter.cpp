@@ -22,13 +22,13 @@ void PolesFilter::UpdateCoeff() {
     memset(&this->channels[0], 0, sizeof(channel));
     memset(&this->channels[1], 0, sizeof(channel));
 
-    this->channels[0].lower_angle = ((float)this->lower_freq * M_PI / (float)this->samplerate);
-    this->channels[1].lower_angle = ((float)this->lower_freq * M_PI / (float)this->samplerate);
-    this->channels[0].upper_angle = ((float)this->upper_freq * M_PI / (float)this->samplerate);
-    this->channels[1].upper_angle = ((float)this->upper_freq * M_PI / (float)this->samplerate);
+    this->channels[0].lower_angle = ((float) this->lower_freq * M_PI / (float) this->samplerate);
+    this->channels[1].lower_angle = ((float) this->lower_freq * M_PI / (float) this->samplerate);
+    this->channels[0].upper_angle = ((float) this->upper_freq * M_PI / (float) this->samplerate);
+    this->channels[1].upper_angle = ((float) this->upper_freq * M_PI / (float) this->samplerate);
 }
 
-inline void DoFilterSide(channel* side, float sample, float* out1, float* out2, float* out3) {
+inline void DoFilterSide(channel *side, float sample, float *out1, float *out2, float *out3) {
     float oldestSampleIn = side->in[2];
     side->in[2] = side->in[1];
     side->in[1] = side->in[0];

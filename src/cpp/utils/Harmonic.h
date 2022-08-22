@@ -10,13 +10,16 @@
 class Harmonic {
 public:
     Harmonic();
+
     ~Harmonic();
 
     float Process(float sample);
 
     void Reset();
-    void SetHarmonics(float* coeffs);
-    void UpdateCoeffs(float* coeffs);
+
+    void SetHarmonics(float *coeffs);
+
+    void UpdateCoeffs(float *coeffs);
 
     float coeffs[11];
     float lastProcessed;

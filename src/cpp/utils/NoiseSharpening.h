@@ -11,9 +11,12 @@ class NoiseSharpening {
 public:
     NoiseSharpening();
 
-    void Process(float* buffer, uint32_t size);
+    void Process(float *buffer, uint32_t size);
+
     void Reset();
+
     void SetGain(float gain);
+
     void SetSamplingRate(uint32_t samplerate);
 
     IIR_1st filters[2];

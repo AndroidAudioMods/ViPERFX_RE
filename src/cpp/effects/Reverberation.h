@@ -11,14 +11,21 @@ public:
     Reverberation();
 
     void Reset();
-    void Process(float* buffer, uint32_t size);
+
+    void Process(float *buffer, uint32_t size);
 
     void SetEnable(bool enable);
+
     void SetRoomSize(float value);
+
     void SetDamp(float value);
+
     void SetWet(float value);
+
     void SetDry(float value);
+
     void SetWidth(float value);
+
     void SetSamplingRate(uint32_t value);
 
     float roomsize;

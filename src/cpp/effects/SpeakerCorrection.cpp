@@ -28,8 +28,8 @@ void SpeakerCorrection::Reset() {
     this->bandpass[0].Reset();
     this->bandpass[1].Reset();
 
-    this->highpass[0].RefreshFilter(FilterType::HIGHPASS, 0.f, 80.f, (float)this->samplerate, 1.f, false);
-    this->highpass[1].RefreshFilter(FilterType::HIGHPASS, 0.f, 80.f, (float)this->samplerate, 1.f, false);
+    this->highpass[0].RefreshFilter(FilterType::HIGHPASS, 0.f, 80.f, (float) this->samplerate, 1.f, false);
+    this->highpass[1].RefreshFilter(FilterType::HIGHPASS, 0.f, 80.f, (float) this->samplerate, 1.f, false);
     this->lowpass[0].SetLowPassParameter(13500.f, this->samplerate, 1.0);
     this->lowpass[1].SetLowPassParameter(13500.f, this->samplerate, 1.0);
     this->bandpass[0].SetBandPassParameter(420.f, this->samplerate, 3.88f);

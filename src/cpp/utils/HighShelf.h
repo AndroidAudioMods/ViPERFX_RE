@@ -3,6 +3,7 @@
 //
 
 #pragma once
+
 #include <cstdint>
 
 class HighShelf {
@@ -10,8 +11,11 @@ public:
     float Process(float sample);
 
     void SetFrequency(uint32_t freq);
+
     void SetGain(float gain);
+
     void SetQuality(float q);
+
     void SetSamplingRate(uint32_t samplerate);
 
     uint32_t frequency, samplerate;

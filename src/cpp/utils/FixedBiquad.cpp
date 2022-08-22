@@ -11,7 +11,8 @@ FixedBiquad::FixedBiquad() {
 }
 
 float FixedBiquad::ProcessSample(float sample) {
-    float out = sample * this->b0 + this->x_1 * this->b1 + this->x_2 * this->b2 + this->y_1 * this->a1 + this->y_2 * this->a2;
+    float out = sample * this->b0 + this->x_1 * this->b1 + this->x_2 * this->b2 + this->y_1 * this->a1 +
+                this->y_2 * this->a2;
     this->y_2 = this->y_1;
     this->y_1 = out;
     this->x_2 = this->x_1;
@@ -44,16 +45,17 @@ void FixedBiquad::SetCoeffs(float a0, float a1, float a2, float b0, float b1, fl
 }
 
 void FixedBiquad::SetBandPassParameter(float frequency, uint32_t samplerate, float qFactor) {
-    float x = (2.f * frequency * (float)M_PI / (float)samplerate);
+    float x = (2.f * frequency * (float) M_PI / (float) samplerate);
     float sinX = sinf(x);
     float cosX = cosf(x);
     float y = x / (2.f * qFactor);
     SetCoeffs(y + 1.f, -2.f * cosX, 1.f - y, sinX / 2.f, 0.f, -sinX / 2.f);
 }
 
-void FixedBiquad::SetHighPassParameter(float frequency, uint32_t samplerate, float param_4, float qFactor, float param_6) {
+void
+FixedBiquad::SetHighPassParameter(float frequency, uint32_t samplerate, float param_4, float qFactor, float param_6) {
     // TODO: Cleanup and named params
-    float fVar12 = (frequency * 2.f * (float)M_PI) / (float)samplerate;
+    float fVar12 = (frequency * 2.f * (float) M_PI) / (float) samplerate;
     float x = powf(10.f, param_4 / 40.f);
     float fVar5 = (1.f / x + x) * (1.f / qFactor - 1.f) + 2.f;
     float fVar7 = sqrtf(x);
@@ -63,7 +65,7 @@ void FixedBiquad::SetHighPassParameter(float frequency, uint32_t samplerate, flo
     fVar5 = cosf(fVar12);
     fVar12 = fVar10 + fVar8 * fVar5;
     float fVar11 = fVar10 - fVar8 * fVar5;
-    float fVar2 = powf(10.f,param_6 / 20.f);
+    float fVar2 = powf(10.f, param_6 / 20.f);
     float fVar9 = fVar8 - fVar10 * fVar5;
     SetCoeffs(fVar11 + (fVar7 + fVar7) * fVar6,
               fVar9 + fVar9,
@@ -74,7 +76,7 @@ void FixedBiquad::SetHighPassParameter(float frequency, uint32_t samplerate, flo
 }
 
 void FixedBiquad::SetLowPassParameter(float frequency, uint32_t samplerate, float qFactor) {
-    float x = (frequency * 2.f * (float)M_PI) / (float)samplerate;
+    float x = (frequency * 2.f * (float) M_PI) / (float) samplerate;
     float sinX = sinf(x);
     float y = sinX / (qFactor * 2.f);
     float cosX = cosf(x);

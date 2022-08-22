@@ -6,7 +6,8 @@
 #include "HighShelf.h"
 
 float HighShelf::Process(float sample) {
-    float out = sample * this->b0 + this->x_1 * this->b1 + this->x_2 * this->b2 + this->y_1 * this->a1 + this->y_2 * this->a2;
+    float out = sample * this->b0 + this->x_1 * this->b1 + this->x_2 * this->b2 + this->y_1 * this->a1 +
+                this->y_2 * this->a2;
     this->y_2 = this->y_1;
     this->y_1 = out;
     this->x_2 = this->x_1;

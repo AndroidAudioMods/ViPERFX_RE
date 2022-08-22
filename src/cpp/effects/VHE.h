@@ -11,14 +11,19 @@
 class VHE {
 public:
     VHE();
+
     ~VHE();
 
-    void Process(float* source, float* dest, int frameSize);
+    void Process(float *source, float *dest, int frameSize);
+
     void Reset();
 
     bool GetEnabled();
+
     void SetEffectLevel(uint32_t level);
+
     void SetEnable(bool enabled);
+
     void SetSamplingRate(uint32_t srate);
 
     PConvSingle_F32 convLeft, convRight;

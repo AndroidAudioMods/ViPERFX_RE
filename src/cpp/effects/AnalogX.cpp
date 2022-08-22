@@ -27,7 +27,7 @@ AnalogX::AnalogX() {
 }
 
 void AnalogX::Process(float *samples, uint32_t size) {
-    for (int i = 0; i < 2*size; i++) {
+    for (int i = 0; i < 2 * size; i++) {
         float sample = samples[i];
         int index = i % 2;
 
@@ -47,11 +47,11 @@ void AnalogX::Process(float *samples, uint32_t size) {
 }
 
 void AnalogX::Reset() {
-    this->highpass[0].RefreshFilter(FilterType::HIGHPASS, 0.f, 240.f, (float)this->samplerate, 0.717, false);
-    this->highpass[1].RefreshFilter(FilterType::HIGHPASS, 0.f, 240.f, (float)this->samplerate, 0.717, false);
+    this->highpass[0].RefreshFilter(FilterType::HIGHPASS, 0.f, 240.f, (float) this->samplerate, 0.717, false);
+    this->highpass[1].RefreshFilter(FilterType::HIGHPASS, 0.f, 240.f, (float) this->samplerate, 0.717, false);
 
-    this->peak[0].RefreshFilter(FilterType::PEAK, 0.58f, 633.f, (float)this->samplerate, 6.28, true);
-    this->peak[1].RefreshFilter(FilterType::PEAK, 0.58f, 633.f, (float)this->samplerate, 6.28, true);
+    this->peak[0].RefreshFilter(FilterType::PEAK, 0.58f, 633.f, (float) this->samplerate, 6.28, true);
+    this->peak[1].RefreshFilter(FilterType::PEAK, 0.58f, 633.f, (float) this->samplerate, 6.28, true);
 
     this->harmonics[0].Reset();
     this->harmonics[1].Reset();
@@ -60,20 +60,20 @@ void AnalogX::Reset() {
         this->harmonics[0].SetHarmonics(ANALOGX_HARMONICS);
         this->harmonics[1].SetHarmonics(ANALOGX_HARMONICS);
         this->gain = 0.6f;
-        this->lowpass[0].RefreshFilter(FilterType::LOWPASS, 0.0, 18233.f, (float)this->samplerate, 0.717f, false);
-        this->lowpass[1].RefreshFilter(FilterType::LOWPASS, 0.0, 18233.f, (float)this->samplerate, 0.717f, false);
+        this->lowpass[0].RefreshFilter(FilterType::LOWPASS, 0.0, 18233.f, (float) this->samplerate, 0.717f, false);
+        this->lowpass[1].RefreshFilter(FilterType::LOWPASS, 0.0, 18233.f, (float) this->samplerate, 0.717f, false);
     } else if (this->processingModel == 1) {
         this->harmonics[0].SetHarmonics(ANALOGX_HARMONICS);
         this->harmonics[1].SetHarmonics(ANALOGX_HARMONICS);
         this->gain = 1.2f;
-        this->lowpass[0].RefreshFilter(FilterType::LOWPASS, 0.0, 19650.f, (float)this->samplerate, 0.717f, false);
-        this->lowpass[1].RefreshFilter(FilterType::LOWPASS, 0.0, 19650.f, (float)this->samplerate, 0.717f, false);
+        this->lowpass[0].RefreshFilter(FilterType::LOWPASS, 0.0, 19650.f, (float) this->samplerate, 0.717f, false);
+        this->lowpass[1].RefreshFilter(FilterType::LOWPASS, 0.0, 19650.f, (float) this->samplerate, 0.717f, false);
     } else if (this->processingModel == 2) {
         this->harmonics[0].SetHarmonics(ANALOGX_HARMONICS);
         this->harmonics[1].SetHarmonics(ANALOGX_HARMONICS);
         this->gain = 2.4f;
-        this->lowpass[0].RefreshFilter(FilterType::LOWPASS, 0.0, 16307.f, (float)this->samplerate, 0.717f, false);
-        this->lowpass[1].RefreshFilter(FilterType::LOWPASS, 0.0, 16307.f, (float)this->samplerate, 0.717f, false);
+        this->lowpass[0].RefreshFilter(FilterType::LOWPASS, 0.0, 16307.f, (float) this->samplerate, 0.717f, false);
+        this->lowpass[1].RefreshFilter(FilterType::LOWPASS, 0.0, 16307.f, (float) this->samplerate, 0.717f, false);
     }
 
     this->freqRange = 0;

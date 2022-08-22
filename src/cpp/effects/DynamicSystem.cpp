@@ -12,7 +12,7 @@ DynamicSystem::DynamicSystem() {
     this->bass.Reset();
 }
 
-void DynamicSystem::Process(float* samples, uint32_t size) {
+void DynamicSystem::Process(float *samples, uint32_t size) {
     if (this->enabled) {
         this->bass.FilterSamples(samples, size);
     }

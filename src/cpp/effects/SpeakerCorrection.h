@@ -11,10 +11,12 @@ class SpeakerCorrection {
 public:
     SpeakerCorrection();
 
-    void Process(float* samples, uint32_t size);
+    void Process(float *samples, uint32_t size);
+
     void Reset();
 
     void SetEnable(bool enabled);
+
     void SetSamplingRate(uint32_t samplerate);
 
     uint32_t samplerate;

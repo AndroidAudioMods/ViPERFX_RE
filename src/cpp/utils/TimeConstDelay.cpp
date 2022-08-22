@@ -23,14 +23,14 @@ float TimeConstDelay::ProcessSample(float sample) {
     if (this->samples != nullptr) {
         float val = this->samples[this->offset];
         this->samples[this->offset] = sample;
-        this->offset = (int)modf((float)this->offset + 1, (float*)&this->sampleCount);
+        this->offset = (int) modf((float) this->offset + 1, (float *) &this->sampleCount);
         return val;
     }
     return 0.f;
 }
 
 void TimeConstDelay::SetParameters(uint32_t samplerate, float delay) {
-    this->sampleCount = (int)((float)samplerate * delay * 0.5f);
+    this->sampleCount = (int) ((float) samplerate * delay * 0.5f);
     if (this->samples != nullptr) {
         free(this->samples);
     }

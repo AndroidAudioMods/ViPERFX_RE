@@ -10,11 +10,14 @@
 class Effect {
 public:
     Effect();
+
     ~Effect();
 
-    virtual int32_t command(uint32_t cmdCode, uint32_t cmdSize, void* pCmdData, uint32_t* replySize, void* pReplyData);
+    virtual int32_t command(uint32_t cmdCode, uint32_t cmdSize, void *pCmdData, uint32_t *replySize, void *pReplyData);
+
     int32_t process(audio_buffer_s *in, audio_buffer_s *out);
-    int32_t configure(effect_config_t* config);
+
+    int32_t configure(effect_config_t *config);
 
     bool enabled;
     bool configureOk;
@@ -23,7 +26,7 @@ public:
     // Misc data here?
 
     // TODO: Figure out what buffer is used for
-    float* buffer;
+    float *buffer;
     uint32_t bufferSize;
-    void* instance;  // type: ProcessUnit_FX
+    void *instance;  // type: ProcessUnit_FX
 };

@@ -7,7 +7,9 @@
 #ifdef ANDROID_TOOLCHAIN
 #include <android/errno.h>
 #else
+
 #include <cerrno>
+
 #endif
 
 #include "log.h" // TODO: Remove this dependency

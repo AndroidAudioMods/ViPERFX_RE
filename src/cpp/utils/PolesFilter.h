@@ -21,11 +21,15 @@ public:
     PolesFilter();
 
     void Reset();
+
     void UpdateCoeff();
-    void DoFilterLeft(float sample, float* out1, float* out2, float* out3);
-    void DoFilterRight(float sample, float* out1, float* out2, float* out3);
+
+    void DoFilterLeft(float sample, float *out1, float *out2, float *out3);
+
+    void DoFilterRight(float sample, float *out1, float *out2, float *out3);
 
     void SetPassFilter(uint32_t lower_freq, uint32_t upper_freq);
+
     void SetSamplingRate(uint32_t samplerate);
 
     channel channels[2];

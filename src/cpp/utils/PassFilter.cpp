@@ -29,8 +29,8 @@ void PassFilter::Reset() {
         cutoff = 18000;
     }
 
-    this->filters[0]->setLPF((float)cutoff, this->samplerate);
-    this->filters[1]->setLPF((float)cutoff, this->samplerate);
+    this->filters[0]->setLPF((float) cutoff, this->samplerate);
+    this->filters[1]->setLPF((float) cutoff, this->samplerate);
     this->filters[2]->setLPF(10.f, cutoff);
     this->filters[3]->setLPF(10.f, cutoff);
 
@@ -42,16 +42,16 @@ void PassFilter::Reset() {
 
 void PassFilter::ProcessFrames(float *buffer, uint32_t size) {
     for (int x = 0; x < size; x++) {
-        float left = buffer[2*x];
-        float right = buffer[2*x+1];
+        float left = buffer[2 * x];
+        float right = buffer[2 * x + 1];
 
         left = do_filter_lh(this->filters[2], left);
         left = do_filter_lh(this->filters[0], left);
         right = do_filter_lh(this->filters[3], right);
         right = do_filter_lh(this->filters[1], right);
 
-        buffer[2*x] = left;
-        buffer[2*x+1] = right;
+        buffer[2 * x] = left;
+        buffer[2 * x + 1] = right;
     }
 }
 

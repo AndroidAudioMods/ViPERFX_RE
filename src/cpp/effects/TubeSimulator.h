@@ -11,7 +11,8 @@ public:
     TubeSimulator();
 
     void Reset();
-    void TubeProcess(float* buffer, uint32_t size);
+
+    void TubeProcess(float *buffer, uint32_t size);
 
     float acc[2];
     bool enabled;

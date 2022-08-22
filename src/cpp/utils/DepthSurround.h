@@ -13,9 +13,12 @@ class DepthSurround {
 public:
     DepthSurround();
 
-    void Process(float* samples, uint32_t size);
+    void Process(float *samples, uint32_t size);
+
     void RefreshStrength(short strength);
+
     void SetSamplingRate(uint32_t samplerate);
+
     void SetStrength(short strength);
 
     short strength;

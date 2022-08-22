@@ -43,12 +43,12 @@ int32_t Effect::process(audio_buffer_s *in, audio_buffer_s *out) {
 }
 
 int32_t Effect::command(uint32_t cmdCode, uint32_t cmdSize, void *pCmdData, uint32_t *replySize, void *pReplyData) {
-    switch(cmdCode) {
+    switch (cmdCode) {
         case EFFECT_CMD_INIT:
         case EFFECT_CMD_SET_CONFIG:
         case EFFECT_CMD_SET_PARAM:
         case EFFECT_CMD_SET_PARAM_COMMIT:
-            *((int*)pReplyData) = 0;
+            *((int *) pReplyData) = 0;
         case EFFECT_CMD_RESET:
         case EFFECT_CMD_SET_PARAM_DEFERRED:
         case EFFECT_CMD_SET_DEVICE:
@@ -58,7 +58,7 @@ int32_t Effect::command(uint32_t cmdCode, uint32_t cmdSize, void *pCmdData, uint
         case EFFECT_CMD_SET_AUDIO_SOURCE:
             break;
         case EFFECT_CMD_SET_CONFIG_REVERSE:
-            *((int*)pReplyData) = -EINVAL;
+            *((int *) pReplyData) = -EINVAL;
         default:
             return -EINVAL;
         case EFFECT_CMD_GET_CONFIG:
@@ -77,9 +77,10 @@ return -EINVAL
 int32_t Effect::configure(effect_config_t *newConfig) {
     v4a_print(ANDROID_LOG_INFO, "Begin audio configure ...");
     v4a_print(ANDROID_LOG_INFO, "Checking input and output configuration ...");
-    
+
     if (newConfig->inputCfg.samplingRate != newConfig->outputCfg.samplingRate) {
-        v4a_printf(ANDROID_LOG_ERROR, "ViPER4Android disabled, reason [in.SR = %d, out.SR = %d]", newConfig->inputCfg.samplingRate, newConfig->outputCfg.samplingRate);
+        v4a_printf(ANDROID_LOG_ERROR, "ViPER4Android disabled, reason [in.SR = %d, out.SR = %d]",
+                   newConfig->inputCfg.samplingRate, newConfig->outputCfg.samplingRate);
         DO_ERROR();
     }
 
@@ -89,7 +90,8 @@ int32_t Effect::configure(effect_config_t *newConfig) {
     }
 
     if (newConfig->inputCfg.channels != newConfig->outputCfg.channels) {
-        v4a_printf(ANDROID_LOG_ERROR, "ViPER4Android disabled, reason [in.CH = %d, out.CH = %d]", newConfig->inputCfg.channels, newConfig->outputCfg.channels);
+        v4a_printf(ANDROID_LOG_ERROR, "ViPER4Android disabled, reason [in.CH = %d, out.CH = %d]",
+                   newConfig->inputCfg.channels, newConfig->outputCfg.channels);
         DO_ERROR();
     }
 
@@ -116,9 +118,9 @@ int32_t Effect::configure(effect_config_t *newConfig) {
 
     memcpy(&this->config, newConfig, sizeof(effect_config_t));
     this->configureOk = true;
-    
+
     v4a_print(ANDROID_LOG_INFO, "Audio configure finished");
-    
+
     return 0;
 }
 

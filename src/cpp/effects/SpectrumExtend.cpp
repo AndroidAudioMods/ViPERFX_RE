@@ -42,11 +42,15 @@ void SpectrumExtend::Process(float *samples, uint32_t size) {
 }
 
 void SpectrumExtend::Reset() {
-    this->highpass[0].RefreshFilter(FilterType::HIGHPASS, 0.0, (float)this->referenceFreq, (float)this->samplerate, 0.717, false);
-    this->highpass[1].RefreshFilter(FilterType::HIGHPASS, 0.0, (float)this->referenceFreq, (float)this->samplerate, 0.717, false);
+    this->highpass[0].RefreshFilter(FilterType::HIGHPASS, 0.0, (float) this->referenceFreq, (float) this->samplerate,
+                                    0.717, false);
+    this->highpass[1].RefreshFilter(FilterType::HIGHPASS, 0.0, (float) this->referenceFreq, (float) this->samplerate,
+                                    0.717, false);
 
-    this->lowpass[0].RefreshFilter(FilterType::LOWPASS, 0.0, (float)this->referenceFreq / 2.f - 2000.f, (float)this->referenceFreq, 0.717, false);
-    this->lowpass[1].RefreshFilter(FilterType::LOWPASS, 0.0, (float)this->referenceFreq / 2.f - 2000.f, (float)this->referenceFreq, 0.717, false);
+    this->lowpass[0].RefreshFilter(FilterType::LOWPASS, 0.0, (float) this->referenceFreq / 2.f - 2000.f,
+                                   (float) this->referenceFreq, 0.717, false);
+    this->lowpass[1].RefreshFilter(FilterType::LOWPASS, 0.0, (float) this->referenceFreq / 2.f - 2000.f,
+                                   (float) this->referenceFreq, 0.717, false);
 
     this->harmonics[0].Reset();
     this->harmonics[1].Reset();

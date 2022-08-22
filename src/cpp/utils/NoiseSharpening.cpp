@@ -13,8 +13,8 @@ NoiseSharpening::NoiseSharpening() {
 
 void NoiseSharpening::Process(float *buffer, uint32_t size) {
     for (int i = 0; i < size; i++) {
-        float sampleLeft = buffer[i*2];
-        float sampleRight = buffer[i*2+1];
+        float sampleLeft = buffer[i * 2];
+        float sampleRight = buffer[i * 2 + 1];
         float prevLeft = this->in[0];
         float prevRight = this->in[1];
         this->in[0] = sampleLeft;
@@ -33,8 +33,8 @@ void NoiseSharpening::Process(float *buffer, uint32_t size) {
         float right = this->filters[1].prevSample + (sampleRightIn) * this->filters[1].b0;
         this->filters[1].prevSample = (sampleRightIn) * this->filters[1].a1 + hist;
 
-        buffer[i*2] = left;
-        buffer[i*2+1] = right;
+        buffer[i * 2] = left;
+        buffer[i * 2 + 1] = right;
     }
 }
 

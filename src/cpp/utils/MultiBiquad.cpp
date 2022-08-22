@@ -18,7 +18,8 @@ MultiBiquad::MultiBiquad() {
 }
 
 float MultiBiquad::ProcessSample(float sample) {
-    float out = sample * this->b0 + this->x_1 * this->b1 + this->x_2 * this->b2 + this->y_1 * this->a1 + this->y_2 * this->a2;
+    float out = sample * this->b0 + this->x_1 * this->b1 + this->x_2 * this->b2 + this->y_1 * this->a1 +
+                this->y_2 * this->a2;
     this->y_2 = this->y_1;
     this->y_1 = out;
     this->x_2 = this->x_1;
@@ -26,7 +27,8 @@ float MultiBiquad::ProcessSample(float sample) {
     return out;
 }
 
-void MultiBiquad::RefreshFilter(FilterType type, float gainAmp, float freq, float samplerate, float qFactor, bool param_7) {
+void
+MultiBiquad::RefreshFilter(FilterType type, float gainAmp, float freq, float samplerate, float qFactor, bool param_7) {
     bool uVar1;
     int iVar2;
     int iVar3;
@@ -45,24 +47,24 @@ void MultiBiquad::RefreshFilter(FilterType type, float gainAmp, float freq, floa
     double b1;
     double b2;
 
-    dVar10 = pow(10.0,gainAmp / 40.0);
-    dVar4 = (freq * 2*M_PI) / samplerate;
+    dVar10 = pow(10.0, gainAmp / 40.0);
+    dVar4 = (freq * 2 * M_PI) / samplerate;
     dVar5 = sin(dVar4);
     dVar11 = cos(dVar4);
     uVar1 = type == HIGHSHELF;
     dVar4 = (1.0 / dVar10 + dVar10) * (1.0 / qFactor - 1.0) + 2.0;
     dVar6 = sqrt(dVar4);
-    if (!(bool)uVar1) {
+    if (!(bool) uVar1) {
         dVar4 = sinh(dVar4);
         dVar6 = dVar4;
     }
     dVar4 = sqrt(dVar10);
     dVar5 = dVar5 * 0.5 * dVar6;
-    if (!(bool)uVar1) {
+    if (!(bool) uVar1) {
         dVar4 = sinh(dVar10);
     }
     dVar4 = (dVar4 + dVar4) * dVar5;
-    switch(type) {
+    switch (type) {
         case LOWPASS:
             b1 = 1.0 - dVar11;
             dVar10 = b1;

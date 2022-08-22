@@ -19,13 +19,18 @@ class ViPERClarity {
 public:
     ViPERClarity();
 
-    void Process(float* samples, uint32_t size);
+    void Process(float *samples, uint32_t size);
+
     void Reset();
 
     void SetClarity(float gainPercent);
+
     void SetClarityToFilter();
+
     void SetEnable(bool enabled);
+
     void SetProcessMode(ClarityMode mode);
+
     void SetSamplingRate(uint32_t samplerate);
 
     NoiseSharpening sharp;

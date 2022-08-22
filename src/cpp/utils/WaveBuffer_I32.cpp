@@ -10,7 +10,7 @@ WaveBuffer_I32::WaveBuffer_I32(int channels, uint32_t size) {
     this->channels = channels;
     this->size = size * channels;
     this->index = 0;
-    this->buffer = (float*)malloc(this->size * sizeof(float));
+    this->buffer = (float *) malloc(this->size * sizeof(float));
 }
 
 WaveBuffer_I32::~WaveBuffer_I32() {
@@ -40,7 +40,7 @@ uint32_t WaveBuffer_I32::PopSamples(uint32_t size, bool resetIndex) {
 
     if (this->channels * size <= this->index) {
         this->index -= this->channels * size;
-        memmove(this->buffer, &this->buffer[this->channels*size], this->index * sizeof(float));
+        memmove(this->buffer, &this->buffer[this->channels * size], this->index * sizeof(float));
         return size;
     }
 
@@ -61,7 +61,7 @@ uint32_t WaveBuffer_I32::PopSamples(float *dest, uint32_t size, bool resetIndex)
     if (this->channels * size <= this->index) {
         memcpy(dest, this->buffer, this->index * sizeof(float));
         this->index -= this->channels * size;
-        memmove(this->buffer, &this->buffer[this->channels*size], this->index * sizeof(float));
+        memmove(this->buffer, &this->buffer[this->channels * size], this->index * sizeof(float));
         return size;
     }
 
@@ -82,7 +82,7 @@ int WaveBuffer_I32::PushSamples(float *source, uint32_t size) {
 
     if (size > 0) {
         if (this->size < this->channels * size + this->index) {
-            float* buf = (float*)malloc((this->channels * size + this->index) * sizeof(float));
+            float *buf = (float *) malloc((this->channels * size + this->index) * sizeof(float));
             if (buf == nullptr) {
                 return 0;
             }
@@ -105,7 +105,7 @@ int WaveBuffer_I32::PushZeros(uint32_t size) {
 
     if (size > 0) {
         if (this->size < this->channels * size + this->index) {
-            float* buf = (float*)malloc((this->channels * size + this->index) * sizeof(float));
+            float *buf = (float *) malloc((this->channels * size + this->index) * sizeof(float));
             if (buf == nullptr) {
                 return 0;
             }
@@ -128,7 +128,7 @@ float *WaveBuffer_I32::PushZerosGetBuffer(uint32_t size) {
 
     if (size > 0) {
         if (this->size < this->channels * size + this->index) {
-            float* buf = (float*)malloc((this->channels * size + this->index) * sizeof(float));
+            float *buf = (float *) malloc((this->channels * size + this->index) * sizeof(float));
             if (buf == nullptr) {
                 return nullptr;
             }

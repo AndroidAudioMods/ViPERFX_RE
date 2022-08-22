@@ -12,10 +12,12 @@ class AnalogX {
 public:
     AnalogX();
 
-    void Process(float* samples, uint32_t size);
+    void Process(float *samples, uint32_t size);
+
     void Reset();
 
     void SetProcessingModel(int model);
+
     void SetSamplingRate(uint32_t samplerate);
 
     MultiBiquad highpass[2];

@@ -14,7 +14,7 @@ DynamicBass::DynamicBass() {
     this->lowFreqX = 120;
     this->highFreqX = 80;
     this->lowFreqY = 40;
-    this->highFreqY = (float)this->samplerate / 4.f;
+    this->highFreqY = (float) this->samplerate / 4.f;
 
     this->filterX.SetPassFilter(this->lowFreqX, this->highFreqX);
     this->filterY.SetPassFilter(this->lowFreqY, this->highFreqY);
@@ -30,23 +30,23 @@ void DynamicBass::Reset() {
 void DynamicBass::FilterSamples(float *samples, uint32_t size) {
     if (this->lowFreqX <= 120) {
         for (int i = 0; i < size; i++) {
-            float left = samples[2*i];
-            float right = samples[2*i+1];
+            float left = samples[2 * i];
+            float right = samples[2 * i + 1];
             float avg = this->lowPass.ProcessSample(left + right);
-            samples[2*i] = left + avg;
-            samples[2*i+1] = right + avg;
+            samples[2 * i] = left + avg;
+            samples[2 * i + 1] = right + avg;
         }
     } else {
         for (int i = 0; i < size; i++) {
             float x1, x2, x3, x4, x5, x6, y1, y2, y3, y4, y5, y6;
 
-            this->filterX.DoFilterLeft(samples[2*i], &x1, &x2, &x3);
-            this->filterX.DoFilterRight(samples[2*i+1], &x4, &x5, &x6);
+            this->filterX.DoFilterLeft(samples[2 * i], &x1, &x2, &x3);
+            this->filterX.DoFilterRight(samples[2 * i + 1], &x4, &x5, &x6);
             this->filterY.DoFilterLeft(this->bassGain * x1, &y1, &y2, &y3);
             this->filterY.DoFilterRight(this->bassGain * x4, &y4, &y5, &y6);
 
-            samples[2*i] = x2 + y3 + this->sideGainX * y2 + this->sideGainY * y1 + x3;
-            samples[2*i+1] = x5 + y6 + this->sideGainX * y5 + this->sideGainY * y4 + x6;
+            samples[2 * i] = x2 + y3 + this->sideGainX * y2 + this->sideGainY * y1 + x3;
+            samples[2 * i + 1] = x5 + y6 + this->sideGainX * y5 + this->sideGainY * y4 + x6;
         }
     }
 }

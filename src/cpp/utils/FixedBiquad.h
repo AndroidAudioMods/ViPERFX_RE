@@ -12,10 +12,15 @@ public:
     FixedBiquad();
 
     float ProcessSample(float sample);
+
     void Reset();
+
     void SetCoeffs(float a0, float a1, float a2, float b0, float b1, float b2);
+
     void SetBandPassParameter(float frequency, uint32_t samplerate, float qFactor);
+
     void SetHighPassParameter(float frequency, uint32_t samplerate, float param_4, float qFactor, float param_6);
+
     void SetLowPassParameter(float frequency, uint32_t samplerate, float qFactor);
 
 

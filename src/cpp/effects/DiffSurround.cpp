@@ -20,8 +20,8 @@ DiffSurround::~DiffSurround() {
 }
 
 void DiffSurround::Process(float *samples, uint32_t size) {
-    float* bufs[2];
-    float* outbufs[2];
+    float *bufs[2];
+    float *outbufs[2];
 
     if (this->enabled) {
         bufs[0] = this->buffers[0]->PushZerosGetBuffer(size);
@@ -47,7 +47,7 @@ void DiffSurround::Reset() {
     this->buffers[0]->Reset();
     this->buffers[1]->Reset();
 
-    this->buffers[1]->PushZeros((uint32_t)(this->delayTime / 1000.f * (float)this->samplerate));
+    this->buffers[1]->PushZeros((uint32_t) (this->delayTime / 1000.f * (float) this->samplerate));
 }
 
 void DiffSurround::SetDelayTime(float value) {

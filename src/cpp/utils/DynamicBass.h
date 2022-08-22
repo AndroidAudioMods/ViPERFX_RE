@@ -12,12 +12,18 @@ class DynamicBass {
 public:
     DynamicBass();
 
-    void FilterSamples(float* samples, uint32_t size);
+    void FilterSamples(float *samples, uint32_t size);
+
     void Reset();
+
     void SetBassGain(float gain);
+
     void SetFilterXPassFrequency(uint32_t low, uint32_t high);
+
     void SetFilterYPassFrequency(uint32_t low, uint32_t high);
+
     void SetSamplingRate(uint32_t samplerate);
+
     void SetSideGain(float gainX, float gainY);
 
     uint32_t lowFreqX, highFreqX;

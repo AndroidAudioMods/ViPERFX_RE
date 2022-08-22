@@ -7,7 +7,7 @@
 #include <cmath>
 
 Subwoofer::Subwoofer() {
-    float samplerate = (float)DEFAULT_SAMPLERATE;
+    float samplerate = (float) DEFAULT_SAMPLERATE;
     this->peak[0].RefreshFilter(FilterType::PEAK, 0.f, 37.f, samplerate, 1.f, false);
     this->peak[1].RefreshFilter(FilterType::PEAK, 0.f, 37.f, samplerate, 1.f, false);
     this->peakLow[0].RefreshFilter(FilterType::PEAK, 0.f, 75.f, samplerate, 1.f, false);
@@ -31,10 +31,10 @@ void Subwoofer::SetBassGain(uint32_t samplerate, float gainDb) {
     float gain = 20.f * log10f(gainDb);
     float gainLower = 20.f * log10f(gainDb / 8.f);
 
-    this->peak[0].RefreshFilter(FilterType::PEAK, gain, 44.f, (float)samplerate, 0.75, true);
-    this->peak[1].RefreshFilter(FilterType::PEAK, gain, 44.f, (float)samplerate, 0.75, true);
-    this->peakLow[0].RefreshFilter(FilterType::PEAK, gainLower, 80.f, (float)samplerate, 0.2, true);
-    this->peakLow[1].RefreshFilter(FilterType::PEAK, gainLower, 80.f, (float)samplerate, 0.2, true);
-    this->lowpass[0].RefreshFilter(FilterType::LOWPASS, 0.f, 380.f, (float)samplerate, 0.6, false);
-    this->lowpass[1].RefreshFilter(FilterType::LOWPASS, 0.f, 380.f, (float)samplerate, 0.6, false);
+    this->peak[0].RefreshFilter(FilterType::PEAK, gain, 44.f, (float) samplerate, 0.75, true);
+    this->peak[1].RefreshFilter(FilterType::PEAK, gain, 44.f, (float) samplerate, 0.75, true);
+    this->peakLow[0].RefreshFilter(FilterType::PEAK, gainLower, 80.f, (float) samplerate, 0.2, true);
+    this->peakLow[1].RefreshFilter(FilterType::PEAK, gainLower, 80.f, (float) samplerate, 0.2, true);
+    this->lowpass[0].RefreshFilter(FilterType::LOWPASS, 0.f, 380.f, (float) samplerate, 0.6, false);
+    this->lowpass[1].RefreshFilter(FilterType::LOWPASS, 0.f, 380.f, (float) samplerate, 0.6, false);
 }

@@ -28,14 +28,14 @@ HiFi::~HiFi() {
 
 void HiFi::Process(float *samples, uint32_t size) {
     if (size > 0) {
-        float* bpBuf = this->buffers[0]->PushZerosGetBuffer(size);
-        float* lpBuf = this->buffers[1]->PushZerosGetBuffer(size);
+        float *bpBuf = this->buffers[0]->PushZerosGetBuffer(size);
+        float *lpBuf = this->buffers[1]->PushZerosGetBuffer(size);
         if (bpBuf == nullptr || lpBuf == nullptr) {
             Reset();
             return;
         }
 
-        for (int i = 0; i < size*2; i++) {
+        for (int i = 0; i < size * 2; i++) {
             int index = i % 2;
             float out1 = do_filter_lh(this->filters[index].lowpass, samples[i]);
             float out2 = do_filter_lh(this->filters[index].highpass, samples[i]);
@@ -44,8 +44,8 @@ void HiFi::Process(float *samples, uint32_t size) {
             lpBuf[i] = out1;
             bpBuf[i] = out3;
         }
-        float* bpOut = this->buffers[0]->GetCurrentBufferI32Ptr();
-        float* lpOut = this->buffers[1]->GetCurrentBufferI32Ptr();
+        float *bpOut = this->buffers[0]->GetCurrentBufferI32Ptr();
+        float *lpOut = this->buffers[1]->GetCurrentBufferI32Ptr();
         for (int i = 0; i < size * 2; i++) {
             float hp = samples[i] * this->gain * 1.2f;
             float bp = bpOut[i] * this->gain;
@@ -66,9 +66,9 @@ void HiFi::Reset() {
         this->filters[i].bandpass->Mute();
     }
     this->buffers[0]->Reset();
-    this->buffers[0]->PushZeros(this->samplerate/400);
+    this->buffers[0]->PushZeros(this->samplerate / 400);
     this->buffers[1]->Reset();
-    this->buffers[1]->PushZeros(this->samplerate/200);
+    this->buffers[1]->PushZeros(this->samplerate / 200);
 
 }
 

@@ -15,7 +15,8 @@ ProcessUnit_FX::~ProcessUnit_FX() {
 
 }
 
-int32_t ProcessUnit_FX::command(uint32_t cmdCode, uint32_t cmdSize, void *pCmdData, uint32_t *replySize, void *pReplyData) {
+int32_t
+ProcessUnit_FX::command(uint32_t cmdCode, uint32_t cmdSize, void *pCmdData, uint32_t *replySize, void *pReplyData) {
     // TODO
     return -1;
 }

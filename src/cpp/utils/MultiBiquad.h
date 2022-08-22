@@ -22,6 +22,7 @@ public:
     MultiBiquad();
 
     float ProcessSample(float sample);
+
     void RefreshFilter(FilterType type, float gainAmp, float freq, float samplerate, float qFactor, bool param_7);
 
     float y_2, y_1, x_2, x_1;

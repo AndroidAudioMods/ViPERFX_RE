@@ -85,11 +85,11 @@ void CRevModel::Mute() {
         return;
     }
 
-    for (int i=0; i<8; i++) {
+    for (int i = 0; i < 8; i++) {
         combL[i].Mute();
         combR[i].Mute();
     }
-    for (int i=0; i<4; i++) {
+    for (int i = 0; i < 4; i++) {
         allpassL[i].Mute();
         allpassR[i].Mute();
     }
@@ -101,18 +101,18 @@ void CRevModel::ProcessReplace(float *bufL, float *bufR, uint32_t size) {
         float outR = 0.f;
         float input = (*bufL + *bufR) * gain;
 
-        for (int i=0; i<8; i++) {
+        for (int i = 0; i < 8; i++) {
             outL += combL[i].Process(input);
             outR += combR[i].Process(input);
         }
 
-        for (int i=0; i<4; i++) {
+        for (int i = 0; i < 4; i++) {
             outL = allpassL[i].Process(outL);
             outR = allpassR[i].Process(outR);
         }
 
-        *bufL = outL*wet1 + outR*wet2 + *bufL * dry;
-        *bufR = outR*wet1 + outL*wet2 + *bufR * dry;
+        *bufL = outL * wet1 + outR * wet2 + *bufL * dry;
+        *bufR = outR * wet1 + outL * wet2 + *bufR * dry;
 
         bufL += 1;
         bufR += 1;
@@ -120,8 +120,8 @@ void CRevModel::ProcessReplace(float *bufL, float *bufR, uint32_t size) {
 }
 
 void CRevModel::UpdateCoeffs() {
-    wet1 = wet*(width/2.f + 0.5f);
-    wet2 = wet*((1.f-width)/2.f);
+    wet1 = wet * (width / 2.f + 0.5f);
+    wet2 = wet * ((1.f - width) / 2.f);
 
     if (mode == 1) {
         roomsize1 = 1.f;
@@ -133,46 +133,46 @@ void CRevModel::UpdateCoeffs() {
         gain = 0.015f;
     }
 
-    for (int i=0; i<8; i++) {
+    for (int i = 0; i < 8; i++) {
         combL[i].SetFeedback(roomsize1);
         combR[i].SetFeedback(roomsize1);
     }
 
-    for(int i=0; i<8; i++) {
+    for (int i = 0; i < 8; i++) {
         combL[i].SetDamp(damp1);
         combR[i].SetDamp(damp1);
     }
 }
 
 void CRevModel::Reset() {
-    for (int i=0; i<8; i++) {
+    for (int i = 0; i < 8; i++) {
         combL[i].Mute();
         combR[i].Mute();
     }
 
-    for(int i=0; i<4; i++) {
+    for (int i = 0; i < 4; i++) {
         allpassL[i].Mute();
         allpassR[i].Mute();
     }
 }
 
 void CRevModel::SetRoomSize(float value) {
-    roomsize = (value*0.28f) + 0.7f;
+    roomsize = (value * 0.28f) + 0.7f;
     UpdateCoeffs();
 }
 
 void CRevModel::SetDamp(float value) {
-    damp = value*0.4f;
+    damp = value * 0.4f;
     UpdateCoeffs();
 }
 
 void CRevModel::SetWet(float value) {
-    wet = value*3.f;
+    wet = value * 3.f;
     UpdateCoeffs();
 }
 
 void CRevModel::SetDry(float value) {
-    dry = value*2.f;
+    dry = value * 2.f;
 }
 
 void CRevModel::SetWidth(float value) {
@@ -186,19 +186,19 @@ void CRevModel::SetMode(int value) {
 }
 
 float CRevModel::GetRoomSize() {
-    return (roomsize-0.7f)/0.28f;
+    return (roomsize - 0.7f) / 0.28f;
 }
 
 float CRevModel::GetDamp() {
-    return damp/0.4f;
+    return damp / 0.4f;
 }
 
 float CRevModel::GetWet() {
-    return wet/3.f;
+    return wet / 3.f;
 }
 
 float CRevModel::GetDry() {
-    return dry/2.f;
+    return dry / 2.f;
 }
 
 float CRevModel::GetWidth() {

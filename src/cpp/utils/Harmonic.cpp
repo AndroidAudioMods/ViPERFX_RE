@@ -68,9 +68,9 @@ void Harmonic::UpdateCoeffs(float *coefficients) {
     float fVar6;
     float _coeffs[20];
     float afStack76[14];
-    
+
     memset(_coeffs, 0, 11 * sizeof(float));
-    this->buildup = (int)fabsf(coefficients[10]);
+    this->buildup = (int) fabsf(coefficients[10]);
     memcpy(&_coeffs[1], coefficients, 10 * sizeof(float));
 
     fVar6 = 1.f / (
@@ -98,7 +98,7 @@ void Harmonic::UpdateCoeffs(float *coefficients) {
     _coeffs[11] = _coeffs[10];
     fVar6 = _coeffs[11];
     for (int i = 2; i < 11; i++) {
-        for(int idx = 0; idx < i; idx++) {
+        for (int idx = 0; idx < i; idx++) {
             _coeffs[11] = fVar6;
             fVar5 = _coeffs[10 - idx + i];
             fVar6 = afStack76[2 - idx + i];
@@ -116,6 +116,6 @@ void Harmonic::UpdateCoeffs(float *coefficients) {
 
     _coeffs[11] = _coeffs[0] * 0.5f - _coeffs[11];
     for (int i = 0; i < 11; i++) {
-        this->coeffs[i] = _coeffs[11+i];
+        this->coeffs[i] = _coeffs[11 + i];
     }
 }

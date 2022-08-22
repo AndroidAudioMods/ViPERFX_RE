@@ -10,24 +10,39 @@
 class CRevModel {
 public:
     CRevModel();
+
     ~CRevModel();
 
     void Mute();
+
     void ProcessReplace(float *bufL, float *bufR, uint32_t size);
+
     void UpdateCoeffs();
+
     void Reset();
 
     void SetRoomSize(float value);
+
     void SetDamp(float value);
+
     void SetWet(float value);
+
     void SetDry(float value);
+
     void SetWidth(float value);
+
     void SetMode(int value);
+
     float GetRoomSize();
+
     float GetDamp();
+
     float GetWet();
+
     float GetDry();
+
     float GetWidth();
+
     int GetMode();
 
     float gain;
@@ -48,7 +63,7 @@ public:
     CAllpassFilter allpassL[4];
     CAllpassFilter allpassR[4];
 
-    float* buffers[24];
+    float *buffers[24];
 };
 
 

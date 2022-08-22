@@ -12,7 +12,7 @@ class Subwoofer {
 public:
     Subwoofer();
 
-    void Process(float* samples, uint32_t size);
+    void Process(float *samples, uint32_t size);
 
     void SetBassGain(uint32_t samplerate, float gainDb);
 
