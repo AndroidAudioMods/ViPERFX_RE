@@ -1,16 +1,20 @@
 cmake_minimum_required(VERSION 3.16.3)
-
-project("ViPER4Android Reworked")
-
 set(CMAKE_CXX_COMPILER_VERSION 20)
 
-include_directories(src/include/)
-
+project("ViPER4Android Reworked")
 add_compile_definitions(VERSION_MAJOR=1)
 add_compile_definitions(VERSION_MINOR=0)
-add_compile_definitions(VERSION_REVISION=0)
-add_compile_definitions(VERSION_BUILD=0)
 add_compile_definitions(VERSION_CODENAME="Reworked")
+
+# KISS FFT
+set(KISSFFT_PKGCONFIG OFF)
+set(KISSFFT_STATIC ON)
+set(KISSFFT_TEST OFF)
+set(KISSFFT_TOOLS OFF)
+add_subdirectory(src/cpp/kissfft)
+
+# ViPERFX
+include_directories(src/include)
 
 set(FILES
         # Main
@@ -55,7 +59,6 @@ set(FILES
 
 message(${CMAKE_BUILD_TYPE})
 
-
 add_library(
         # Sets the name of the library.
         v4afx_r
@@ -66,6 +69,4 @@ add_library(
         # Provides a relative path to your source file(s).
         ${FILES})
 
-find_library(log-lib log)
-
-target_link_libraries(v4afx_r ${log-lib})
+target_link_libraries(v4afx_r log kissfft)
