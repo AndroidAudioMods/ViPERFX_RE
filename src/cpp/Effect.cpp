@@ -33,7 +33,8 @@ Effect::Effect() {
 
 Effect::~Effect() {
     if (this->buffer != nullptr) {
-        free(this->buffer);
+        delete this->buffer;
+        this->buffer = nullptr;
     }
 }
 

@@ -16,6 +16,15 @@
 #include "effects/Cure.h"
 #include "effects/DiffSurround.h"
 #include "effects/VHE.h"
+#include "effects/AdaptiveBuffer_F32.h"
+#include "effects/Convolver.h"
+#include "effects/ViPERDDC.h"
+#include "effects/IIRFilter.h"
+#include "effects/ColorfulMusic.h"
+#include "effects/FETCompressor.h"
+#include "effects/ViPERBass.h"
+#include "effects/SoftwareLimiter.h"
+#include "effects/PlaybackGain.h"
 
 class ProcessUnit_FX : public Effect {
 public:
@@ -35,26 +44,27 @@ public:
     bool init_ok, enabled, force_enabled, fetcomp_enabled;
     FxMode mode;
 
-//    AdaptiveBuffer_F32* adaptiveBuffer;
+    // Effects
+    AdaptiveBuffer_F32 *adaptiveBuffer;
     WaveBuffer_I32 *waveBuffer;
-//    Convolver* convolver;
+    Convolver *convolver;
     VHE *vhe;
-//    ViPERDDC* vddc;
+    ViPERDDC *viperDdc;
     SpectrumExtend *spectrumExtend;
-//    IIRFilter* iirfilter;
-//    ColorfulMusic* colm;
-    Reverberation *reverb;
-//    PlaybackGain* playbackGain;
-//    FETCompressor* fetcomp;
-    DynamicSystem *dynsys;
-//    ViPERBass* bass;
-    ViPERClarity *clarity;
+    IIRFilter *iirFilter;
+    ColorfulMusic *colorfulMusic;
+    Reverberation *reverberation;
+    PlaybackGain *playbackGain;
+    FETCompressor *fetCompressor;
+    DynamicSystem *dynamicSystem;
+    ViPERBass *viperBass;
+    ViPERClarity *viperClarity;
     DiffSurround *diffSurround;
     Cure *cure;
-    TubeSimulator *tube;
-    AnalogX *analogx;
+    TubeSimulator *tubeSimulator;
+    AnalogX *analogX;
     SpeakerCorrection *speakerCorrection;
-//    SoftwareLimiter* limiter[2];
+    SoftwareLimiter *softwareLimiters[2];
 
     int unk[3];
 };
