@@ -4,7 +4,7 @@
 #include "constants.h"
 #include "log.h"
 
-#define EFFECT_NAME "ViPER4Android Reworked [" VERSION_STRING "]"
+#define EFFECT_NAME "ViPER4Android Reworked " VERSION_STRING
 #define EFFECT_IMPLEMENTOR "ViPER.WYF, Martmists, Iscle"
 
 static effect_descriptor_t viper_descriptor = {

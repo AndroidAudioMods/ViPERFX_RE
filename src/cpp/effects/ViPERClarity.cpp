@@ -22,15 +22,21 @@ ViPERClarity::ViPERClarity() {
 
 void ViPERClarity::Process(float *samples, uint32_t size) {
     if (this->enabled) {
-        if (this->processMode == ClarityMode::NATURAL) {
-            this->sharp.Process(samples, size);
-        } else if (this->processMode == ClarityMode::OZONE) {
-            for (int i = 0; i < size * 2; i++) {
-                samples[i] = this->hiShelf[i % 2].Process(samples[i]);
+        switch (this->processMode) {
+            case ClarityMode::NATURAL: {
+                this->sharp.Process(samples, size);
+                break;
             }
-        } else {
-            // ClarityMode::XHIFI
-            this->hifi.Process(samples, size);
+            case ClarityMode::OZONE: {
+                for (int i = 0; i < size * 2; i++) {
+                    samples[i] = this->hiShelf[i % 2].Process(samples[i]);
+                }
+                break;
+            }
+            case ClarityMode::XHIFI: {
+                this->hifi.Process(samples, size);
+                break;
+            }
         }
     }
 }
