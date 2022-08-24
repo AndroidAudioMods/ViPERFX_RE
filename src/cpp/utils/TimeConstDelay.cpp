@@ -13,10 +13,8 @@ TimeConstDelay::TimeConstDelay() {
 }
 
 TimeConstDelay::~TimeConstDelay() {
-    if (this->samples != nullptr) {
-        free(this->samples);
-        this->samples = nullptr;
-    }
+    delete this->samples;
+    this->samples = nullptr;
 }
 
 float TimeConstDelay::ProcessSample(float sample) {
@@ -31,10 +29,8 @@ float TimeConstDelay::ProcessSample(float sample) {
 
 void TimeConstDelay::SetParameters(uint32_t samplerate, float delay) {
     this->sampleCount = (int) ((float) samplerate * delay * 0.5f);
-    if (this->samples != nullptr) {
-        free(this->samples);
-    }
-    this->samples = new float[this->sampleCount * sizeof(float)];
+    delete this->samples;
+    this->samples = new float[this->sampleCount];
     this->offset = 0;
     memset(this->samples, 0, this->sampleCount * sizeof(float));
 }

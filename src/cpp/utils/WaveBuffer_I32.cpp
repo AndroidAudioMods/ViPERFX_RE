@@ -10,11 +10,12 @@ WaveBuffer_I32::WaveBuffer_I32(int channels, uint32_t size) {
     this->channels = channels;
     this->size = size * channels;
     this->index = 0;
-    this->buffer = (float *) malloc(this->size * sizeof(float));
+    this->buffer = new float[this->size];
 }
 
 WaveBuffer_I32::~WaveBuffer_I32() {
-    free(this->buffer);
+    delete this->buffer;
+    this->buffer = nullptr;
 }
 
 void WaveBuffer_I32::Reset() {
@@ -82,12 +83,9 @@ int WaveBuffer_I32::PushSamples(float *source, uint32_t size) {
 
     if (size > 0) {
         if (this->size < this->channels * size + this->index) {
-            float *buf = (float *) malloc((this->channels * size + this->index) * sizeof(float));
-            if (buf == nullptr) {
-                return 0;
-            }
+            auto *buf = new float[this->channels * size + this->index];
             memcpy(buf, this->buffer, this->index * sizeof(float));
-            free(this->buffer);
+            delete this->buffer;
             this->buffer = buf;
             this->size = this->channels * size + this->index;
         }
@@ -105,12 +103,9 @@ int WaveBuffer_I32::PushZeros(uint32_t size) {
 
     if (size > 0) {
         if (this->size < this->channels * size + this->index) {
-            float *buf = (float *) malloc((this->channels * size + this->index) * sizeof(float));
-            if (buf == nullptr) {
-                return 0;
-            }
+            auto *buf = new float[this->channels * size + this->index];
             memcpy(buf, this->buffer, this->index * sizeof(float));
-            free(this->buffer);
+            delete this->buffer;
             this->buffer = buf;
             this->size = this->channels * size + this->index;
         }
@@ -128,12 +123,9 @@ float *WaveBuffer_I32::PushZerosGetBuffer(uint32_t size) {
 
     if (size > 0) {
         if (this->size < this->channels * size + this->index) {
-            float *buf = (float *) malloc((this->channels * size + this->index) * sizeof(float));
-            if (buf == nullptr) {
-                return nullptr;
-            }
+            auto *buf = new float[this->channels * size + this->index];
             memcpy(buf, this->buffer, this->index * sizeof(float));
-            free(this->buffer);
+            delete this->buffer;
             this->buffer = buf;
             this->size = this->channels * size + this->index;
         }

@@ -32,10 +32,8 @@ Effect::Effect() {
 }
 
 Effect::~Effect() {
-    if (this->buffer != nullptr) {
-        delete this->buffer;
-        this->buffer = nullptr;
-    }
+    delete this->buffer;
+    this->buffer = nullptr;
 }
 
 int32_t Effect::process(audio_buffer_s *in, audio_buffer_s *out) {
