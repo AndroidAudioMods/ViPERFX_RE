@@ -16,7 +16,7 @@
 #include "effects/Cure.h"
 #include "effects/DiffSurround.h"
 #include "effects/VHE.h"
-#include "effects/AdaptiveBuffer_F32.h"
+#include "utils/AdaptiveBuffer_F32.h"
 #include "effects/Convolver.h"
 #include "effects/ViPERDDC.h"
 #include "effects/IIRFilter.h"

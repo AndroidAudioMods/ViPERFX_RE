@@ -35,6 +35,7 @@ set(FILES
         src/cpp/effects/ViPERClarity.cpp
 
         # Utils
+        src/cpp/utils/AdaptiveBuffer_F32.cpp
         src/cpp/utils/CAllpassFilter.cpp
         src/cpp/utils/CCombFilter.cpp
         src/cpp/utils/CRevModel.cpp

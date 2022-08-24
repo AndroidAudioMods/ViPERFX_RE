@@ -101,8 +101,8 @@ ProcessUnit_FX::ProcessUnit_FX() {
     this->speakerCorrection->SetSamplingRate(this->sampleRate);
     this->speakerCorrection->Reset();
 
-    for (int i = 0; i < sizeof(softwareLimiters); i++) {
-        this->softwareLimiters[i] = new SoftwareLimiter();
+    for (auto &softwareLimiter: this->softwareLimiters) {
+        softwareLimiter = new SoftwareLimiter();
 //        this->softwareLimiters[i]->ResetLimiter();
     }
 
@@ -190,10 +190,10 @@ ProcessUnit_FX::~ProcessUnit_FX() {
         delete this->speakerCorrection;
         this->speakerCorrection = nullptr;
     }
-    for (int i = 0; i < sizeof(softwareLimiters); i++) {
-        if (softwareLimiters[i] != nullptr) {
-            delete softwareLimiters[i];
-            softwareLimiters[i] = nullptr;
+    for (auto &softwareLimiter: softwareLimiters) {
+        if (softwareLimiter != nullptr) {
+            delete softwareLimiter;
+            softwareLimiter = nullptr;
         }
     }
 }
