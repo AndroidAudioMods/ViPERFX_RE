@@ -103,7 +103,7 @@ ProcessUnit_FX::ProcessUnit_FX() {
 
     for (auto &softwareLimiter: this->softwareLimiters) {
         softwareLimiter = new SoftwareLimiter();
-//        this->softwareLimiters[i]->ResetLimiter();
+//        softwareLimiter->ResetLimiter();
     }
 
     this->init_ok = true;
@@ -287,9 +287,9 @@ void ProcessUnit_FX::ResetAllEffects() {
         this->speakerCorrection->SetSamplingRate(this->sampleRate);
         this->speakerCorrection->Reset();
     }
-    for (int i = 0; i < sizeof(softwareLimiters); i++) {
-        if (softwareLimiters[i] != nullptr) {
-//            softwareLimiters[i]->Reset();
+    for (auto &softwareLimiter: softwareLimiters) {
+        if (softwareLimiter != nullptr) {
+//            softwareLimiter->Reset();
         }
     }
 }
