@@ -30,7 +30,6 @@ float TimeConstDelay::ProcessSample(float sample) {
 void TimeConstDelay::SetParameters(uint32_t samplerate, float delay) {
     this->sampleCount = (int) ((float) samplerate * delay * 0.5f);
     delete this->samples;
-    this->samples = new float[this->sampleCount];
+    this->samples = new float[this->sampleCount]();
     this->offset = 0;
-    memset(this->samples, 0, this->sampleCount * sizeof(float));
 }

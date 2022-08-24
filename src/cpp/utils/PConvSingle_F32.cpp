@@ -56,8 +56,7 @@ int PConvSingle_F32::LoadKernel(float *buf, int param_2, int segmentSize) {
     if (param_2 > 0 && segmentSize > 0 && segmentSize % 2 == 0) {
         this->enabled = false;
         ReleaseResources();
-        this->data = new PConvData; //(PConvData *) malloc(0x140);  // TODO: Sizeof
-        memset(this->data, 0, 0x140);  // Ditto
+        this->data = new PConvData(); //(PConvData *) malloc(0x140);  // TODO: Sizeof
         this->segmentSize = segmentSize;
         int n = ProcessKernel(buf, param_2, 1);
         if (n != 0) {
@@ -76,8 +75,7 @@ int PConvSingle_F32::LoadKernel(float *buf, float *param_2, int segmentSize, int
     if (param_5 > 0 && segmentSize > 0 && segmentSize % 2 == 0) {
         this->enabled = false;
         ReleaseResources();
-        this->data = new PConvData; //(PConvData *) malloc(0x140);  // TODO: Sizeof
-        memset(this->data, 0, 0x140);  // Ditto
+        this->data = new PConvData(); //(PConvData *) malloc(0x140);  // TODO: Sizeof
         this->segmentSize = segmentSize;
         int n = ProcessKernel(1, param_2, param_4, param_5);
         if (n != 0) {

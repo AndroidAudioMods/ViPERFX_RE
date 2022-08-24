@@ -106,7 +106,7 @@ int32_t ViperEffectCreate(const effect_uuid_t *uuid, int32_t sessionId, int32_t 
                uuid->node[2], uuid->node[3], uuid->node[4], uuid->node[5]);
     v4a_print(ANDROID_LOG_INFO, "ViperEffectCreate(), Constructing ProcessUnit_FX");
 
-    auto *pContext = new ViperContext;
+    auto *pContext = new ViperContext();
     pContext->interface = &viper_interface;
     pContext->effect = new ProcessUnit_FX();
 
