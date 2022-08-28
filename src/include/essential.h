@@ -20,27 +20,27 @@ static const effect_uuid_t * const EFFECT_UUID_NULL = &EFFECT_UUID_NULL_;
 static const char * const EFFECT_UUID_NULL_STR = "ec7178ec-e5e1-4432-a3f4-4657e6795210";
 
 
-// The effect descriptor contains necessary information to facilitate the enumeration of the effect
+// The viper descriptor contains necessary information to facilitate the enumeration of the viper
 // engines present in a library.
 typedef struct effect_descriptor_s
 {
-    effect_uuid_t type;     // UUID of to the OpenSL ES interface implemented by this effect
+    effect_uuid_t type;     // UUID of to the OpenSL ES interface implemented by this viper
     effect_uuid_t uuid;     // UUID for this particular implementation
-    uint32_t apiVersion;    // Version of the effect control API implemented
-    uint32_t flags;         // effect engine capabilities/requirements flags (see below)
+    uint32_t apiVersion;    // Version of the viper control API implemented
+    uint32_t flags;         // viper engine capabilities/requirements flags (see below)
     uint16_t cpuLoad;       // CPU load indication (see below)
     uint16_t memoryUsage;   // Data Memory usage (see below)
-    char    name[EFFECT_STRING_LEN_MAX];   // human readable effect name
-    char    implementor[EFFECT_STRING_LEN_MAX];    // human readable effect implementor name
+    char    name[EFFECT_STRING_LEN_MAX];   // human readable viper name
+    char    implementor[EFFECT_STRING_LEN_MAX];    // human readable viper implementor name
 } effect_descriptor_t;
 
-// CPU load and memory usage indication: each effect implementation must provide an indication of
-// its CPU and memory usage for the audio effect framework to limit the number of effects
+// CPU load and memory usage indication: each viper implementation must provide an indication of
+// its CPU and memory usage for the audio viper framework to limit the number of effects
 // instantiated at a given time on a given platform.
 // The CPU load is expressed in 0.1 MIPS units as estimated on an ARM9E core (ARMv5TE) with 0 WS.
 // The memory usage is expressed in KB and includes only dynamically allocated memory
 
-// Definitions for flags field of effect descriptor.
+// Definitions for flags field of viper descriptor.
 //  +---------------------------+-----------+-----------------------------------
 //  | description               | bits      | values
 //  +---------------------------+-----------+-----------------------------------
@@ -56,7 +56,7 @@ typedef struct effect_descriptor_s
 //  | insertion preference      | 3..5      | 0 none
 //  |                           |           | 1 first of the chain
 //  |                           |           | 2 last of the chain
-//  |                           |           | 3 exclusive (only effect in the insert chain)
+//  |                           |           | 3 exclusive (only viper in the insert chain)
 //  |                           |           | 4..7 reserved
 //  +---------------------------+-----------+-----------------------------------
 //  | Volume management         | 6..8      | 0 none
@@ -87,11 +87,11 @@ typedef struct effect_descriptor_s
 //  | Hardware acceleration     | 16..17    | 0 No hardware acceleration
 //  |                           |           | 1 non tunneled hw acceleration: the process() function
 //  |                           |           |   reads the samples, send them to HW accelerated
-//  |                           |           |   effect processor, reads back the processed samples
+//  |                           |           |   viper processor, reads back the processed samples
 //  |                           |           |   and returns them to the output buffer.
 //  |                           |           | 2 tunneled hw acceleration: the process() function is
-//  |                           |           |   transparent. The effect interface is only used to
-//  |                           |           |   control the effect engine. This mode is relevant for
+//  |                           |           |   transparent. The viper interface is only used to
+//  |                           |           |   control the viper engine. This mode is relevant for
 //  |                           |           |   global effects actually applied by the audio
 //  |                           |           |   hardware on the output stream.
 //  +---------------------------+-----------+-----------------------------------
@@ -103,8 +103,8 @@ typedef struct effect_descriptor_s
 //  |                           |           | 1 requires audio source updates
 //  |                           |           | 2..3 reserved
 //  +---------------------------+-----------+-----------------------------------
-//  | Effect offload supported  | 22        | 0 The effect cannot be offloaded to an audio DSP
-//  |                           |           | 1 The effect can be offloaded to an audio DSP
+//  | Effect offload supported  | 22        | 0 The viper cannot be offloaded to an audio DSP
+//  |                           |           | 1 The viper can be offloaded to an audio DSP
 //  +---------------------------+-----------+-----------------------------------
 
 // Insert mode
@@ -210,16 +210,16 @@ typedef struct effect_descriptor_s
 #define EFFECT_CONTROL_API_VERSION EFFECT_MAKE_API_VERSION(2,0)
 
 // Effect control interface structure: effect_interface_s
-// The effect control interface is exposed by each effect engine implementation. It consists of
+// The viper control interface is exposed by each viper engine implementation. It consists of
 // a set of functions controlling the configuration, activation and process of the engine.
 // The functions are grouped in a structure of type effect_interface_s.
 //
 // Effect control interface handle: effect_handle_t
-// The effect_handle_t serves two purposes regarding the implementation of the effect engine:
+// The effect_handle_t serves two purposes regarding the implementation of the viper engine:
 // - 1 it is the address of a pointer to an effect_interface_s structure where the functions
-// of the effect control API for a particular effect are located.
-// - 2 it is the address of the context of a particular effect instance.
-// A typical implementation in the effect library would define a structure as follows:
+// of the viper control API for a particular viper are located.
+// - 2 it is the address of the context of a particular viper instance.
+// A typical implementation in the viper library would define a structure as follows:
 // struct effect_module_s {
 //        const struct effect_interface_s *itfe;
 //        effect_config_t config;
@@ -245,9 +245,9 @@ struct effect_interface_s
     //          samples as specified in output buffer descriptor. If the buffer descriptor
     //          is not specified the function must use either the buffer or the
     //          buffer provider function installed by the EFFECT_CMD_SET_CONFIG command.
-    //          The effect framework will call the process() function after the EFFECT_CMD_ENABLE
+    //          The viper framework will call the process() function after the EFFECT_CMD_ENABLE
     //          command is received and until the EFFECT_CMD_DISABLE is received. When the engine
-    //          receives the EFFECT_CMD_DISABLE command it should turn off the effect gracefully
+    //          receives the EFFECT_CMD_DISABLE command it should turn off the viper gracefully
     //          and when done indicate that it is OK to stop calling the process() function by
     //          returning the -ENODATA status.
     //
@@ -256,7 +256,7 @@ struct effect_interface_s
     //      pthread_cond_wait/pthread_mutex_lock...
     //
     //    Input:
-    //          self:       handle to the effect interface this function
+    //          self:       handle to the viper interface this function
     //              is called on.
     //          inBuffer:   buffer descriptor indicating where to read samples to process.
     //              If NULL, use the configuration passed by EFFECT_CMD_SET_CONFIG command.
@@ -278,10 +278,10 @@ struct effect_interface_s
     //
     //    Function:       command
     //
-    //    Description:    Send a command and receive a response to/from effect engine.
+    //    Description:    Send a command and receive a response to/from viper engine.
     //
     //    Input:
-    //          self:       handle to the effect interface this function
+    //          self:       handle to the viper interface this function
     //              is called on.
     //          cmdCode:    command code: the command can be a standardized command defined in
     //              effect_command_e (see below) or a proprietary command.
@@ -314,19 +314,19 @@ struct effect_interface_s
     //
     //    Function:        get_descriptor
     //
-    //    Description:    Returns the effect descriptor
+    //    Description:    Returns the viper descriptor
     //
     //    Input:
-    //          self:       handle to the effect interface this function
+    //          self:       handle to the viper interface this function
     //              is called on.
     //
     //    Input/Output:
-    //          pDescriptor:    address where to return the effect descriptor.
+    //          pDescriptor:    address where to return the viper descriptor.
     //
     //    Output:
     //        returned value:    0          successful operation.
     //                          -EINVAL     invalid interface handle or invalid pDescriptor
-    //        *pDescriptor:     updated with the effect descriptor.
+    //        *pDescriptor:     updated with the viper descriptor.
     //
     ////////////////////////////////////////////////////////////////////////////////
     int32_t (*get_descriptor)(effect_handle_t self,
@@ -336,12 +336,12 @@ struct effect_interface_s
     //    Function:       process_reverse
     //
     //    Description:    Process reverse stream function. This function is used to pass
-    //          a reference stream to the effect engine. If the engine does not need a reference
+    //          a reference stream to the viper engine. If the engine does not need a reference
     //          stream, this function pointer can be set to NULL.
     //          This function would typically implemented by an Echo Canceler.
     //
     //    Input:
-    //          self:       handle to the effect interface this function
+    //          self:       handle to the viper interface this function
     //              is called on.
     //          inBuffer:   buffer descriptor indicating where to read samples to process.
     //              If NULL, use the configuration passed by EFFECT_CMD_SET_CONFIG_REVERSE command.
@@ -369,11 +369,11 @@ struct effect_interface_s
 //
 enum effect_command_e
 {
-    EFFECT_CMD_INIT,                 // initialize effect engine
-    EFFECT_CMD_SET_CONFIG,           // configure effect engine (see effect_config_t)
-    EFFECT_CMD_RESET,                // reset effect engine
-    EFFECT_CMD_ENABLE,               // enable effect process
-    EFFECT_CMD_DISABLE,              // disable effect process
+    EFFECT_CMD_INIT,                 // initialize viper engine
+    EFFECT_CMD_SET_CONFIG,           // configure viper engine (see effect_config_t)
+    EFFECT_CMD_RESET,                // reset viper engine
+    EFFECT_CMD_ENABLE,               // enable viper process
+    EFFECT_CMD_DISABLE,              // disable viper process
     EFFECT_CMD_SET_PARAM,            // set parameter immediately (see effect_param_t)
     EFFECT_CMD_SET_PARAM_DEFERRED,   // set parameter deferred
     EFFECT_CMD_SET_PARAM_COMMIT,     // commit previous set parameter deferred
@@ -381,16 +381,16 @@ enum effect_command_e
     EFFECT_CMD_SET_DEVICE,           // set audio device (see audio.h, audio_devices_t)
     EFFECT_CMD_SET_VOLUME,           // set volume
     EFFECT_CMD_SET_AUDIO_MODE,       // set the audio mode (normal, ring, ...)
-    EFFECT_CMD_SET_CONFIG_REVERSE,   // configure effect engine reverse stream(see effect_config_t)
+    EFFECT_CMD_SET_CONFIG_REVERSE,   // configure viper engine reverse stream(see effect_config_t)
     EFFECT_CMD_SET_INPUT_DEVICE,     // set capture device (see audio.h, audio_devices_t)
-    EFFECT_CMD_GET_CONFIG,           // read effect engine configuration
-    EFFECT_CMD_GET_CONFIG_REVERSE,   // read configure effect engine reverse stream configuration
+    EFFECT_CMD_GET_CONFIG,           // read viper engine configuration
+    EFFECT_CMD_GET_CONFIG_REVERSE,   // read configure viper engine reverse stream configuration
     EFFECT_CMD_GET_FEATURE_SUPPORTED_CONFIGS,// get all supported configurations for a feature.
     EFFECT_CMD_GET_FEATURE_CONFIG,   // get current feature configuration
     EFFECT_CMD_SET_FEATURE_CONFIG,   // set current feature configuration
     EFFECT_CMD_SET_AUDIO_SOURCE,     // set the audio source (see audio.h, audio_source_t)
-    EFFECT_CMD_OFFLOAD,              // set if effect thread is an offload one,
-    // send the ioHandle of the effect thread
+    EFFECT_CMD_OFFLOAD,              // set if viper thread is an offload one,
+    // send the ioHandle of the viper thread
     EFFECT_CMD_FIRST_PROPRIETARY = 0x10000 // first proprietary command code
 };
 
@@ -398,7 +398,7 @@ enum effect_command_e
 // command: EFFECT_CMD_INIT
 //--------------------------------------------------------------------------------------------------
 // description:
-//  Initialize effect engine: All configurations return to default
+//  Initialize viper engine: All configurations return to default
 //--------------------------------------------------------------------------------------------------
 // command format:
 //  size: 0
@@ -424,7 +424,7 @@ enum effect_command_e
 // command: EFFECT_CMD_RESET
 //--------------------------------------------------------------------------------------------------
 // description:
-//  Reset the effect engine. Keep configuration but resets state and buffer content
+//  Reset the viper engine. Keep configuration but resets state and buffer content
 //--------------------------------------------------------------------------------------------------
 // command format:
 //  size: 0
@@ -517,7 +517,7 @@ enum effect_command_e
 // description:
 //  Set the rendering device the audio output path is connected to. See audio.h, audio_devices_t
 //  for device values.
-//  The effect implementation must set EFFECT_FLAG_DEVICE_IND flag in its descriptor to receive this
+//  The viper implementation must set EFFECT_FLAG_DEVICE_IND flag in its descriptor to receive this
 //  command when the device changes
 //--------------------------------------------------------------------------------------------------
 // command format:
@@ -531,12 +531,12 @@ enum effect_command_e
 // command: EFFECT_CMD_SET_VOLUME
 //--------------------------------------------------------------------------------------------------
 // description:
-//  Set and get volume. Used by audio framework to delegate volume control to effect engine.
-//  The effect implementation must set EFFECT_FLAG_VOLUME_IND or EFFECT_FLAG_VOLUME_CTRL flag in
+//  Set and get volume. Used by audio framework to delegate volume control to viper engine.
+//  The viper implementation must set EFFECT_FLAG_VOLUME_IND or EFFECT_FLAG_VOLUME_CTRL flag in
 //  its descriptor to receive this command before every call to process() function
-//  If EFFECT_FLAG_VOLUME_CTRL flag is set in the effect descriptor, the effect engine must return
-//  the volume that should be applied before the effect is processed. The overall volume (the volume
-//  actually applied by the effect engine multiplied by the returned value) should match the value
+//  If EFFECT_FLAG_VOLUME_CTRL flag is set in the viper descriptor, the viper engine must return
+//  the volume that should be applied before the viper is processed. The overall volume (the volume
+//  actually applied by the viper engine multiplied by the returned value) should match the value
 //  indicated in the command.
 //--------------------------------------------------------------------------------------------------
 // command format:
@@ -546,18 +546,18 @@ enum effect_command_e
 //--------------------------------------------------------------------------------------------------
 // reply format:
 //  size: n * sizeof(uint32_t) / 0
-//  data: - if EFFECT_FLAG_VOLUME_CTRL is set in effect descriptor:
+//  data: - if EFFECT_FLAG_VOLUME_CTRL is set in viper descriptor:
 //              volume for each channel defined in effect_config_t for output buffer expressed in
 //              8.24 fixed point format
-//        - if EFFECT_FLAG_VOLUME_CTRL is not set in effect descriptor:
+//        - if EFFECT_FLAG_VOLUME_CTRL is not set in viper descriptor:
 //              N/A
-//  It is legal to receive a null pointer as pReplyData in which case the effect framework has
-//  delegated volume control to another effect
+//  It is legal to receive a null pointer as pReplyData in which case the viper framework has
+//  delegated volume control to another viper
 //==================================================================================================
 // command: EFFECT_CMD_SET_AUDIO_MODE
 //--------------------------------------------------------------------------------------------------
 // description:
-//  Set the audio mode. The effect implementation must set EFFECT_FLAG_AUDIO_MODE_IND flag in its
+//  Set the audio mode. The viper implementation must set EFFECT_FLAG_AUDIO_MODE_IND flag in its
 //  descriptor to receive this command when the audio mode changes.
 //--------------------------------------------------------------------------------------------------
 // command format:
@@ -587,7 +587,7 @@ enum effect_command_e
 // description:
 //  Set the capture device the audio input path is connected to. See audio.h, audio_devices_t
 //  for device values.
-//  The effect implementation must set EFFECT_FLAG_DEVICE_IND flag in its descriptor to receive this
+//  The viper implementation must set EFFECT_FLAG_DEVICE_IND flag in its descriptor to receive this
 //  command when the device changes
 //--------------------------------------------------------------------------------------------------
 // command format:
@@ -700,8 +700,8 @@ enum effect_command_e
 // command: EFFECT_CMD_OFFLOAD
 //--------------------------------------------------------------------------------------------------
 // description:
-//  1.indicate if the playback thread the effect is attached to is offloaded or not
-//  2.update the io handle of the playback thread the effect is attached to
+//  1.indicate if the playback thread the viper is attached to is offloaded or not
+//  2.update the io handle of the playback thread the viper is attached to
 //--------------------------------------------------------------------------------------------------
 // command format:
 //  size: sizeof(effect_offload_param_t)
@@ -714,7 +714,7 @@ enum effect_command_e
 // command: EFFECT_CMD_FIRST_PROPRIETARY
 //--------------------------------------------------------------------------------------------------
 // description:
-//  All proprietary effect commands must use command codes above this value. The size and format of
+//  All proprietary viper commands must use command codes above this value. The size and format of
 //  command and response fields is free in this case
 //==================================================================================================
 
@@ -747,7 +747,7 @@ typedef struct buffer_provider_s
 
 
 // The buffer_config_s structure specifies the input or output audio format
-// to be used by the effect engine. It is part of the effect_config_t
+// to be used by the viper engine. It is part of the effect_config_t
 // structure that defines both input and output buffer configurations and is
 // passed by the EFFECT_CMD_SET_CONFIG or EFFECT_CMD_SET_CONFIG_REVERSE command.
 typedef struct buffer_config_s
@@ -769,7 +769,7 @@ typedef enum
     EFFECT_BUFFER_ACCESS_ACCUMULATE
 } effect_buffer_access_e;
 // effect_config_s structure describes the format of the pCmdData argument of EFFECT_CMD_SET_CONFIG
-// command to configure audio parameters and buffers for effect engine input and output.
+// command to configure audio parameters and buffers for viper engine input and output.
 typedef struct effect_config_s
 {
     buffer_config_t   inputCfg;
@@ -818,14 +818,14 @@ typedef struct effect_param_s
 
 #define AUDIO_EFFECT_LIBRARY_TAG ((('A') << 24) | (('E') << 16) | (('L') << 8) | ('T'))
 
-// Every effect library must have a data structure named AUDIO_EFFECT_LIBRARY_INFO_SYM
+// Every viper library must have a data structure named AUDIO_EFFECT_LIBRARY_INFO_SYM
 // and the fields of this data structure must begin with audio_effect_library_t
 
 typedef struct audio_effect_library_s
 {
     // tag must be initialized to AUDIO_EFFECT_LIBRARY_TAG
     uint32_t tag;
-    // Version of the effect library API : 0xMMMMmmmm MMMM: Major, mmmm: minor
+    // Version of the viper library API : 0xMMMMmmmm MMMM: Major, mmmm: minor
     uint32_t version;
     // Name of this library
     const char *name;
@@ -836,29 +836,29 @@ typedef struct audio_effect_library_s
     //
     //    Function:        create_effect
     //
-    //    Description:    Creates an effect engine of the specified implementation uuid and
-    //          returns an effect control interface on this engine. The function will allocate the
-    //          resources for an instance of the requested effect engine and return
-    //          a handle on the effect control interface.
+    //    Description:    Creates an viper engine of the specified implementation uuid and
+    //          returns an viper control interface on this engine. The function will allocate the
+    //          resources for an instance of the requested viper engine and return
+    //          a handle on the viper control interface.
     //
     //    Input:
-    //          uuid:    pointer to the effect uuid.
-    //          sessionId:  audio session to which this effect instance will be attached. All effects
+    //          uuid:    pointer to the viper uuid.
+    //          sessionId:  audio session to which this viper instance will be attached. All effects
     //              created with the same session ID are connected in series and process the same signal
-    //              stream. Knowing that two effects are part of the same effect chain can help the
+    //              stream. Knowing that two effects are part of the same viper chain can help the
     //              library implement some kind of optimizations.
-    //          ioId:   identifies the output or input stream this effect is directed to at audio HAL.
+    //          ioId:   identifies the output or input stream this viper is directed to at audio HAL.
     //              For future use especially with tunneled HW accelerated effects
     //
     //    Input/Output:
-    //          pHandle:        address where to return the effect interface handle.
+    //          pHandle:        address where to return the viper interface handle.
     //
     //    Output:
     //        returned value:    0          successful operation.
     //                          -ENODEV     library failed to initialize
     //                          -EINVAL     invalid pEffectUuid or pHandle
-    //                          -ENOENT     no effect with this uuid found
-    //        *pHandle:         updated with the effect interface handle.
+    //                          -ENOENT     no viper with this uuid found
+    //        *pHandle:         updated with the viper interface handle.
     //
     ////////////////////////////////////////////////////////////////////////////////
     int32_t (*create_effect)(const effect_uuid_t *uuid,
@@ -870,12 +870,12 @@ typedef struct audio_effect_library_s
     //
     //    Function:        release_effect
     //
-    //    Description:    Releases the effect engine whose handle is given as argument.
-    //          All resources allocated to this particular instance of the effect are
+    //    Description:    Releases the viper engine whose handle is given as argument.
+    //          All resources allocated to this particular instance of the viper are
     //          released.
     //
     //    Input:
-    //          handle:         handle on the effect interface to be released.
+    //          handle:         handle on the viper interface to be released.
     //
     //    Output:
     //        returned value:    0          successful operation.
@@ -889,18 +889,18 @@ typedef struct audio_effect_library_s
     //
     //    Function:        get_descriptor
     //
-    //    Description:    Returns the descriptor of the effect engine which implementation UUID is
+    //    Description:    Returns the descriptor of the viper engine which implementation UUID is
     //          given as argument.
     //
     //    Input/Output:
-    //          uuid:           pointer to the effect uuid.
-    //          pDescriptor:    address where to return the effect descriptor.
+    //          uuid:           pointer to the viper uuid.
+    //          pDescriptor:    address where to return the viper descriptor.
     //
     //    Output:
     //        returned value:    0          successful operation.
     //                          -ENODEV     library failed to initialize
     //                          -EINVAL     invalid pDescriptor or uuid
-    //        *pDescriptor:     updated with the effect descriptor.
+    //        *pDescriptor:     updated with the viper descriptor.
     //
     ////////////////////////////////////////////////////////////////////////////////
     int32_t (*get_descriptor)(const effect_uuid_t *uuid,

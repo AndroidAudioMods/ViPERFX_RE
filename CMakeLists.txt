@@ -11,52 +11,52 @@ set(KISSFFT_PKGCONFIG OFF)
 set(KISSFFT_STATIC ON)
 set(KISSFFT_TEST OFF)
 set(KISSFFT_TOOLS OFF)
-add_subdirectory(src/cpp/kissfft)
+add_subdirectory(src/cpp/viper/kissfft)
 
 # ViPERFX
 include_directories(src/include)
 
 set(FILES
         # Main
-        src/cpp/Effect.cpp
-        src/cpp/ProcessUnit_FX.cpp
-        src/cpp/viper.cpp
+        src/cpp/viper/Effect.cpp
+        src/cpp/viper/ViPER.cpp
+        src/cpp/ViPER4Android.cpp
 
         # Effects
-        src/cpp/effects/AnalogX.cpp
-        src/cpp/effects/Cure.cpp
-        src/cpp/effects/DiffSurround.cpp
-        src/cpp/effects/DynamicSystem.cpp
-        src/cpp/effects/Reverberation.cpp
-        src/cpp/effects/SpeakerCorrection.cpp
-        src/cpp/effects/SpectrumExtend.cpp
-        src/cpp/effects/TubeSimulator.cpp
-        src/cpp/effects/VHE.cpp
-        src/cpp/effects/ViPERClarity.cpp
+        src/cpp/viper/effects/AnalogX.cpp
+        src/cpp/viper/effects/Cure.cpp
+        src/cpp/viper/effects/DiffSurround.cpp
+        src/cpp/viper/effects/DynamicSystem.cpp
+        src/cpp/viper/effects/Reverberation.cpp
+        src/cpp/viper/effects/SpeakerCorrection.cpp
+        src/cpp/viper/effects/SpectrumExtend.cpp
+        src/cpp/viper/effects/TubeSimulator.cpp
+        src/cpp/viper/effects/VHE.cpp
+        src/cpp/viper/effects/ViPERClarity.cpp
 
         # Utils
-        src/cpp/utils/AdaptiveBuffer_F32.cpp
-        src/cpp/utils/CAllpassFilter.cpp
-        src/cpp/utils/CCombFilter.cpp
-        src/cpp/utils/CRevModel.cpp
-        src/cpp/utils/Crossfeed.cpp
-        src/cpp/utils/DepthSurround.cpp
-        src/cpp/utils/DynamicBass.cpp
-        src/cpp/utils/FixedBiquad.cpp
-        src/cpp/utils/Harmonic.cpp
-        src/cpp/utils/HiFi.cpp
-        src/cpp/utils/HighShelf.cpp
-        src/cpp/utils/IIR_1st.cpp
-        src/cpp/utils/IIR_NOrder_BW_BP.cpp
-        src/cpp/utils/IIR_NOrder_BW_LH.cpp
-        src/cpp/utils/MultiBiquad.cpp
-        src/cpp/utils/NoiseSharpening.cpp
-        src/cpp/utils/PassFilter.cpp
-        src/cpp/utils/PConvSingle_F32.cpp
-        src/cpp/utils/PolesFilter.cpp
-        src/cpp/utils/Subwoofer.cpp
-        src/cpp/utils/TimeConstDelay.cpp
-        src/cpp/utils/WaveBuffer_I32.cpp)
+        src/cpp/viper/utils/AdaptiveBuffer_F32.cpp
+        src/cpp/viper/utils/CAllpassFilter.cpp
+        src/cpp/viper/utils/CCombFilter.cpp
+        src/cpp/viper/utils/CRevModel.cpp
+        src/cpp/viper/utils/Crossfeed.cpp
+        src/cpp/viper/utils/DepthSurround.cpp
+        src/cpp/viper/utils/DynamicBass.cpp
+        src/cpp/viper/utils/FixedBiquad.cpp
+        src/cpp/viper/utils/Harmonic.cpp
+        src/cpp/viper/utils/HiFi.cpp
+        src/cpp/viper/utils/HighShelf.cpp
+        src/cpp/viper/utils/IIR_1st.cpp
+        src/cpp/viper/utils/IIR_NOrder_BW_BP.cpp
+        src/cpp/viper/utils/IIR_NOrder_BW_LH.cpp
+        src/cpp/viper/utils/MultiBiquad.cpp
+        src/cpp/viper/utils/NoiseSharpening.cpp
+        src/cpp/viper/utils/PassFilter.cpp
+        src/cpp/viper/utils/PConvSingle_F32.cpp
+        src/cpp/viper/utils/PolesFilter.cpp
+        src/cpp/viper/utils/Subwoofer.cpp
+        src/cpp/viper/utils/TimeConstDelay.cpp
+        src/cpp/viper/utils/WaveBuffer_I32.cpp)
 
 message(${CMAKE_BUILD_TYPE})
 

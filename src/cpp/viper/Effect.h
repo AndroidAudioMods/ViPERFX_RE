@@ -28,5 +28,5 @@ public:
     // TODO: Figure out what buffer is used for
     float *buffer;
     uint32_t bufferSize;
-    void *instance;  // type: ProcessUnit_FX
+    void *instance;  // type: ViPER
 };

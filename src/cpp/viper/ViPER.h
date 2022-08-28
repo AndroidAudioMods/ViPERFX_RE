@@ -4,7 +4,6 @@
 #pragma once
 
 #include "Effect.h"
-#include "viper.h"
 #include "utils/WaveBuffer_I32.h"
 #include "effects/SpectrumExtend.h"
 #include "effects/Reverberation.h"
@@ -25,12 +24,13 @@
 #include "effects/ViPERBass.h"
 #include "effects/SoftwareLimiter.h"
 #include "effects/PlaybackGain.h"
+#include "../ViPER4Android.h"
 
-class ProcessUnit_FX : public Effect {
+class ViPER : public Effect {
 public:
-    ProcessUnit_FX();
+    ViPER();
 
-    ~ProcessUnit_FX();
+    ~ViPER();
 
     int32_t command(uint32_t cmdCode, uint32_t cmdSize, void *pCmdData, uint32_t *replySize, void *pReplyData) override;
 
