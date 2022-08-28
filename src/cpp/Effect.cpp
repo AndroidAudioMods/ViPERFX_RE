@@ -44,17 +44,12 @@ int32_t Effect::process(audio_buffer_s *in, audio_buffer_s *out) {
 int32_t Effect::command(uint32_t cmdCode, uint32_t cmdSize, void *pCmdData, uint32_t *replySize, void *pReplyData) {
     switch (cmdCode) {
         case EFFECT_CMD_INIT:
-        case EFFECT_CMD_SET_CONFIG:
+        case EFFECT_CMD_SET_CONFIG: // receives effect_config_t
         case EFFECT_CMD_SET_PARAM:
         case EFFECT_CMD_SET_PARAM_COMMIT:
             *((int *) pReplyData) = 0;
         case EFFECT_CMD_RESET:
         case EFFECT_CMD_SET_PARAM_DEFERRED:
-        case EFFECT_CMD_SET_DEVICE:
-        case EFFECT_CMD_SET_VOLUME:
-        case EFFECT_CMD_SET_AUDIO_MODE:
-        case EFFECT_CMD_SET_INPUT_DEVICE:
-        case EFFECT_CMD_SET_AUDIO_SOURCE:
             break;
         case EFFECT_CMD_SET_CONFIG_REVERSE:
             *((int *) pReplyData) = -EINVAL;
@@ -63,9 +58,6 @@ int32_t Effect::command(uint32_t cmdCode, uint32_t cmdSize, void *pCmdData, uint
         case EFFECT_CMD_GET_CONFIG:
             memcpy(pReplyData, &this->config, sizeof(effect_config_t));
             break;
-        case EFFECT_CMD_OFFLOAD:
-            // TODO: Figure this out
-            return -1;
     }
     return 0;
 }
