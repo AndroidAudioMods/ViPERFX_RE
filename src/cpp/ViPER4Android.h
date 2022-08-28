@@ -5,6 +5,7 @@
 #pragma once
 
 // Source: https://github.com/vipersaudio/viperfx_core_binary/blob/master/viperfx_intf.h
+// Updated parameters source: https://github.com/vipersaudio/viper4android_fx/blob/master/android_4.x/src/com/vipercn/viper4android_v2/service/ViPER4AndroidService.java
 
 extern "C" {
 enum ParamsMode {
@@ -17,18 +18,24 @@ enum ParamsGet {
     PARAM_GET_DRIVER_VERSION,
     PARAM_GET_NEONENABLED,
     PARAM_GET_ENABLED,
+    PARAM_GET_CONFIGURE,
     PARAM_GET_DRVCANWORK,
+    PARAM_GET_STREAMING,
     PARAM_GET_EFFECT_TYPE,
     PARAM_GET_SAMPLINGRATE,
+    PARAM_GET_CONVUSABLE,
     PARAM_GET_CONVKNLID,
     PARAM_GET_STATUS_END
 };
 
 enum ParamsSet {
     PARAM_SET_STATUS_BEGIN = 0x09000,
+    PARAM_SET_UNKNOWN,
+    PARAM_SET_UPDATE_STATUS,
     PARAM_SET_RESET_STATUS,
-    PARAM_SET_SAMPLINGRATE,
     PARAM_SET_DOPROCESS_STATUS,
+    PARAM_SET_FORCEENABLE_STATUS,
+    PARAM_SET_SELFDIAGNOSE_STATUS,
     PARAM_SET_STATUS_END
 };
 

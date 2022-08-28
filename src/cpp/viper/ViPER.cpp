@@ -2,6 +2,7 @@
 // Created by mart on 7/25/21.
 //
 
+#include <ctime>
 #include "ViPER.h"
 #include "Effect.h"
 #include "constants.h"
@@ -179,8 +180,136 @@ ViPER::~ViPER() {
 
 int32_t
 ViPER::command(uint32_t cmdCode, uint32_t cmdSize, void *pCmdData, uint32_t *replySize, void *pReplyData) {
-    // TODO
-    return -1;
+    switch (cmdCode) {
+        case EFFECT_CMD_ENABLE: {
+            if (!this->enabled) {
+                ResetAllEffects();
+                break;
+            }
+            return 0;
+        }
+        case EFFECT_CMD_RESET: {
+            ResetAllEffects();
+            break;
+        }
+        case EFFECT_CMD_SET_CONFIG: {
+            if (cmdSize != 64 || *replySize != 4) {
+                return -EINVAL;
+            }
+
+            auto currentSampleRate = this->sampleRate;
+
+            *(int32_t *) pReplyData = this->configure((effect_config_t *) pCmdData);
+            if (*(int32_t *) pReplyData == 0) {
+                if (currentSampleRate != this->sampleRate) {
+                    ResetAllEffects();
+                }
+            }
+
+            return 0;
+        }
+        case EFFECT_CMD_SET_PARAM: {
+            auto pCmdParam = (effect_param_t *) pCmdData;
+
+            if (pCmdParam->psize != sizeof(int32_t)) {
+                *(int32_t *) pReplyData = -EINVAL;
+                return 0;
+            }
+
+            // TODO: implement
+        }
+        case EFFECT_CMD_GET_PARAM: {
+            auto *pCmdParam = (effect_param_t *) pCmdData;
+            auto *pReplyParam = (effect_param_t *) pReplyData;
+
+            if (pCmdParam->psize != sizeof(int32_t)) break;
+
+            switch (*(int *) pCmdParam->data) {
+                case PARAM_GET_DRIVER_VERSION: {
+                    pReplyParam->status = 0;
+                    //pReplyParam->psize = sizeof(int32_t); // TODO
+                    pReplyParam->vsize = sizeof(int32_t);
+                    *(int32_t *) pReplyParam->data = 0x2050004; // As original, change as needed
+                    *replySize = 0x14; // As original, TODO: calculate correctly
+                    return 0;
+                }
+                case PARAM_GET_NEONENABLED: {
+                    pReplyParam->status = 0;
+                    //pReplyParam->psize = sizeof(int32_t); // TODO
+                    pReplyParam->vsize = sizeof(int32_t);
+                    *(int32_t *) pReplyParam->data = 1; // TODO: check if neon is enabled
+                    *replySize = 0x14; // As original, TODO: calculate correctly
+                    return 0;
+                }
+                case PARAM_GET_ENABLED: {
+                    pReplyParam->status = 0;
+                    //pReplyParam->psize = sizeof(int32_t); // TODO
+                    pReplyParam->vsize = sizeof(int32_t);
+                    *(int32_t *) pReplyParam->data = this->enabled;
+                    *replySize = 0x14; // As original, TODO: calculate correctly
+                    return 0;
+                }
+                case PARAM_GET_CONFIGURE: {
+                    pReplyParam->status = 0;
+                    //pReplyParam->psize = sizeof(int32_t); // TODO
+                    pReplyParam->vsize = sizeof(int32_t);
+                    *(int32_t *) pReplyParam->data = this->configureOk;
+                    *replySize = 0x14; // As original, TODO: calculate correctly
+                    return 0;
+                }
+                case PARAM_GET_DRVCANWORK: {
+                    pReplyParam->status = 0;
+                    //pReplyParam->psize = sizeof(int32_t); // TODO
+                    pReplyParam->vsize = sizeof(int32_t);
+                    *(int32_t *) pReplyParam->data = this->init_ok;
+                    *replySize = 0x14; // As original, TODO: calculate correctly
+                    return 0;
+                }
+                case PARAM_GET_STREAMING: {
+                    struct timeval time{};
+                    gettimeofday(&time, nullptr);
+
+                    // TODO: Do some calculations
+
+                    return 0;
+                }
+                case PARAM_GET_EFFECT_TYPE: {
+                    pReplyParam->status = 0;
+                    //pReplyParam->psize = sizeof(int32_t); // TODO
+                    pReplyParam->vsize = sizeof(int32_t);
+                    *(int32_t *) pReplyParam->data = this->mode;
+                    *replySize = 0x14; // As original, TODO: calculate correctly
+                    return 0;
+                }
+                case PARAM_GET_SAMPLINGRATE: {
+                    pReplyParam->status = 0;
+                    //pReplyParam->psize = sizeof(int32_t); // TODO
+                    pReplyParam->vsize = sizeof(int32_t);
+                    *(uint32_t *) pReplyParam->data = this->sampleRate;
+                    *replySize = 0x14; // As original, TODO: calculate correctly
+                    return 0;
+                }
+                case PARAM_GET_CONVUSABLE: {
+                    pReplyParam->status = 0;
+                    //pReplyParam->psize = sizeof(int32_t); // TODO
+                    pReplyParam->vsize = sizeof(int32_t);
+                    *(int32_t *) pReplyParam->data = 1; // TODO: Figure out what is this
+                    *replySize = 0x14; // As original, TODO: calculate correctly
+                    return 0;
+                }
+                case PARAM_GET_CONVKNLID: {
+                    pReplyParam->status = 0;
+                    //pReplyParam->psize = sizeof(int32_t); // TODO
+                    pReplyParam->vsize = sizeof(int32_t);
+//                *(int32_t *) pReplyParam->data = this->convolver->GetKernelID(); // TODO: Uncomment when function is implemented
+                    *replySize = 0x14; // As original, TODO: calculate correctly
+                    return 0;
+                }
+            }
+        }
+    }
+
+    return this->Effect::command(cmdCode, cmdSize, pCmdData, replySize, pReplyData);
 }
 
 void ViPER::processBuffer(float *buffer, int frameSize) {

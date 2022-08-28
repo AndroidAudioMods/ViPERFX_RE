@@ -28,8 +28,8 @@ struct ViperContext {
 static int32_t Viper_IProcess(effect_handle_t self, audio_buffer_t *inBuffer, audio_buffer_t *outBuffer) {
     auto pContext = (ViperContext *) self;
 
-    if (pContext == nullptr || inBuffer == nullptr || outBuffer == nullptr) {
-        VIPER_LOGE("Viper_IProcess: pContext, inBuffer or outBuffer is null!");
+    if (pContext == nullptr || pContext->viper == nullptr || inBuffer == nullptr || outBuffer == nullptr) {
+        VIPER_LOGE("Viper_IProcess: pContext, pContext->viper, inBuffer or outBuffer is null!");
         return -EINVAL;
     }
 
@@ -41,8 +41,8 @@ static int32_t Viper_ICommand(effect_handle_t self,
                               uint32_t *replySize, void *pReplyData) {
     auto pContext = (ViperContext *) self;
 
-    if (pContext == nullptr) {
-        VIPER_LOGE("Viper_ICommand: pContext is null!");
+    if (pContext == nullptr || pContext->viper == nullptr) {
+        VIPER_LOGE("Viper_ICommand: pContext or pContext->viper is null!");
         return -EINVAL;
     }
 
