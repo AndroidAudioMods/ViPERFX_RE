@@ -1,9 +1,5 @@
-//
-// Created by mart on 7/30/21.
-//
-
-#include <cstring>
 #include "AnalogX.h"
+#include <cstring>
 #include "../constants.h"
 
 static float ANALOGX_HARMONICS[10] = {
@@ -24,6 +20,10 @@ AnalogX::AnalogX() {
     this->processingModel = 0;
     this->enabled = false;
     Reset();
+}
+
+AnalogX::~AnalogX() {
+
 }
 
 void AnalogX::Process(float *samples, uint32_t size) {

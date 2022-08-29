@@ -41,12 +41,19 @@ public:
 
     void ResetAllEffects();
 
-    bool init_ok, enabled, force_enabled, fetcomp_enabled;
-    FxMode mode;
+    bool update_status;
+    // Something or padding of 3 bytes
+    uint64_t process_time_ms;
+    bool init_ok;
+    bool enabled;
+    bool force_enabled;
+    // Something or padding of 1 byte
+    // FxMode mode;
 
     // Effects
     AdaptiveBuffer_F32 *adaptiveBuffer;
     WaveBuffer_I32 *waveBuffer;
+    bool fetcomp_enabled;
     Convolver *convolver;
     VHE *vhe;
     ViPERDDC *viperDdc;
@@ -66,5 +73,7 @@ public:
     SpeakerCorrection *speakerCorrection;
     SoftwareLimiter *softwareLimiters[2];
 
-    int unk[3];
+    float scale_frames_if_not_1point0;
+    float pan_frames_if_less_than_1point0;
+    float pan_frames_if_less_than_1point0_2;
 };

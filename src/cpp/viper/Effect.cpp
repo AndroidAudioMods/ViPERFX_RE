@@ -61,9 +61,6 @@ int32_t Effect::command(uint32_t cmdCode, uint32_t cmdSize, void *pCmdData, uint
     return 0;
 }
 
-#define DO_ERROR() this->configureOk = false;\
-return -EINVAL
-
 int32_t Effect::configure(effect_config_t *newConfig) {
     VIPER_LOGI("Begin audio configure ...");
     VIPER_LOGI("Checking input and output configuration ...");
@@ -71,23 +68,23 @@ int32_t Effect::configure(effect_config_t *newConfig) {
     if (newConfig->inputCfg.samplingRate != newConfig->outputCfg.samplingRate) {
         VIPER_LOGE("ViPER4Android disabled, reason [in.SR = %d, out.SR = %d]",
                    newConfig->inputCfg.samplingRate, newConfig->outputCfg.samplingRate);
-        DO_ERROR();
+        goto exit_error;
     }
 
     if (newConfig->inputCfg.samplingRate > 48000) {
         VIPER_LOGE("ViPER4Android disabled, reason [SR out of range]");
-        DO_ERROR();
+        goto exit_error;
     }
 
     if (newConfig->inputCfg.channels != newConfig->outputCfg.channels) {
         VIPER_LOGE("ViPER4Android disabled, reason [in.CH = %d, out.CH = %d]",
                    newConfig->inputCfg.channels, newConfig->outputCfg.channels);
-        DO_ERROR();
+        goto exit_error;
     }
 
     if (newConfig->inputCfg.channels != AUDIO_CHANNEL_OUT_STEREO) {
         VIPER_LOGE("ViPER4Android disabled, reason [CH != 2]");
-        DO_ERROR();
+        goto exit_error;
     }
 
     // TODO: Allow multiple formats by converting before/after processing
@@ -95,13 +92,13 @@ int32_t Effect::configure(effect_config_t *newConfig) {
     if (newConfig->inputCfg.format != AUDIO_FORMAT_PCM_FLOAT) {
         VIPER_LOGE("ViPER4Android disabled, reason [in.FMT = %d]", newConfig->inputCfg.format);
         VIPER_LOGE("We only accept f32 format");
-        DO_ERROR();
+        goto exit_error;
     }
 
     if (newConfig->outputCfg.format != AUDIO_FORMAT_PCM_FLOAT) {
         VIPER_LOGE("ViPER4Android disabled, reason [out.FMT = %d]", newConfig->outputCfg.format);
         VIPER_LOGE("We only accept f32 format");
-        DO_ERROR();
+        goto exit_error;
     }
 
     VIPER_LOGI("Input and output configuration checked.");
@@ -112,5 +109,9 @@ int32_t Effect::configure(effect_config_t *newConfig) {
     VIPER_LOGI("Audio configure finished");
 
     return 0;
+
+exit_error:
+    this->configureOk = false;
+    return -EINVAL;
 }
 

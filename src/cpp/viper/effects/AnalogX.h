@@ -1,23 +1,17 @@
-//
-// Created by mart on 7/30/21.
-//
-
 #pragma once
 
-
+#include <cstdint>
 #include "../utils/Harmonic.h"
 #include "../utils/MultiBiquad.h"
 
 class AnalogX {
 public:
     AnalogX();
+    ~AnalogX();
 
     void Process(float *samples, uint32_t size);
-
     void Reset();
-
     void SetProcessingModel(int model);
-
     void SetSamplingRate(uint32_t samplerate);
 
     MultiBiquad highpass[2];

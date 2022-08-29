@@ -155,13 +155,4 @@ enum ParamsConfigure {
     PARAM_PROCESSUNIT_FX_END
 };
 
-enum FxMode {
-    ViPER_FX_TYPE_NONE = 0,
-
-    ViPER_FX_TYPE_HEADPHONE = 1,
-    ViPER_FX_TYPE_SPEAKER = 2,
-
-    ViPER_FX_TYPE_COUNT
-};
-
 }

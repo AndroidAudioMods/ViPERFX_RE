@@ -1,22 +1,17 @@
-//
-// Created by mart on 7/30/21.
-//
-
 #pragma once
 
+#include <cstdint>
 #include "../utils/MultiBiquad.h"
 #include "../utils/FixedBiquad.h"
 
 class SpeakerCorrection {
 public:
     SpeakerCorrection();
+    ~SpeakerCorrection();
 
     void Process(float *samples, uint32_t size);
-
     void Reset();
-
     void SetEnable(bool enabled);
-
     void SetSamplingRate(uint32_t samplerate);
 
     uint32_t samplerate;

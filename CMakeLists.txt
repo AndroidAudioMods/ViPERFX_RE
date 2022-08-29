@@ -24,15 +24,23 @@ set(FILES
 
         # Effects
         src/cpp/viper/effects/AnalogX.cpp
+        src/cpp/viper/effects/ColorfulMusic.cpp
+        src/cpp/viper/effects/Convolver.cpp
         src/cpp/viper/effects/Cure.cpp
         src/cpp/viper/effects/DiffSurround.cpp
         src/cpp/viper/effects/DynamicSystem.cpp
+        src/cpp/viper/effects/FETCompressor.cpp
+        src/cpp/viper/effects/IIRFilter.cpp
+        src/cpp/viper/effects/PlaybackGain.cpp
         src/cpp/viper/effects/Reverberation.cpp
+        src/cpp/viper/effects/SoftwareLimiter.cpp
         src/cpp/viper/effects/SpeakerCorrection.cpp
         src/cpp/viper/effects/SpectrumExtend.cpp
         src/cpp/viper/effects/TubeSimulator.cpp
         src/cpp/viper/effects/VHE.cpp
+        src/cpp/viper/effects/ViPERBass.cpp
         src/cpp/viper/effects/ViPERClarity.cpp
+        src/cpp/viper/effects/ViPERDDC.cpp
 
         # Utils
         src/cpp/viper/utils/AdaptiveBuffer_F32.cpp
