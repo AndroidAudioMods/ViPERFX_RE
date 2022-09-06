@@ -9,8 +9,8 @@ public:
 
     void GetMeter();
     void GetParameter();
-    void GetParamterDefault();
-    void Process();
+    void GetParameterDefault();
+    void Process(float *samples, uint32_t size);
     void ProcessSidechain();
     void Reset();
     void SetParameter(int32_t param_1, float param_2);

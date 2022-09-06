@@ -68,3 +68,7 @@ void Reverberation::SetSamplingRate(uint32_t value) {
     this->samplerate = value;
     this->model.Reset();
 }
+
+Reverberation::~Reverberation() {
+
+}

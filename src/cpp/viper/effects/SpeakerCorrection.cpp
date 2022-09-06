@@ -47,3 +47,7 @@ void SpeakerCorrection::SetSamplingRate(uint32_t samplerate) {
     this->samplerate = samplerate;
     Reset();
 }
+
+SpeakerCorrection::~SpeakerCorrection() {
+
+}

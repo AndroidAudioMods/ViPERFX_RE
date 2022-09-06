@@ -26,3 +26,7 @@ void TubeSimulator::TubeProcess(float *buffer, uint32_t size) {
         }
     }
 }
+
+TubeSimulator::~TubeSimulator() {
+
+}

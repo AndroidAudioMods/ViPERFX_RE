@@ -9,6 +9,10 @@ Cure::Cure() {
     Reset();
 }
 
+Cure::~Cure() {
+
+}
+
 void Cure::Process(float *buffer, uint32_t size) {
     if (this->enabled) {
         this->crossfeed.ProcessFrames(buffer, size);

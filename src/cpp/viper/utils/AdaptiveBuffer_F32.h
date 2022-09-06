@@ -10,7 +10,7 @@ public:
     void FlushBuffer();
     uint32_t GetBufferLength();
     int32_t GetBufferOffset();
-    int32_t *GetBufferPointer();
+    float *GetBufferPointer();
     uint32_t GetChannels();
     void PanFrames(int32_t param_1, int32_t param_2);
     int32_t PopFrames(int16_t param_1, uint32_t param_2);

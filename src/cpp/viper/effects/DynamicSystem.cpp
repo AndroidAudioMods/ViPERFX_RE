@@ -47,3 +47,7 @@ void DynamicSystem::SetSamplingRate(uint32_t samplerate) {
     this->samplerate = samplerate;
     this->bass.SetSamplingRate(samplerate);
 }
+
+DynamicSystem::~DynamicSystem() {
+
+}

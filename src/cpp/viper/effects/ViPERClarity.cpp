@@ -86,3 +86,7 @@ void ViPERClarity::SetSamplingRate(uint32_t samplerate) {
     this->samplerate = samplerate;
     Reset();
 }
+
+ViPERClarity::~ViPERClarity() {
+
+}

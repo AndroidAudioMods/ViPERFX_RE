@@ -8,7 +8,7 @@ public:
     ~PlaybackGain();
 
     void AnalyseWave();
-    void Process();
+    void Process(float *samples, uint32_t size);
     void Reset();
     void SetEnable(bool enable);
     void SetMaxGainFactor();
