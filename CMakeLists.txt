@@ -43,7 +43,7 @@ set(FILES
         src/cpp/viper/effects/ViPERDDC.cpp
 
         # Utils
-        src/cpp/viper/utils/AdaptiveBuffer_F32.cpp
+        src/cpp/viper/utils/AdaptiveBuffer.cpp
         src/cpp/viper/utils/CAllpassFilter.cpp
         src/cpp/viper/utils/CCombFilter.cpp
         src/cpp/viper/utils/CRevModel.cpp
