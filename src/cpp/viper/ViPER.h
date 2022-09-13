@@ -15,7 +15,7 @@
 #include "effects/Cure.h"
 #include "effects/DiffSurround.h"
 #include "effects/VHE.h"
-#include "utils/AdaptiveBuffer_F32.h"
+#include "utils/AdaptiveBuffer.h"
 #include "effects/Convolver.h"
 #include "effects/ViPERDDC.h"
 #include "effects/IIRFilter.h"
@@ -51,7 +51,7 @@ public:
     // FxMode mode;
 
     // Effects
-    AdaptiveBuffer_F32 *adaptiveBuffer;
+    AdaptiveBuffer *adaptiveBuffer;
     WaveBuffer_I32 *waveBuffer;
     bool fetcomp_enabled;
     Convolver *convolver;
