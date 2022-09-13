@@ -11,18 +11,18 @@ public:
 
     void Process(float *samples, uint32_t size);
     void Reset();
-    void SetProcessingModel(int model);
-    void SetSamplingRate(uint32_t samplerate);
+    void SetProcessingModel(int processingModel);
+    void SetSamplingRate(uint32_t samplingRate);
 
     MultiBiquad highpass[2];
-    Harmonic harmonics[2];
+    Harmonic harmonic[2];
     MultiBiquad lowpass[2];
     MultiBiquad peak[2];
 
     float gain;
     uint32_t freqRange;
     int processingModel;
-    uint32_t samplerate;
+    uint32_t samplingRate;
     bool enabled;
 };
 

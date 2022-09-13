@@ -19,6 +19,7 @@ public:
     void ScaleFrames(float scale);
     void SetBufferOffset(uint32_t offset);
 
+private:
     float *buffer;
     uint32_t length;
     uint32_t offset;
