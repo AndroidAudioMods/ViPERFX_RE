@@ -14,6 +14,7 @@ public:
     void SetProcessingModel(int processingModel);
     void SetSamplingRate(uint32_t samplingRate);
 
+private:
     MultiBiquad highpass[2];
     Harmonic harmonic[2];
     MultiBiquad lowpass[2];

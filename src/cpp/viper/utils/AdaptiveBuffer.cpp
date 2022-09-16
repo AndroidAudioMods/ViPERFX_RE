@@ -21,19 +21,19 @@ void AdaptiveBuffer::FlushBuffer() {
     this->offset = 0;
 }
 
-uint32_t AdaptiveBuffer::GetBufferLength() {
+uint32_t AdaptiveBuffer::GetBufferLength() const {
     return this->length;
 }
 
-uint32_t AdaptiveBuffer::GetBufferOffset() {
+uint32_t AdaptiveBuffer::GetBufferOffset() const {
     return this->offset;
 }
 
-float *AdaptiveBuffer::GetBufferPointer() {
+float *AdaptiveBuffer::GetBufferPointer() const {
     return this->buffer;
 }
 
-uint32_t AdaptiveBuffer::GetChannels() {
+uint32_t AdaptiveBuffer::GetChannels() const {
     return this->channels;
 }
 
@@ -58,14 +58,14 @@ int AdaptiveBuffer::PopFrames(float *frames, uint32_t length) {
         memcpy(frames, this->buffer, length * this->channels * sizeof(*frames));
         this->offset = this->offset - length;
         if (this->offset != 0) {
-            memmove(this->buffer, &this->buffer[length * this->channels], this->offset * this->channels * sizeof(*this->buffer));
+            memmove(this->buffer, &this->buffer[length * this->channels], this->offset * this->channels * sizeof(float));
         }
     }
 
     return 1;
 }
 
-int AdaptiveBuffer::PushFrames(float *frames, uint32_t length) {
+int AdaptiveBuffer::PushFrames(const float *frames, uint32_t length) {
     if (this->buffer == nullptr) {
         return 0;
     }
@@ -73,13 +73,13 @@ int AdaptiveBuffer::PushFrames(float *frames, uint32_t length) {
     if (length != 0) {
         if (this->offset + length > this->length) {
             auto tmp = new float[(this->offset + length) * this->channels];
-            memcpy(tmp, this->buffer, this->offset * this->channels * sizeof(*this->buffer));
+            memcpy(tmp, this->buffer, this->offset * this->channels * sizeof(float));
             delete this->buffer;
             this->buffer = tmp;
             this->length = this->offset + length;
         }
 
-        memcpy(&this->buffer[this->offset * this->channels], frames, length * this->channels * sizeof(*frames));
+        memcpy(&this->buffer[this->offset * this->channels], frames, length * this->channels * sizeof(float));
         this->offset = this->offset + length;
     }
 
@@ -93,13 +93,13 @@ int AdaptiveBuffer::PushZero(uint32_t length) {
 
     if (this->offset + length > this->length) {
         auto tmp = new float[(this->offset + length) * this->channels];
-        memcpy(tmp, this->buffer, this->offset * this->channels * sizeof(*this->buffer));
+        memcpy(tmp, this->buffer, this->offset * this->channels * sizeof(float));
         delete this->buffer;
         this->buffer = tmp;
         this->length = this->offset + length;
     }
 
-    memset(&this->buffer[this->offset * this->channels], 0, length * this->channels * sizeof(*this->buffer));
+    memset(&this->buffer[this->offset * this->channels], 0, length * this->channels * sizeof(float));
     this->offset = this->offset + length;
 
     return 1;

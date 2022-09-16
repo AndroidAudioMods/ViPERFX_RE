@@ -73,7 +73,7 @@ public:
     SpeakerCorrection *speakerCorrection;
     SoftwareLimiter *softwareLimiters[2];
 
-    float scale_frames_if_not_1point0;
-    float pan_frames_if_less_than_1point0;
-    float pan_frames_if_less_than_1point0_2;
+    float frame_scale;
+    float left_pan;
+    float right_pan;
 };

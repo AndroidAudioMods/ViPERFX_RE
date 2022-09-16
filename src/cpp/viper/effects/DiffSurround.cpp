@@ -1,22 +1,21 @@
-//
-// Created by mart on 7/31/21.
-//
-
 #include <cstring>
 #include "DiffSurround.h"
 #include "../constants.h"
 
 DiffSurround::DiffSurround() {
     this->samplerate = DEFAULT_SAMPLERATE;
-    this->delayTime = 0.f;
+    this->delayTime = 0.0f;
     this->enabled = false;
-    this->buffers[0] = new WaveBuffer_I32(1, 0x1000);
-    this->buffers[1] = new WaveBuffer_I32(1, 0x1000);
+    for (auto &buffer : this->buffers) {
+        buffer = new WaveBuffer_I32(1, 0x1000);
+    }
 }
 
 DiffSurround::~DiffSurround() {
-    delete this->buffers[0];
-    delete this->buffers[1];
+    for (auto &buffer : this->buffers) {
+        delete buffer;
+        buffer = nullptr;
+    }
 }
 
 void DiffSurround::Process(float *samples, uint32_t size) {
@@ -44,25 +43,32 @@ void DiffSurround::Process(float *samples, uint32_t size) {
 }
 
 void DiffSurround::Reset() {
-    this->buffers[0]->Reset();
-    this->buffers[1]->Reset();
+    for (auto &buffer : this->buffers) {
+        buffer->Reset();
+    }
 
-    this->buffers[1]->PushZeros((uint32_t) (this->delayTime / 1000.f * (float) this->samplerate));
+    this->buffers[1]->PushZeros((uint32_t) (this->delayTime / 1000.0f * (float) this->samplerate));
 }
 
-void DiffSurround::SetDelayTime(float value) {
-    this->delayTime = value;
-    Reset();
+void DiffSurround::SetDelayTime(float delayTime) {
+    if (this->delayTime != delayTime) {
+        this->delayTime = delayTime;
+        this->Reset();
+    }
 }
 
 void DiffSurround::SetEnable(bool enabled) {
-    this->enabled = enabled;
-    if (this->enabled) {
-        Reset();
+    if (this->enabled != enabled) {
+        this->enabled = enabled;
+        if (enabled) {
+            Reset();
+        }
     }
 }
 
 void DiffSurround::SetSamplingRate(uint32_t samplerate) {
-    this->samplerate = samplerate;
-    Reset();
+    if (this->samplerate != samplerate) {
+        this->samplerate = samplerate;
+        this->Reset();
+    }
 }

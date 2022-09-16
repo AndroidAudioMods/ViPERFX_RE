@@ -8,13 +8,13 @@ public:
     ~AdaptiveBuffer();
 
     void FlushBuffer();
-    uint32_t GetBufferLength();
-    uint32_t GetBufferOffset();
-    float *GetBufferPointer();
-    uint32_t GetChannels();
+    uint32_t GetBufferLength() const;
+    uint32_t GetBufferOffset() const;
+    float *GetBufferPointer() const;
+    uint32_t GetChannels() const;
     void PanFrames(float left, float right);
     int PopFrames(float *frames, uint32_t length);
-    int PushFrames(float *frames, uint32_t length);
+    int PushFrames(const float *frames, uint32_t length);
     int PushZero(uint32_t length);
     void ScaleFrames(float scale);
     void SetBufferOffset(uint32_t offset);

@@ -30,8 +30,6 @@ float MultiBiquad::ProcessSample(float sample) {
 void
 MultiBiquad::RefreshFilter(FilterType type, float gainAmp, float freq, float samplerate, float qFactor, bool param_7) {
     bool uVar1;
-    int iVar2;
-    int iVar3;
     double dVar4;
     double dVar5;
     double dVar6;

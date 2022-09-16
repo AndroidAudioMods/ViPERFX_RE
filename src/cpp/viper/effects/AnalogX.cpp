@@ -7,12 +7,12 @@ static float ANALOGX_HARMONICS[10] = {
         0.02f,
         0.0001f,
         0.001f,
-        0.f,
-        0.f,
-        0.f,
-        0.f,
-        0.f,
-        0.f
+        0.0f,
+        0.0f,
+        0.0f,
+        0.0f,
+        0.0f,
+        0.0f
 };
 
 AnalogX::AnalogX() {

@@ -1,7 +1,3 @@
-//
-// Created by mart on 7/31/21.
-//
-
 #include <cstdlib>
 #include <cstring>
 #include "WaveBuffer_I32.h"

@@ -87,7 +87,7 @@ ViPER::ViPER() {
     this->tubeSimulator->Reset();
 
     this->analogX = new AnalogX();
-    this->analogX->enabled = false; //SetEnable(false);
+//    this->analogX->SetEnable(false);
     this->analogX->SetSamplingRate(this->sampleRate);
     this->analogX->SetProcessingModel(0);
     this->analogX->Reset();
@@ -104,10 +104,10 @@ ViPER::ViPER() {
 
     this->fetcomp_enabled = false;
     this->init_ok = true;
-    this->scale_frames_if_not_1point0 = 1.0;
-    this->pan_frames_if_less_than_1point0 = 1.0;
+    this->frame_scale = 1.0;
+    this->left_pan = 1.0;
     this->process_time_ms = 0;
-    this->pan_frames_if_less_than_1point0_2 = 1.0;
+    this->right_pan = 1.0;
     this->enabled = false;
     this->force_enabled = false;
     this->update_status = false;
@@ -171,7 +171,7 @@ ViPER::~ViPER() {
     delete this->speakerCorrection;
     this->speakerCorrection = nullptr;
 
-    for (auto &softwareLimiter: softwareLimiters) {
+    for (auto &softwareLimiter: this->softwareLimiters) {
         delete softwareLimiter;
         softwareLimiter = nullptr;
     }
@@ -322,7 +322,7 @@ void ViPER::processBuffer(float *buffer, int frameSize) {
         this->process_time_ms = time.tv_sec * 1000 + time.tv_usec / 1000;
     }
 
-    int ret;
+    uint32_t ret;
 
     // if convolver is enabled
     ret = this->waveBuffer->PushSamples(buffer, frameSize);
@@ -366,11 +366,11 @@ void ViPER::processBuffer(float *buffer, int frameSize) {
         this->analogX->Process(pAdaptiveBuffer, ret);
     }
 
-    if (this->scale_frames_if_not_1point0 != 1.0) {
-        this->adaptiveBuffer->ScaleFrames(this->scale_frames_if_not_1point0);
+    if (this->frame_scale != 1.0) {
+        this->adaptiveBuffer->ScaleFrames(this->frame_scale);
     }
-    if (this->pan_frames_if_less_than_1point0 < 1.0 || this->pan_frames_if_less_than_1point0_2 < 1.0) {
-        this->adaptiveBuffer->PanFrames(this->pan_frames_if_less_than_1point0, this->pan_frames_if_less_than_1point0_2);
+    if (this->left_pan < 1.0 || this->right_pan < 1.0) {
+        this->adaptiveBuffer->PanFrames(this->left_pan, this->right_pan);
     }
 
     if (ret << 1 != 0) {

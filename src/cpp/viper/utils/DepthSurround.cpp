@@ -12,9 +12,11 @@ DepthSurround::DepthSurround() {
     this->enabled = false;
     this->strengthAtLeast500 = false;
     this->gain = 0;
-    memset(&this->prev, 0, 2 * sizeof(float));
-    SetSamplingRate(DEFAULT_SAMPLERATE);
-    RefreshStrength(this->strength);
+    for (auto &prev : this->prev) {
+        prev = 0.0f;
+    }
+    this->SetSamplingRate(DEFAULT_SAMPLERATE);
+    this->RefreshStrength(this->strength);
 }
 
 void DepthSurround::Process(float *samples, uint32_t size) {
@@ -61,11 +63,11 @@ void DepthSurround::RefreshStrength(short strength) {
     this->strengthAtLeast500 = strength >= 500;
     this->enabled = strength != 0;
     if (strength != 0) {
-        float _gain = powf(10.f, ((strength / 1000.f) * 10.f - 15.f) / 20.f);
-        if (fabsf(_gain) > 1.f) {
-            _gain = 1.f;
+        float gain = powf(10.0f, ((strength / 1000.0f) * 10.0f - 15.0f) / 20.0f);
+        if (fabsf(gain) > 1.0f) {
+            gain = 1.0f;
         }
-        this->gain = _gain;
+        this->gain = gain;
     } else {
         this->gain = 0;
     }
@@ -74,11 +76,13 @@ void DepthSurround::RefreshStrength(short strength) {
 void DepthSurround::SetSamplingRate(uint32_t samplerate) {
     this->delay[0].SetParameters(samplerate, 0.02);
     this->delay[1].SetParameters(samplerate, 0.014);
-    this->highpass.SetHighPassParameter(800.f, samplerate, -11.0f, 0.72f, 0);
-    memset(&this->prev, 0, 2 * sizeof(float));
+    this->highpass.SetHighPassParameter(800.0f, samplerate, -11.0f, 0.72f, 0);
+    for (auto &prev : this->prev) {
+        prev = 0.0f;
+    }
 }
 
 void DepthSurround::SetStrength(short strength) {
     this->strength = strength;
-    RefreshStrength(strength);
+    this->RefreshStrength(strength);
 }

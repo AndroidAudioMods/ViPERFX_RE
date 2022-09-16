@@ -10,7 +10,7 @@ public:
 
     void Process(float *samples, uint32_t size);
     void Reset();
-    void SetDelayTime(float value);
+    void SetDelayTime(float delayTime);
     void SetEnable(bool enabled);
     void SetSamplingRate(uint32_t samplerate);
 

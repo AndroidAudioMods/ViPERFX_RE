@@ -50,6 +50,7 @@ set(FILES
         src/cpp/viper/utils/Crossfeed.cpp
         src/cpp/viper/utils/DepthSurround.cpp
         src/cpp/viper/utils/DynamicBass.cpp
+        src/cpp/viper/utils/FIR.cpp
         src/cpp/viper/utils/FixedBiquad.cpp
         src/cpp/viper/utils/Harmonic.cpp
         src/cpp/viper/utils/HiFi.cpp
@@ -62,6 +63,8 @@ set(FILES
         src/cpp/viper/utils/PassFilter.cpp
         src/cpp/viper/utils/PConvSingle_F32.cpp
         src/cpp/viper/utils/PolesFilter.cpp
+        src/cpp/viper/utils/Polyphase.cpp
+        src/cpp/viper/utils/Stereo3DSurround.cpp
         src/cpp/viper/utils/Subwoofer.cpp
         src/cpp/viper/utils/TimeConstDelay.cpp
         src/cpp/viper/utils/WaveBuffer_I32.cpp)

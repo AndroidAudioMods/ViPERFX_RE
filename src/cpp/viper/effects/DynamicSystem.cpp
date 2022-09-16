@@ -28,7 +28,12 @@ void DynamicSystem::SetBassGain(float gain) {
 }
 
 void DynamicSystem::SetEnable(bool enable) {
-    this->enabled = enable;
+    if (this->enabled != enable) {
+        this->enabled = enable;
+        if (enable) {
+            Reset();
+        }
+    }
 }
 
 void DynamicSystem::SetSideGain(float gainX, float gainY) {
@@ -44,8 +49,10 @@ void DynamicSystem::SetYCoeffs(uint32_t low, uint32_t high) {
 }
 
 void DynamicSystem::SetSamplingRate(uint32_t samplerate) {
-    this->samplerate = samplerate;
-    this->bass.SetSamplingRate(samplerate);
+    if (this->samplerate != samplerate) {
+        this->samplerate = samplerate;
+        this->bass.SetSamplingRate(samplerate);
+    }
 }
 
 DynamicSystem::~DynamicSystem() {

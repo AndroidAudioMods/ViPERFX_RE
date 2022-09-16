@@ -26,8 +26,12 @@ void Cure::Reset() {
 }
 
 void Cure::SetEnable(bool enabled) {
-    Reset();
-    this->enabled = enabled;
+    if (this->enabled != enabled) {
+        this->enabled = enabled;
+        if (enabled) {
+            Reset();
+        }
+    }
 }
 
 void Cure::SetSamplingRate(uint32_t samplerate) {
@@ -53,7 +57,6 @@ preset_t Cure::GetPreset() {
 
 void Cure::SetCutoff(uint16_t cutoff) {
     this->crossfeed.SetCutoff(cutoff);
-
 }
 
 void Cure::SetFeedback(float feedback) {

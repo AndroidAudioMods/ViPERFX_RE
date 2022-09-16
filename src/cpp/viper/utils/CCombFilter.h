@@ -10,20 +10,15 @@ class CCombFilter {
 public:
     CCombFilter();
 
-    float Process(float sample);
-
-    void Mute();
-
     float GetDamp();
-
     float GetFeedback();
-
+    void Mute();
+    float Process(float sample);
+    void SetBuffer(float *buffer, uint32_t size);
     void SetDamp(float damp);
-
     void SetFeedback(float feedback);
 
-    void SetBuffer(float *buffer, uint32_t size);
-
+private:
     float feedback;
     float filterstore;
     float damp;

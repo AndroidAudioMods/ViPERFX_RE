@@ -1,15 +1,15 @@
-//
-// Created by mart on 7/26/21.
-//
-
-#include <cstring>
 #include "CAllpassFilter.h"
+#include <cstring>
 
 CAllpassFilter::CAllpassFilter() {
     this->buffer = nullptr;
     this->bufidx = 0;
     this->bufsize = 0;
     this->feedback = 0;
+}
+
+float CAllpassFilter::GetFeedback() {
+    return this->feedback;
 }
 
 void CAllpassFilter::Mute() {
@@ -24,10 +24,6 @@ float CAllpassFilter::Process(float sample) {
         this->bufidx = 0;
     }
     return outSample - sample;
-}
-
-float CAllpassFilter::GetFeedback() {
-    return this->feedback;
 }
 
 void CAllpassFilter::SetBuffer(float *buffer, uint32_t size) {
