@@ -1,7 +1,3 @@
-//
-// Created by mart on 7/25/21.
-//
-
 #pragma once
 
 #ifdef ANDROID_TOOLCHAIN

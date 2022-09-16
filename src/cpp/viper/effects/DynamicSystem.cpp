@@ -1,7 +1,3 @@
-//
-// Created by mart on 7/28/21.
-//
-
 #include "DynamicSystem.h"
 #include "../constants.h"
 

@@ -1,7 +1,3 @@
-//
-// Created by mart on 7/30/21.
-//
-
 #include "SpeakerCorrection.h"
 #include "../constants.h"
 

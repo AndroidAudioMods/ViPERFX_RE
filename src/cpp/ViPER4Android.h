@@ -1,7 +1,3 @@
-//
-// Created by mart on 7/26/21.
-//
-
 #pragma once
 
 // Source: https://github.com/vipersaudio/viperfx_core_binary/blob/master/viperfx_intf.h

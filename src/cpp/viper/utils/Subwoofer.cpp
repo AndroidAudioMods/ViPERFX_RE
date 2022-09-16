@@ -1,7 +1,3 @@
-//
-// Created by mart on 7/30/21.
-//
-
 #include "Subwoofer.h"
 #include "../constants.h"
 #include <cmath>

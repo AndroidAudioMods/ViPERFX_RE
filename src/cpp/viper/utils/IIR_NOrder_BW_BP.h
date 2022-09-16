@@ -1,7 +1,3 @@
-//
-// Created by mart on 7/26/21.
-//
-
 #pragma once
 
 #include "IIR_1st.h"

@@ -1,7 +1,3 @@
-//
-// Created by mart on 7/26/21.
-//
-
 #include "IIR_NOrder_BW_LH.h"
 
 IIR_NOrder_BW_LH::IIR_NOrder_BW_LH(uint32_t order) {

@@ -1,7 +1,3 @@
-//
-// Created by mart on 9/12/21.
-//
-
 #include <cstdlib>
 #include <cstring>
 #include "PConvSingle_F32.h"

@@ -1,7 +1,3 @@
-//
-// Created by mart on 7/30/21.
-//
-
 #include <cstring>
 #include <cstdlib>
 #include <cmath>

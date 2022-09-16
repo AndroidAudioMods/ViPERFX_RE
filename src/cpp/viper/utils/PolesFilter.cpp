@@ -1,7 +1,3 @@
-//
-// Created by mart on 7/28/21.
-//
-
 #include "PolesFilter.h"
 #include "../constants.h"
 #include <cstring>

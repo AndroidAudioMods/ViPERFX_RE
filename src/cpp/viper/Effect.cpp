@@ -1,7 +1,3 @@
-//
-// Created by mart on 7/25/21.
-//
-
 #include <cstring>
 #include "Effect.h"
 #include "constants.h"

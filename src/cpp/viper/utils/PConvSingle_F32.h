@@ -1,7 +1,3 @@
-//
-// Created by mart on 9/12/21.
-//
-
 #pragma once
 
 typedef struct {
