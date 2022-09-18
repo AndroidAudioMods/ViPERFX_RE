@@ -2,7 +2,7 @@
 
 #include <cstdint>
 #include "../utils/PConvSingle_F32.h"
-#include "../utils/WaveBuffer_I32.h"
+#include "../utils/WaveBuffer.h"
 
 class VHE {
 public:
@@ -17,7 +17,7 @@ public:
     void SetSamplingRate(uint32_t srate);
 
     PConvSingle_F32 convLeft, convRight;
-    WaveBuffer_I32 *bufA, *bufB;
+    WaveBuffer *bufA, *bufB;
     uint32_t samplerate;
     bool enabled;
     int effectLevel;

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-#include "FixedBiquad.h"
+#include "Biquad.h"
 #include "TimeConstDelay.h"
 
 
@@ -23,5 +23,5 @@ public:
     uint32_t gain;
     float prev[2];
     TimeConstDelay delay[2];
-    FixedBiquad highpass;
+    Biquad highpass;
 };

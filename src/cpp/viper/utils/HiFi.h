@@ -2,7 +2,7 @@
 
 
 #include "IIR_NOrder_BW_LH.h"
-#include "WaveBuffer_I32.h"
+#include "WaveBuffer.h"
 #include "IIR_NOrder_BW_BP.h"
 
 class HiFi {
@@ -19,7 +19,7 @@ public:
 
     void SetSamplingRate(uint32_t samplerate);
 
-    WaveBuffer_I32 *buffers[2];
+    WaveBuffer *buffers[2];
     struct {
         IIR_NOrder_BW_LH *lowpass;
         IIR_NOrder_BW_LH *highpass;

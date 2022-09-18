@@ -1,10 +1,7 @@
-//
-// Created by mart on 7/25/21.
-//
 #pragma once
 
 #include "Effect.h"
-#include "utils/WaveBuffer_I32.h"
+#include "utils/WaveBuffer.h"
 #include "effects/SpectrumExtend.h"
 #include "effects/Reverberation.h"
 #include "effects/DynamicSystem.h"
@@ -51,8 +48,8 @@ public:
     // FxMode mode;
 
     // Effects
-    AdaptiveBuffer *adaptiveBuffer;
-    WaveBuffer_I32 *waveBuffer;
+    FIREqualizer *adaptiveBuffer;
+    WaveBuffer *waveBuffer;
     bool fetcomp_enabled;
     Convolver *convolver;
     VHE *vhe;

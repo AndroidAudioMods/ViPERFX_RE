@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-#include "WaveBuffer_I32.h"
+#include "WaveBuffer.h"
 #include "FIR.h"
 
 class Polyphase {
@@ -17,8 +17,8 @@ public:
 private:
     FIR *fir1;
     FIR *fir2;
-    WaveBuffer_I32 *waveBuffer1;
-    WaveBuffer_I32 *waveBuffer2;
+    WaveBuffer *waveBuffer1;
+    WaveBuffer *waveBuffer2;
     int *unknown1;
     bool enabled;
     // 3 unknowns

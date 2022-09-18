@@ -7,8 +7,8 @@ VHE::VHE() {
     convSize = 0;
     samplerate = DEFAULT_SAMPLERATE;
 
-    bufA = new WaveBuffer_I32(2, 0x1000);
-    bufB = new WaveBuffer_I32(2, 0x1000);
+    bufA = new WaveBuffer(2, 0x1000);
+    bufB = new WaveBuffer(2, 0x1000);
     Reset();
 }
 
@@ -21,7 +21,7 @@ void VHE::Process(float *source, float *dest, int frameSize) {
     if (enabled && convLeft.InstanceUsable() && convRight.InstanceUsable()) {
         if (bufA->PushSamples(source, frameSize) != 0) {
             while (bufA->GetBufferOffset() > convSize) {
-                float *buffer = bufA->GetCurrentBufferI32Ptr();
+                float *buffer = bufA->GetBuffer();
                 convLeft.ConvolveInterleaved(buffer, 0);
                 convRight.ConvolveInterleaved(buffer, 1);
                 bufB->PushSamples(buffer, convSize);

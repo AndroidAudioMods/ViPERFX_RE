@@ -7,7 +7,7 @@ DiffSurround::DiffSurround() {
     this->delayTime = 0.0f;
     this->enabled = false;
     for (auto &buffer : this->buffers) {
-        buffer = new WaveBuffer_I32(1, 0x1000);
+        buffer = new WaveBuffer(1, 0x1000);
     }
 }
 
@@ -30,8 +30,8 @@ void DiffSurround::Process(float *samples, uint32_t size) {
             bufs[i % 2][i / 2] = samples[i];
         }
 
-        outbufs[0] = this->buffers[0]->GetCurrentBufferI32Ptr();
-        outbufs[1] = this->buffers[1]->GetCurrentBufferI32Ptr();
+        outbufs[0] = this->buffers[0]->GetBuffer();
+        outbufs[1] = this->buffers[1]->GetBuffer();
 
         for (int i = 0; i < size * 2; i++) {
             samples[i] = outbufs[i % 2][i / 2];

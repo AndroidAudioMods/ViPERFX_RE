@@ -5,7 +5,7 @@ HiFi::HiFi() {
     this->gain = 1.f;
     this->samplerate = DEFAULT_SAMPLERATE;
     for (int i = 0; i < 2; i++) {
-        this->buffers[i] = new WaveBuffer_I32(2, 0x800);
+        this->buffers[i] = new WaveBuffer(2, 0x800);
         this->filters[i].lowpass = new IIR_NOrder_BW_LH(1);
         this->filters[i].highpass = new IIR_NOrder_BW_LH(3);
         this->filters[i].bandpass = new IIR_NOrder_BW_BP(3);
@@ -40,8 +40,8 @@ void HiFi::Process(float *samples, uint32_t size) {
             lpBuf[i] = out1;
             bpBuf[i] = out3;
         }
-        float *bpOut = this->buffers[0]->GetCurrentBufferI32Ptr();
-        float *lpOut = this->buffers[1]->GetCurrentBufferI32Ptr();
+        float *bpOut = this->buffers[0]->GetBuffer();
+        float *lpOut = this->buffers[1]->GetBuffer();
         for (int i = 0; i < size * 2; i++) {
             float hp = samples[i] * this->gain * 1.2f;
             float bp = bpOut[i] * this->gain;

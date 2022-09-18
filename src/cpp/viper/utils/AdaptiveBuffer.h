@@ -2,10 +2,10 @@
 
 #include <cstdint>
 
-class AdaptiveBuffer {
+class FIREqualizer {
 public:
-    AdaptiveBuffer(uint32_t channels, uint32_t length);
-    ~AdaptiveBuffer();
+    FIREqualizer(uint32_t channels, uint32_t length);
+    ~FIREqualizer();
 
     void FlushBuffer();
     uint32_t GetBufferLength() const;

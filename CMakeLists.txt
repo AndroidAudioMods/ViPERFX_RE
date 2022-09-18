@@ -30,6 +30,7 @@ set(FILES
         src/cpp/viper/effects/DiffSurround.cpp
         src/cpp/viper/effects/DynamicSystem.cpp
         src/cpp/viper/effects/FETCompressor.cpp
+        src/cpp/viper/effects/FIREqualizer.cpp
         src/cpp/viper/effects/IIRFilter.cpp
         src/cpp/viper/effects/PlaybackGain.cpp
         src/cpp/viper/effects/Reverberation.cpp
@@ -51,7 +52,7 @@ set(FILES
         src/cpp/viper/utils/DepthSurround.cpp
         src/cpp/viper/utils/DynamicBass.cpp
         src/cpp/viper/utils/FIR.cpp
-        src/cpp/viper/utils/FixedBiquad.cpp
+        src/cpp/viper/utils/Biquad.cpp
         src/cpp/viper/utils/Harmonic.cpp
         src/cpp/viper/utils/HiFi.cpp
         src/cpp/viper/utils/HighShelf.cpp
@@ -67,7 +68,7 @@ set(FILES
         src/cpp/viper/utils/Stereo3DSurround.cpp
         src/cpp/viper/utils/Subwoofer.cpp
         src/cpp/viper/utils/TimeConstDelay.cpp
-        src/cpp/viper/utils/WaveBuffer_I32.cpp)
+        src/cpp/viper/utils/WaveBuffer.cpp)
 
 message(${CMAKE_BUILD_TYPE})
 

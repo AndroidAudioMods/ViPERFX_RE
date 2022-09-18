@@ -3,11 +3,11 @@
 
 #include <cstdint>
 
-class WaveBuffer_I32 {
+class WaveBuffer {
 public:
-    WaveBuffer_I32(int channels, uint32_t size);
+    WaveBuffer(int channels, uint32_t size);
 
-    ~WaveBuffer_I32();
+    ~WaveBuffer();
 
     void Reset();
 
@@ -15,7 +15,7 @@ public:
 
     uint32_t GetBufferSize();
 
-    float *GetCurrentBufferI32Ptr();
+    float *GetBuffer();
 
     uint32_t PopSamples(uint32_t size, bool resetIndex);
 

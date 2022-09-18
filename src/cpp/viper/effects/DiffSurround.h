@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-#include "../utils/WaveBuffer_I32.h"
+#include "../utils/WaveBuffer.h"
 
 class DiffSurround {
 public:
@@ -17,7 +17,7 @@ public:
     uint32_t samplerate;
     bool enabled;
     float delayTime;
-    WaveBuffer_I32 *buffers[2];
+    WaveBuffer *buffers[2];
 };
 
 

@@ -7,8 +7,8 @@ ViPER::ViPER() {
     VIPER_LOGI("Welcome to ViPER FX");
     VIPER_LOGI("Current version is %s %s", VERSION_STRING, VERSION_CODENAME);
 
-    this->adaptiveBuffer = new AdaptiveBuffer(2, 4096);
-    this->waveBuffer = new WaveBuffer_I32(2, 4096);
+    this->adaptiveBuffer = new FIREqualizer(2, 4096);
+    this->waveBuffer = new WaveBuffer(2, 4096);
 
     this->convolver = new Convolver();
     this->convolver->SetEnable(false);
@@ -331,7 +331,7 @@ void ViPER::processBuffer(float *buffer, int frameSize) {
         return;
     }
 
-    auto pWaveBuffer = this->waveBuffer->GetCurrentBufferI32Ptr();
+    auto pWaveBuffer = this->waveBuffer->GetBuffer();
     this->convolver->Process(pWaveBuffer, pWaveBuffer, frameSize);
     this->vhe->Process(pWaveBuffer, pWaveBuffer, frameSize);
     this->waveBuffer->SetBufferOffset(frameSize);

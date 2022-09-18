@@ -2,7 +2,7 @@
 
 #include <cstdint>
 #include "../utils/MultiBiquad.h"
-#include "../utils/FixedBiquad.h"
+#include "../utils/Biquad.h"
 
 class SpeakerCorrection {
 public:
@@ -17,6 +17,6 @@ public:
     uint32_t samplerate;
     bool enabled;
     MultiBiquad highpass[2];
-    FixedBiquad lowpass[2];
-    FixedBiquad bandpass[2];
+    Biquad lowpass[2];
+    Biquad bandpass[2];
 };

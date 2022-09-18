@@ -1,9 +1,9 @@
 #pragma once
 
 #include <cstdint>
-#include "../utils/FixedBiquad.h"
+#include "../utils/Biquad.h"
 #include "../utils/Subwoofer.h"
-#include "../utils/WaveBuffer_I32.h"
+#include "../utils/WaveBuffer.h"
 #include "../utils/Polyphase.h"
 
 class ViPERBass {
@@ -21,9 +21,9 @@ public:
 
 private:
     Polyphase *polyphase;
-    FixedBiquad *fixedBiquad;
+    Biquad *fixedBiquad;
     Subwoofer *subwoofer;
-    WaveBuffer_I32 *waveBuffer;
+    WaveBuffer *waveBuffer;
     bool enable;
     bool initOk;
     int processMode;

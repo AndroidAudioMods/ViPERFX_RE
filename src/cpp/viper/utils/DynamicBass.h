@@ -2,7 +2,7 @@
 
 #include <cstdint>
 #include "PolesFilter.h"
-#include "FixedBiquad.h"
+#include "Biquad.h"
 
 class DynamicBass {
 public:
@@ -31,5 +31,5 @@ public:
 
     PolesFilter filterX;
     PolesFilter filterY;
-    FixedBiquad lowPass;
+    Biquad lowPass;
 };
