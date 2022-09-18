@@ -48,7 +48,7 @@ public:
     // FxMode mode;
 
     // Effects
-    FIREqualizer *adaptiveBuffer;
+    AdaptiveBuffer *adaptiveBuffer;
     WaveBuffer *waveBuffer;
     bool fetcomp_enabled;
     Convolver *convolver;

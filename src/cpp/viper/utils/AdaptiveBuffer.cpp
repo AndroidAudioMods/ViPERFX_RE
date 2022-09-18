@@ -1,7 +1,7 @@
 #include <cstring>
 #include "AdaptiveBuffer.h"
 
-FIREqualizer::FIREqualizer(uint32_t channels, uint32_t length) {
+AdaptiveBuffer::AdaptiveBuffer(uint32_t channels, uint32_t length) {
     this->channels = channels;
     this->buffer = nullptr;
     this->length = 0;
@@ -12,32 +12,32 @@ FIREqualizer::FIREqualizer(uint32_t channels, uint32_t length) {
     }
 }
 
-FIREqualizer::~FIREqualizer() {
+AdaptiveBuffer::~AdaptiveBuffer() {
     delete this->buffer;
     this->buffer = nullptr;
 }
 
-void FIREqualizer::FlushBuffer() {
+void AdaptiveBuffer::FlushBuffer() {
     this->offset = 0;
 }
 
-uint32_t FIREqualizer::GetBufferLength() const {
+uint32_t AdaptiveBuffer::GetBufferLength() const {
     return this->length;
 }
 
-uint32_t FIREqualizer::GetBufferOffset() const {
+uint32_t AdaptiveBuffer::GetBufferOffset() const {
     return this->offset;
 }
 
-float *FIREqualizer::GetBufferPointer() const {
+float *AdaptiveBuffer::GetBufferPointer() const {
     return this->buffer;
 }
 
-uint32_t FIREqualizer::GetChannels() const {
+uint32_t AdaptiveBuffer::GetChannels() const {
     return this->channels;
 }
 
-void FIREqualizer::PanFrames(float left, float right) {
+void AdaptiveBuffer::PanFrames(float left, float right) {
     if (this->buffer != nullptr && this->channels == 2) {
         for (int i = 0; i < this->offset * this->channels; i++) {
             if (i % 2 == 0) {
@@ -49,7 +49,7 @@ void FIREqualizer::PanFrames(float left, float right) {
     }
 }
 
-int FIREqualizer::PopFrames(float *frames, uint32_t length) {
+int AdaptiveBuffer::PopFrames(float *frames, uint32_t length) {
     if (this->buffer == nullptr || this->offset < length) {
         return 0;
     }
@@ -65,7 +65,7 @@ int FIREqualizer::PopFrames(float *frames, uint32_t length) {
     return 1;
 }
 
-int FIREqualizer::PushFrames(const float *frames, uint32_t length) {
+int AdaptiveBuffer::PushFrames(const float *frames, uint32_t length) {
     if (this->buffer == nullptr) {
         return 0;
     }
@@ -86,7 +86,7 @@ int FIREqualizer::PushFrames(const float *frames, uint32_t length) {
     return 1;
 }
 
-int FIREqualizer::PushZero(uint32_t length) {
+int AdaptiveBuffer::PushZero(uint32_t length) {
     if (this->buffer == nullptr) {
         return 0;
     }
@@ -105,7 +105,7 @@ int FIREqualizer::PushZero(uint32_t length) {
     return 1;
 }
 
-void FIREqualizer::ScaleFrames(float scale) {
+void AdaptiveBuffer::ScaleFrames(float scale) {
     if (this->buffer != nullptr) {
         for (uint32_t i = 0; i < this->offset * this->channels; i++) {
             this->buffer[i] = this->buffer[i] * scale;
@@ -113,6 +113,6 @@ void FIREqualizer::ScaleFrames(float scale) {
     }
 }
 
-void FIREqualizer::SetBufferOffset(uint32_t offset) {
+void AdaptiveBuffer::SetBufferOffset(uint32_t offset) {
     this->offset = offset;
 }

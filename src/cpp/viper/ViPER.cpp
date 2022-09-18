@@ -7,7 +7,7 @@ ViPER::ViPER() {
     VIPER_LOGI("Welcome to ViPER FX");
     VIPER_LOGI("Current version is %s %s", VERSION_STRING, VERSION_CODENAME);
 
-    this->adaptiveBuffer = new FIREqualizer(2, 4096);
+    this->adaptiveBuffer = new AdaptiveBuffer(2, 4096);
     this->waveBuffer = new WaveBuffer(2, 4096);
 
     this->convolver = new Convolver();
