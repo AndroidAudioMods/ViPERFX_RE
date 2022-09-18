@@ -4,7 +4,7 @@
 ViPERClarity::ViPERClarity() {
     for (int i = 0; i < 2; i++) {
         this->hiShelf[i].SetFrequency(12000.f);
-        this->hiShelf[i].SetQuality(100.f);
+//        this->hiShelf[i].SetQuality(100.f);
         this->hiShelf[i].SetGain(1.f);
         this->hiShelf[i].SetSamplingRate(DEFAULT_SAMPLERATE);
     }
@@ -43,7 +43,7 @@ void ViPERClarity::Reset() {
     SetClarityToFilter();
     for (int i = 0; i < 2; i++) {
         this->hiShelf[i].SetFrequency(8250.f);
-        this->hiShelf[i].SetQuality(100.f);
+//        this->hiShelf[i].SetQuality(100.f);
         this->hiShelf[i].SetSamplingRate(DEFAULT_SAMPLERATE);
     }
     this->hifi.SetSamplingRate(this->samplerate);
