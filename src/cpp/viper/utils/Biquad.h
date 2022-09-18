@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <cstdint>
 
 class Biquad {
@@ -15,6 +14,13 @@ public:
     void SetLowPassParameter(double frequency, double samplingRate, double qFactor);
 
 private:
-    double y_2, y_1, x_2, x_1;
-    double b0, b1, b2, a1, a2;
+    double x_1;
+    double x_2;
+    double y_1;
+    double y_2;
+    double a1;
+    double a2;
+    double b0;
+    double b1;
+    double b2;
 };
