@@ -21,16 +21,9 @@ ViPERBass::ViPERBass() {
 
 ViPERBass::~ViPERBass() {
     delete this->polyphase;
-    this->polyphase = nullptr;
-
     delete this->biquad;
-    this->biquad = nullptr;
-
     delete this->subwoofer;
-    this->subwoofer = nullptr;
-
     delete this->waveBuffer;
-    this->waveBuffer = nullptr;
 }
 
 void ViPERBass::Process(float *samples, uint32_t size) {
@@ -74,8 +67,9 @@ void ViPERBass::Process(float *samples, uint32_t size) {
 
                 if (this->polyphase->Process(samples, size) == size) {
                     for (uint32_t i = 0; i < size * 2; i += 2) {
-                        samples[i] += buffer[i / 2] * this->bassFactor;
-                        samples[i + 1] += buffer[i / 2] * this->bassFactor;
+                        float x = buffer[i / 2] * this->bassFactor;
+                        samples[i] += x;
+                        samples[i + 1] += x;
                     }
                     this->waveBuffer->PopSamples(size, true);
                 }
@@ -120,7 +114,7 @@ void ViPERBass::SetSamplingRate(uint32_t samplingRate) {
         this->invertedSamplingRate = 1.0f / (float) samplingRate;
         this->polyphase->SetSamplingRate(samplingRate);
         this->biquad->SetLowPassParameter(this->speaker, samplingRate, 0.53);
-        this->subwoofer->SetBassGain(samplingRate, this->bassFactor * 2.5);
+        this->subwoofer->SetBassGain(samplingRate, this->bassFactor * 2.5f);
     }
 }
 

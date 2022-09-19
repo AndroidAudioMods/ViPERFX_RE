@@ -10,16 +10,16 @@ double HighShelf::Process(double sample) {
     return out;
 }
 
-void HighShelf::SetFrequency(double freq) {
+void HighShelf::SetFrequency(float freq) {
     this->frequency = freq;
 }
 
-void HighShelf::SetGain(double gain) {
-    this->gain = log10(gain) * 20.0;
+void HighShelf::SetGain(float gain) {
+    this->gain = 20.0 * log10((double) gain);
 }
 
-void HighShelf::SetSamplingRate(double samplingRate) {
-    double x = (2 * M_PI * this->frequency) / samplingRate;
+void HighShelf::SetSamplingRate(uint32_t samplingRate) {
+    double x = (2 * M_PI * this->frequency) / (double) samplingRate;
     double sinX = sin(x);
     double cosX = cos(x);
     double y = exp((this->gain * log(10.0)) / 40.0);
@@ -38,7 +38,7 @@ void HighShelf::SetSamplingRate(double samplingRate) {
     double f = (y - 1.0) - d;
 
     this->a0 = 1.0 / c;
-    this->a1 = a * 2.0;
+    this->a1 = f * 2.0;
     this->a2 = b - z;
     this->b0 = (e + z) * y;
     this->b1 = -y * 2.0 * ((y - 1.0) + d);

@@ -28,11 +28,11 @@ void Biquad::Reset() {
     this->y_2 = 0;
 }
 
-void Biquad::SetBandPassParameter(double frequency, double samplingRate, double qFactor) {
+void Biquad::SetBandPassParameter(double frequency, double samplingRate, float qFactor) {
     double x = (2.0 * M_PI * frequency) / samplingRate;
     double sinX = sin(x);
     double cosX = cos(x);
-    double y = sinX / (2.0 * qFactor);
+    double y = sinX / ((double) qFactor * 2.0);
 
     double a0 = 1.0 + y;
     double a1 = -cosX * 2.0;
@@ -56,7 +56,7 @@ void Biquad::SetCoeffs(double a0, double a1, double a2, double b0, double b1, do
 }
 
 void
-Biquad::SetHighPassParameter(double frequency, double samplingRate, double param_4, double qFactor, double param_6) {
+Biquad::SetHighPassParameter(double frequency, double samplingRate, double param_4, float qFactor, double param_6) {
     double x = (2.0 * M_PI * frequency) / samplingRate;
     double sinX = sin(x);
     double cosX = cos(x);
@@ -64,7 +64,7 @@ Biquad::SetHighPassParameter(double frequency, double samplingRate, double param
     double y = pow(10.0, param_4 / 40.0);
     double sqrtY = sqrt(y);
 
-    double z = sinX / 2.0 * sqrt((1.0 / y + y) * (1.0 / qFactor - 1.0) + 2.0);
+    double z = sinX / 2.0 * sqrt((1.0 / y + y) * (1.0 / (double) qFactor - 1.0) + 2.0);
     double a = (y - 1.0) * cosX;
     double b = (y + 1.0) + a;
     double c = (y + 1.0) * cosX;
@@ -81,10 +81,10 @@ Biquad::SetHighPassParameter(double frequency, double samplingRate, double param
     this->SetCoeffs(a0, a1, a2, b0, b1, b2);
 }
 
-void Biquad::SetLowPassParameter(double frequency, double samplingRate, double qFactor) {
+void Biquad::SetLowPassParameter(double frequency, double samplingRate, float qFactor) {
     double x = (2.0 * M_PI * frequency) / samplingRate;
     double sinX = sin(x);
-    double y = sinX / (qFactor * 2.0);
+    double y = sinX / ((double) qFactor * 2.0);
     double cosX = cos(x);
     double z = 1.0 - cosX;
 

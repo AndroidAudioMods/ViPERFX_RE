@@ -14,7 +14,6 @@ AdaptiveBuffer::AdaptiveBuffer(uint32_t channels, uint32_t length) {
 
 AdaptiveBuffer::~AdaptiveBuffer() {
     delete this->buffer;
-    this->buffer = nullptr;
 }
 
 void AdaptiveBuffer::FlushBuffer() {

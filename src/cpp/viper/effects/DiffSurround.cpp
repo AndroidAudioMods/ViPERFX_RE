@@ -14,7 +14,6 @@ DiffSurround::DiffSurround() {
 DiffSurround::~DiffSurround() {
     for (auto &buffer : this->buffers) {
         delete buffer;
-        buffer = nullptr;
     }
 }
 

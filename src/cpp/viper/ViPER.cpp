@@ -67,7 +67,6 @@ ViPER::ViPER() {
     this->viperBass->Reset();
 
     this->viperClarity = new ViPERClarity();
-    this->viperClarity->SetEnable(false);
     this->viperClarity->SetSamplingRate(this->sampleRate);
     this->viperClarity->Reset();
 
@@ -114,65 +113,26 @@ ViPER::ViPER() {
 
 ViPER::~ViPER() {
     delete this->adaptiveBuffer;
-    this->adaptiveBuffer = nullptr;
-
     delete this->waveBuffer;
-    this->waveBuffer = nullptr;
-
     delete this->convolver;
-    this->convolver = nullptr;
-
     delete this->vhe;
-    this->vhe = nullptr;
-
     delete this->viperDdc;
-    this->viperDdc = nullptr;
-
     delete this->spectrumExtend;
-    this->spectrumExtend = nullptr;
-
     delete this->iirFilter;
-    this->iirFilter = nullptr;
-
     delete this->colorfulMusic;
-    this->colorfulMusic = nullptr;
-
     delete this->reverberation;
-    this->reverberation = nullptr;
-
     delete this->playbackGain;
-    this->playbackGain = nullptr;
-
     delete this->fetCompressor;
-    this->fetCompressor = nullptr;
-
     delete this->dynamicSystem;
-    this->dynamicSystem = nullptr;
-
     delete this->viperBass;
-    this->viperBass = nullptr;
-
     delete this->viperClarity;
-    this->viperClarity = nullptr;
-
     delete this->diffSurround;
-    this->diffSurround = nullptr;
-
     delete this->cure;
-    this->cure = nullptr;
-
     delete this->tubeSimulator;
-    this->tubeSimulator = nullptr;
-
     delete this->analogX;
-    this->analogX = nullptr;
-
     delete this->speakerCorrection;
-    this->speakerCorrection = nullptr;
-
     for (auto &softwareLimiter: this->softwareLimiters) {
         delete softwareLimiter;
-        softwareLimiter = nullptr;
     }
 }
 

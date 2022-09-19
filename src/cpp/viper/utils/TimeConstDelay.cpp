@@ -10,7 +10,6 @@ TimeConstDelay::TimeConstDelay() {
 
 TimeConstDelay::~TimeConstDelay() {
     delete this->samples;
-    this->samples = nullptr;
 }
 
 float TimeConstDelay::ProcessSample(float sample) {

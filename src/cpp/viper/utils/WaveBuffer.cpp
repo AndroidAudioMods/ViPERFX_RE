@@ -10,7 +10,6 @@ WaveBuffer::WaveBuffer(int channels, uint32_t size) {
 
 WaveBuffer::~WaveBuffer() {
     delete this->buffer;
-    this->buffer = nullptr;
 }
 
 uint32_t WaveBuffer::GetBufferOffset() {

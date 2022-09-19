@@ -19,9 +19,7 @@ private:
     FIR *fir2;
     WaveBuffer *waveBuffer1;
     WaveBuffer *waveBuffer2;
-    int *unknown1;
-    bool enabled;
-    // 3 unknowns
+    float *buffer;
     uint32_t samplingRate;
 };
 

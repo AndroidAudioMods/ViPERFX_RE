@@ -14,7 +14,7 @@ void FIR::FilterSamples(int *samples, uint32_t size) {
     this->FilterSamplesInterleaved(samples, size, 1);
 }
 
-void FIR::FilterSamplesInterleaved(int *samples, uint32_t size, uint32_t channels) {
+void FIR::FilterSamplesInterleaved(float *samples, uint32_t size, uint32_t channels) {
 
 }
 
@@ -22,7 +22,7 @@ int FIR::GetBlockLength() {
     return this->blockLength;
 }
 
-int FIR::LoadCoefficients(float *coeffs, uint32_t coeffsize, int blockLength) {
+int FIR::LoadCoefficients(const float *coeffs, uint32_t coeffsize, int blockLength) {
     return 0;
 }
 

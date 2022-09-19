@@ -5,31 +5,29 @@
 #include "../utils/HiFi.h"
 #include "../utils/HighShelf.h"
 
-enum ClarityMode {
-    NATURAL,
-    OZONE,
-    XHIFI
-};
-
 class ViPERClarity {
 public:
+    enum ClarityMode {
+        NATURAL,
+        OZONE,
+        XHIFI
+    };
+
     ViPERClarity();
-    ~ViPERClarity();
 
     void Process(float *samples, uint32_t size);
     void Reset();
     void SetClarity(float gainPercent);
     void SetClarityToFilter();
-    void SetEnable(bool enabled);
-    void SetProcessMode(ClarityMode mode);
-    void SetSamplingRate(uint32_t samplerate);
+    void SetProcessMode(ClarityMode processMode);
+    void SetSamplingRate(uint32_t samplingRate);
 
-    NoiseSharpening sharp;
-    HighShelf hiShelf[2];
+private:
+    NoiseSharpening noiseSharpening;
+    HighShelf highShelf[2];
     HiFi hifi;
-    bool enabled;
     ClarityMode processMode;
-    uint32_t samplerate;
+    uint32_t samplingRate;
     float clarityGainPercent;
 };
 

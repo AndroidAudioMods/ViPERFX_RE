@@ -5,12 +5,12 @@
 class HighShelf {
 public:
     double Process(double sample);
-    void SetFrequency(double freq);
-    void SetGain(double gain);
-    void SetSamplingRate(double samplingRate);
+    void SetFrequency(float freq);
+    void SetGain(float gain);
+    void SetSamplingRate(uint32_t samplingRate);
 
 private:
-    double frequency;
+    float frequency;
     double gain;
     double x_1;
     double x_2;
