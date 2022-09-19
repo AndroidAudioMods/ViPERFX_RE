@@ -10,7 +10,7 @@ FIR::~FIR() {
     delete this->block;
 }
 
-void FIR::FilterSamples(int *samples, uint32_t size) {
+void FIR::FilterSamples(float *samples, uint32_t size) {
     this->FilterSamplesInterleaved(samples, size, 1);
 }
 
