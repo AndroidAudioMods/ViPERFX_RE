@@ -109,7 +109,7 @@ void ViPERBass::SetBassFactor(float bassFactor) {
 }
 
 void ViPERBass::SetProcessMode(ProcessMode processMode) {
-    if (processMode < MAX_PROCESS_MODE && this->processMode != processMode) {
+    if (this->processMode != processMode) {
         this->processMode = processMode;
         this->Reset();
     }

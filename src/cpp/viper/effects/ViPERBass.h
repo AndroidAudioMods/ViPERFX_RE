@@ -12,7 +12,6 @@ public:
         NATURAL_BASS = 0,
         PURE_BASS_PLUS = 1,
         SUBWOOFER = 2,
-        MAX_PROCESS_MODE
     };
 
     ViPERBass();
