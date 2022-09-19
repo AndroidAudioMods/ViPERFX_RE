@@ -5,7 +5,7 @@ ViPERBass::ViPERBass() {
     this->samplingRate = DEFAULT_SAMPLERATE;
     this->speaker = 60;
     this->invertedSamplingRate = 1.0f / DEFAULT_SAMPLERATE;
-    this->unknown1 = 0.0;
+    this->antiPop = 0.0;
     this->processMode = NATURAL_BASS;
     this->bassFactor = 0.0f;
     this->polyphase = new Polyphase(2);
@@ -38,17 +38,16 @@ void ViPERBass::Process(float *samples, uint32_t size) {
         return;
     }
 
-    // Anti-pop mechanism? this->unknown1 is zeroed in Reset()
-    if (this->unknown1 < 1.0) {
+    if (this->antiPop < 1.0) {
         for (uint32_t i = 0; i < size * 2; i += 2) {
-            samples[i] *= this->unknown1;
-            samples[i + 1] *= this->unknown1;
+            samples[i] *= this->antiPop;
+            samples[i + 1] *= this->antiPop;
             
-            float x = this->unknown1 + this->invertedSamplingRate;
+            float x = this->antiPop + this->invertedSamplingRate;
             if (x > 1.0) {
                 x = 1.0;
             }
-            this->unknown1 = x;
+            this->antiPop = x;
         }
     }
 
@@ -97,7 +96,7 @@ void ViPERBass::Reset() {
     this->waveBuffer->PushZeros(this->polyphase->GetLatency());
     this->subwoofer->SetBassGain(this->samplingRate, this->bassFactor * 2.5f);
     this->biquad->SetLowPassParameter(this->speaker, this->samplingRate, 0.53);
-    this->unknown1 = 0.0f;
+    this->antiPop = 0.0f;
     this->invertedSamplingRate = 1.0f / (float) this->samplingRate;
 }
 

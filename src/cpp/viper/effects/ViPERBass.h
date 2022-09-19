@@ -32,7 +32,7 @@ private:
     ProcessMode processMode;
     uint32_t samplingRate;
     float invertedSamplingRate;
-    float unknown1;
+    float antiPop;
     uint32_t speaker;
     float bassFactor;
 };
