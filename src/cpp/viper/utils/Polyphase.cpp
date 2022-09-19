@@ -1,6 +1,6 @@
 #include "Polyphase.h"
 
-Polyphase::Polyphase() {
+Polyphase::Polyphase(int unknown1) {
 
 }
 
@@ -12,8 +12,8 @@ uint32_t Polyphase::GetLatency() {
     return 63;
 }
 
-void Polyphase::Process(float *samples, uint32_t size) {
-
+uint32_t Polyphase::Process(float *samples, uint32_t size) {
+    return 0;
 }
 
 void Polyphase::Reset() {

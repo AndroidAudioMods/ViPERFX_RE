@@ -8,28 +8,33 @@
 
 class ViPERBass {
 public:
+    enum ProcessMode {
+        NATURAL_BASS = 0,
+        PURE_BASS_PLUS = 1,
+        SUBWOOFER = 2,
+        MAX_PROCESS_MODE
+    };
+
     ViPERBass();
     ~ViPERBass();
 
     void Process(float *samples, uint32_t size);
     void Reset();
     void SetBassFactor(float bassFactor);
-    void SetEnable(bool enable);
-    void SetProcessMode(int processMode);
+    void SetProcessMode(ProcessMode processMode);
     void SetSamplingRate(uint32_t samplingRate);
-    void SetSpeaker(float speaker);
+    void SetSpeaker(uint32_t speaker);
 
 private:
     Polyphase *polyphase;
-    Biquad *fixedBiquad;
+    Biquad *biquad;
     Subwoofer *subwoofer;
     WaveBuffer *waveBuffer;
-    bool enable;
-    bool initOk;
-    int processMode;
+    ProcessMode processMode;
     uint32_t samplingRate;
+    float invertedSamplingRate;
     float unknown1;
-    float speaker;
+    uint32_t speaker;
     float bassFactor;
 };
 

@@ -63,7 +63,6 @@ ViPER::ViPER() {
     this->dynamicSystem->Reset();
 
     this->viperBass = new ViPERBass();
-    this->viperBass->SetEnable(false);
     this->viperBass->SetSamplingRate(this->sampleRate);
     this->viperBass->Reset();
 
