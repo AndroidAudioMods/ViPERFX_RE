@@ -6,7 +6,7 @@ ViPERBass::ViPERBass() {
     this->speaker = 60;
     this->invertedSamplingRate = 1.0f / DEFAULT_SAMPLERATE;
     this->antiPop = 0.0;
-    this->processMode = NATURAL_BASS;
+    this->processMode = ProcessMode::NATURAL_BASS;
     this->bassFactor = 0.0f;
     this->polyphase = new Polyphase(2);
     this->biquad = new Biquad();
@@ -52,7 +52,7 @@ void ViPERBass::Process(float *samples, uint32_t size) {
     }
 
     switch (this->processMode) {
-        case NATURAL_BASS: {
+        case ProcessMode::NATURAL_BASS: {
             for (uint32_t i = 0; i < size * 2; i += 2) {
                 double sample = ((double) samples[i] + (double) samples[i + 1]) / 2.0;
                 auto x = (float) this->biquad->ProcessSample(sample);
@@ -61,7 +61,7 @@ void ViPERBass::Process(float *samples, uint32_t size) {
             }
             break;
         }
-        case PURE_BASS_PLUS: {
+        case ProcessMode::PURE_BASS_PLUS: {
             if (this->waveBuffer->PushSamples(samples, size) != 0) {
                 float *buffer = this->waveBuffer->GetBuffer();
                 uint32_t bufferOffset = this->waveBuffer->GetBufferOffset();
@@ -73,16 +73,16 @@ void ViPERBass::Process(float *samples, uint32_t size) {
                 }
 
                 if (this->polyphase->Process(samples, size) == size) {
-                    for (uint32_t i = 0; i < size; i++) {
-                        samples[i] += buffer[i] * this->bassFactor;
-                        samples[i + 1] += buffer[i] * this->bassFactor;
+                    for (uint32_t i = 0; i < size * 2; i += 2) {
+                        samples[i] += buffer[i / 2] * this->bassFactor;
+                        samples[i + 1] += buffer[i / 2] * this->bassFactor;
                     }
                     this->waveBuffer->PopSamples(size, true);
                 }
             }
             break;
         }
-        case SUBWOOFER: {
+        case ProcessMode::SUBWOOFER: {
             this->subwoofer->Process(samples, size);
             break;
         }
