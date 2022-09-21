@@ -1,8 +1,8 @@
 #pragma once
 
 #include <cstdint>
-#include "WaveBuffer.h"
 #include "FIR.h"
+#include "WaveBuffer.h"
 
 class Polyphase {
 public:

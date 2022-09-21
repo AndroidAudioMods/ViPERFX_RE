@@ -1,7 +1,7 @@
 #include "WaveBuffer.h"
 #include <cstring>
 
-WaveBuffer::WaveBuffer(int channels, uint32_t size) {
+WaveBuffer::WaveBuffer(uint32_t channels, uint32_t size) {
     this->channels = channels;
     this->size = size * channels;
     this->index = 0;

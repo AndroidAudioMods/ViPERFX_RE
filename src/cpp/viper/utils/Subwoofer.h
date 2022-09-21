@@ -8,7 +8,7 @@ public:
     Subwoofer();
 
     void Process(float *samples, uint32_t size);
-    void SetBassGain(uint32_t samplerate, float gainDb);
+    void SetBassGain(uint32_t samplingRate, float gainDb);
 
 private:
     MultiBiquad peak[2];

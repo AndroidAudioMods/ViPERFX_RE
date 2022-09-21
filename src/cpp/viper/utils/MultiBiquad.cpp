@@ -24,7 +24,70 @@ double MultiBiquad::ProcessSample(double sample) {
 }
 
 void
-MultiBiquad::RefreshFilter(FilterType type, double gainAmp, double freq, double samplingRate, double qFactor, bool param_7) {
+MultiBiquad::RefreshFilter(FilterType type, float gainAmp, float frequency, uint32_t samplingRate, float qFactor, bool param_7) {
+    float gain;
+
+    if (type - 5 < 3) { // type - 5 < 3 is always true... right?
+        gain = pow(10.0f, gainAmp / 40.0f);
+    } else {
+        gain = pow(10.0f, gainAmp / 20.0f);
+    }
+
+    double x = (2.0 * M_PI * (double) frequency) / (double) samplingRate;
+    double sinX = sin(x);
+    double cosX = cos(x);
+
+    double y;
+    double z;
+
+    if (type - 6 < 2) {
+        y = sinX / 2.0 * sqrt((1.0 / ((double) gain * 2.0)) * (1.0 / (double) qFactor - 1.0) + 2.0);
+        z = sqrt((double) gain) * y;
+    } else if (!param_7) {
+        y = sinX / ((double) qFactor / 2.0);
+        z = -1.0;
+    } else {
+        y = sinh(((double) qFactor * (log(2) / 2.0) * x) / sinX);
+        z = -1.0;
+    }
+
+    switch (type) {
+        case LOWPASS: {
+
+            break;
+        }
+        case HIGHPASS: {
+
+            break;
+        }
+        case BANDPASS: {
+
+            break;
+        }
+        case BANDSTOP: {
+
+            break;
+        }
+        case ALLPASS: {
+
+            break;
+        }
+        case PEAK: {
+
+            break;
+        }
+        case LOWSHELF: {
+
+            break;
+        }
+        case HIGHSHELF: {
+
+            break;
+        }
+    }
+
+
+
     bool uVar1;
     double dVar4;
     double dVar5;
@@ -42,7 +105,7 @@ MultiBiquad::RefreshFilter(FilterType type, double gainAmp, double freq, double 
     double b2;
 
     dVar10 = pow(10.0, gainAmp / 40.0);
-    dVar4 = (freq * 2 * M_PI) / samplingRate;
+    dVar4 = (frequency * 2 * M_PI) / samplingRate;
     dVar5 = sin(dVar4);
     dVar11 = cos(dVar4);
     uVar1 = type == HIGHSHELF;

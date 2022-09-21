@@ -5,7 +5,7 @@
 
 class WaveBuffer {
 public:
-    WaveBuffer(int channels, uint32_t size);
+    WaveBuffer(uint32_t channels, uint32_t size);
 
     ~WaveBuffer();
 
@@ -24,7 +24,7 @@ private:
     float *buffer;
     uint32_t size;
     uint32_t index;
-    int channels;
+    uint32_t channels;
 };
 
 

@@ -19,18 +19,18 @@ void Subwoofer::Process(float *samples, uint32_t size) {
         double tmp = this->peak[index].ProcessSample(sample);
         tmp = this->peakLow[index].ProcessSample(tmp);
         tmp = this->lowpass[index].ProcessSample(tmp - sample);
-        samples[i] = (float) ((sample / 2.0) + (tmp * 0.6f));
+        samples[i] = (float) ((sample / 2.0) + (tmp * 0.6));
     }
 }
 
-void Subwoofer::SetBassGain(uint32_t samplerate, float gainDb) {
-    double gain = 20.0 * log10( gainDb);
-    double gainLower = 20.0 * log10( gainDb / 8.0);
+void Subwoofer::SetBassGain(uint32_t samplingRate, float gainDb) {
+    float gain = 20.0f * log10( gainDb);
+    float gainLower = 20.0f * log10( gainDb / 8.0f);
 
-    this->peak[0].RefreshFilter(FilterType::PEAK, gain, 44.0, (double) samplerate, 0.75, true);
-    this->peak[1].RefreshFilter(FilterType::PEAK, gain, 44.0, (double) samplerate, 0.75, true);
-    this->peakLow[0].RefreshFilter(FilterType::PEAK, gainLower, 80.0, (double) samplerate, 0.2, true);
-    this->peakLow[1].RefreshFilter(FilterType::PEAK, gainLower, 80.0, (double) samplerate, 0.2, true);
-    this->lowpass[0].RefreshFilter(FilterType::LOWPASS, 0.0, 380.0, (double) samplerate, 0.6, false);
-    this->lowpass[1].RefreshFilter(FilterType::LOWPASS, 0.0, 380.0, (double) samplerate, 0.6, false);
+    this->peak[0].RefreshFilter(FilterType::PEAK, gain, 44.0, (double) samplingRate, 0.75, true);
+    this->peak[1].RefreshFilter(FilterType::PEAK, gain, 44.0, (double) samplingRate, 0.75, true);
+    this->peakLow[0].RefreshFilter(FilterType::PEAK, gainLower, 80.0, (double) samplingRate, 0.2, true);
+    this->peakLow[1].RefreshFilter(FilterType::PEAK, gainLower, 80.0, (double) samplingRate, 0.2, true);
+    this->lowpass[0].RefreshFilter(FilterType::LOWPASS, 0.0, 380.0, (double) samplingRate, 0.6, false);
+    this->lowpass[1].RefreshFilter(FilterType::LOWPASS, 0.0, 380.0, (double) samplingRate, 0.6, false);
 }
