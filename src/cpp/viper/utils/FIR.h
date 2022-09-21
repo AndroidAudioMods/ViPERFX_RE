@@ -9,18 +9,17 @@ public:
 
     void FilterSamples(float *samples, uint32_t size);
     void FilterSamplesInterleaved(float *samples, uint32_t size, uint32_t channels);
-    int GetBlockLength();
-    int LoadCoefficients(const float *coeffs, uint32_t coeffsize, int blockLength);
+    uint32_t GetBlockLength();
+    int LoadCoefficients(const float *coeffs, uint32_t coeffsSize, uint32_t blockLength);
     void Reset();
 
 private:
-    int *offsetBlock;
+    float *offsetBlock;
     float *coeffs;
     float *block;
-    int coeffsize;
-    int blockLength;
-    bool enabled;
-
+    uint32_t coeffsSize;
+    uint32_t blockLength;
+    bool hasCoefficients;
 };
 
 
