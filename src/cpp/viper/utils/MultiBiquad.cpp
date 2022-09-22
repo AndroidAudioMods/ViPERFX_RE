@@ -47,56 +47,10 @@ MultiBiquad::RefreshFilter(FilterType type, float gainAmp, float frequency, uint
         y = sinX / ((double) qFactor / 2.0);
         z = -1.0;
     } else {
-        y = sinh(((double) qFactor * (log(2) / 2.0) * x) / sinX);
+        y = sinh(((double) qFactor * (log(2.0) / 2.0) * x) / sinX);
         z = -1.0;
     }
 
-    switch (type) {
-        case LOWPASS: {
-
-            break;
-        }
-        case HIGHPASS: {
-
-            break;
-        }
-        case BANDPASS: {
-
-            break;
-        }
-        case BANDSTOP: {
-
-            break;
-        }
-        case ALLPASS: {
-
-            break;
-        }
-        case PEAK: {
-
-            break;
-        }
-        case LOWSHELF: {
-
-            break;
-        }
-        case HIGHSHELF: {
-
-            break;
-        }
-    }
-
-
-
-    bool uVar1;
-    double dVar4;
-    double dVar5;
-    double dVar6;
-    double dVar7;
-    double dVar8;
-    double dVar9;
-    double dVar10;
-    double dVar11;
     double a0;
     double a1;
     double a2;
@@ -104,108 +58,93 @@ MultiBiquad::RefreshFilter(FilterType type, float gainAmp, float frequency, uint
     double b1;
     double b2;
 
-    dVar10 = pow(10.0, gainAmp / 40.0);
-    dVar4 = (frequency * 2 * M_PI) / samplingRate;
-    dVar5 = sin(dVar4);
-    dVar11 = cos(dVar4);
-    uVar1 = type == HIGHSHELF;
-    dVar4 = (1.0 / dVar10 + dVar10) * (1.0 / qFactor - 1.0) + 2.0;
-    dVar6 = sqrt(dVar4);
-    if (!(bool) uVar1) {
-        dVar4 = sinh(dVar4);
-        dVar6 = dVar4;
-    }
-    dVar4 = sqrt(dVar10);
-    dVar5 = dVar5 * 0.5 * dVar6;
-    if (!(bool) uVar1) {
-        dVar4 = sinh(dVar10);
-    }
-    dVar4 = (dVar4 + dVar4) * dVar5;
     switch (type) {
-        case LOWPASS:
-            b1 = 1.0 - dVar11;
-            dVar10 = b1;
-            b0 = dVar10 * 0.5;
-            a0 = dVar5 + 1.0;
-            a1 = dVar11 * -2.0;
-            a2 = 1.0 - dVar5;
+        case LOWPASS: {
+            b1 = 1.0 - cosX;
+            b0 = (1.0 - cosX) / 2.0;
+            a1 = -cosX * 2.0;
+            a2 = 1.0 - y;
+            a0 = 1.0 + y;
             b2 = b0;
             break;
-        case HIGHPASS:
-            b1 = 0.0 - (dVar11 + 1.0);
-            dVar10 = dVar11 + 1.0;
-            b0 = dVar10 * 0.5;
-            a0 = dVar5 + 1.0;
-            a1 = dVar11 * -2.0;
-            a2 = 1.0 - dVar5;
+        }
+        case HIGHPASS: {
+            b1 = -1.0 - cosX;
+            b0 = (1.0 + cosX) / 2.0;
+            a1 = -cosX * 2.0;
+            a2 = 1.0 - y;
+            a0 = 1.0 + y;
             b2 = b0;
             break;
-        case BANDPASS:
-            a1 = dVar11 * -2.0;
-            a2 = 1.0 - dVar5;
-            a0 = dVar5 + 1.0;
+        }
+        case BANDPASS: {
             b1 = 0.0;
-            b0 = dVar5;
-            b2 = 0.0 - dVar5;
+            a1 = -cosX * 2.0;
+            a2 = 1.0 - y;
+            a0 = 1.0 + y;
+            b0 = y;
+            b2 = -y;
             break;
-        case BANDSTOP:
-            b1 = dVar11 * -2.0;
-            a2 = 1.0 - dVar5;
-            a0 = dVar5 + 1.0;
+        }
+        case BANDSTOP: {
+            b1 = -cosX * 2.0;
+            a2 = 1.0 - y;
+            a0 = 1.0 + y;
             b0 = 1.0;
             b2 = 1.0;
             a1 = b1;
             break;
-        case ALLPASS:
-            b1 = dVar11 * -2.0;
-            a2 = 1.0 - dVar5;
-            a0 = dVar5 + 1.0;
+        }
+        case ALLPASS: {
+            b1 = -cosX * 2.0;
+            a2 = 1.0 - y;
+            a0 = 1.0 + y;
             b0 = a2;
             b2 = a0;
             a1 = b1;
             break;
-        case PEAK:
-            b1 = dVar11 * -2.0;
-            a2 = 1.0 - dVar5 / dVar10;
-            a0 = dVar5 / dVar10 + 1.0;
-            b0 = dVar5 * dVar10 + 1.0;
-            b2 = 1.0 - dVar5 * dVar10;
+        }
+        case PEAK: {
+            b1 = -cosX * 2.0;
+            a2 = 1.0 - y / (double) gain;
+            a0 = 1.0 + y / (double) gain;
+            b0 = 1.0 + y * (double) gain;
+            b2 = 1.0 - y * (double) gain;
             a1 = b1;
             break;
-        case LOWSHELF:
-            dVar6 = dVar10 - 1.0;
-            dVar7 = dVar10 + 1.0;
-            dVar5 = dVar7 - dVar6 * dVar11;
-            dVar8 = dVar7 + dVar6 * dVar11;
-            a0 = dVar8 + dVar4;
-            b1 = (dVar10 + dVar10) * (dVar6 - dVar11 * dVar7);
-            a2 = dVar8 - dVar4;
-            a1 = (dVar6 + dVar11 * dVar7) * -2.0;
-            b0 = (dVar5 + dVar4) * dVar10;
-            b2 = (dVar5 - dVar4) * dVar10;
+        }
+        case LOWSHELF: {
+            double tmp1 = (gain + 1.0) - (gain - 1.0) * cosX;
+            double tmp2 = (gain + 1.0) + (gain - 1.0) * cosX;
+            a1 = ((gain - 1.0) + (gain + 1.0) * cosX) * -2.0;
+            a2 = tmp2 - z;
+            b1 = (gain * 2.0) * ((gain - 1.0) - (gain + 1.0) * cosX);
+            a0 = tmp2 + z;
+            b0 = (tmp1 + z) * gain;
+            b2 = (tmp1 - z) * gain;
             break;
-        case HIGHSHELF:
-            dVar6 = dVar10 - 1.0;
-            dVar8 = dVar10 + 1.0;
-            dVar5 = dVar8 + dVar6 * dVar11;
-            dVar9 = dVar8 - dVar6 * dVar11;
-            dVar7 = dVar6 - dVar11 * dVar8;
-            a0 = dVar9 + dVar4;
-            b1 = dVar10 * -2.0 * (dVar6 + dVar11 * dVar8);
-            a2 = dVar9 - dVar4;
-            a1 = dVar7 + dVar7;
-            b0 = (dVar5 + dVar4) * dVar10;
-            b2 = (dVar5 - dVar4) * dVar10;
+        }
+        case HIGHSHELF: {
+            double tmp1 = (gain + 1.0) + (gain - 1.0) * cosX;
+            double tmp2 = (gain + 1.0) - (gain - 1.0) * cosX;
+            a2 = tmp2 - z;
+            a0 = tmp2 + z;
+            a1 = ((gain - 1.0) - (gain + 1.0) * cosX) * 2.0;
+            b1 = gain * -2.0 * ((gain - 1.0) + (gain + 1.0) * cosX);
+            b0 = (tmp1 + z) * gain;
+            b2 = (tmp1 - z) * gain;
+            break;
+        }
     }
 
-    this->a1 = a1 / a0;
-    this->a2 = a2 / a0;
+    this->x_1 = 0.0;
+    this->x_2 = 0.0;
+    this->y_1 = 0.0;
+    this->y_2 = 0.0;
+
+    this->a1 = -a1 / a0;
+    this->a2 = -a2 / a0;
     this->b0 = b0 / a0;
     this->b1 = b1 / a0;
     this->b2 = b2 / a0;
-
-    this->y_2 = 0.f;
-    this->y_1 = 0.f;
-    this->x_2 = 0.f;
-    this->x_1 = 0.f;
 }

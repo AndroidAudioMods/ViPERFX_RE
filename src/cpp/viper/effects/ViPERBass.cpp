@@ -4,17 +4,17 @@
 ViPERBass::ViPERBass() {
     this->samplingRate = DEFAULT_SAMPLERATE;
     this->speaker = 60;
-    this->invertedSamplingRate = 1.0f / DEFAULT_SAMPLERATE;
+    this->invertedSamplingRate = 1.0 / DEFAULT_SAMPLERATE;
     this->antiPop = 0.0;
     this->processMode = ProcessMode::NATURAL_BASS;
-    this->bassFactor = 0.0f;
+    this->bassFactor = 0.0;
     this->polyphase = new Polyphase(2);
     this->biquad = new Biquad();
     this->subwoofer = new Subwoofer();
     this->waveBuffer = new WaveBuffer(1, 0x1000);
 
     this->biquad->Reset();
-    this->biquad->SetLowPassParameter(this->speaker, this->samplingRate, 0.53);
+    this->biquad->SetLowPassParameter((float) this->speaker, this->samplingRate, 0.53);
     this->subwoofer->SetBassGain(this->samplingRate, 0.0);
     this->Reset();
 }
@@ -89,7 +89,7 @@ void ViPERBass::Reset() {
     this->waveBuffer->Reset();
     this->waveBuffer->PushZeros(this->polyphase->GetLatency());
     this->subwoofer->SetBassGain(this->samplingRate, this->bassFactor * 2.5f);
-    this->biquad->SetLowPassParameter(this->speaker, this->samplingRate, 0.53);
+    this->biquad->SetLowPassParameter((float) this->speaker, this->samplingRate, 0.53);
     this->antiPop = 0.0f;
     this->invertedSamplingRate = 1.0f / (float) this->samplingRate;
 }
@@ -113,7 +113,7 @@ void ViPERBass::SetSamplingRate(uint32_t samplingRate) {
         this->samplingRate = samplingRate;
         this->invertedSamplingRate = 1.0f / (float) samplingRate;
         this->polyphase->SetSamplingRate(samplingRate);
-        this->biquad->SetLowPassParameter(this->speaker, samplingRate, 0.53);
+        this->biquad->SetLowPassParameter((float) this->speaker, samplingRate, 0.53);
         this->subwoofer->SetBassGain(samplingRate, this->bassFactor * 2.5f);
     }
 }
@@ -121,6 +121,6 @@ void ViPERBass::SetSamplingRate(uint32_t samplingRate) {
 void ViPERBass::SetSpeaker(uint32_t speaker) {
     if (this->speaker != speaker) {
         this->speaker = speaker;
-        this->biquad->SetLowPassParameter(this->speaker, this->samplingRate, 0.53);
+        this->biquad->SetLowPassParameter((float) this->speaker, this->samplingRate, 0.53);
     }
 }
