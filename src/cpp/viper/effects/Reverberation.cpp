@@ -14,7 +14,7 @@ Reverberation::Reverberation() {
     this->model.SetWet(0.f);
     this->model.SetDry(0.5f);
 
-    this->samplerate = DEFAULT_SAMPLERATE;
+    this->samplingRate = DEFAULT_SAMPLERATE;
     this->enabled = false;
 }
 
@@ -61,7 +61,7 @@ void Reverberation::SetWidth(float value) {
 }
 
 void Reverberation::SetSamplingRate(uint32_t value) {
-    this->samplerate = value;
+    this->samplingRate = value;
     this->model.Reset();
 }
 

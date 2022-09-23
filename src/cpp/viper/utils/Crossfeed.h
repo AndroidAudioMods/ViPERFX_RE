@@ -1,15 +1,14 @@
 #pragma once
 
-
 #include <cstdint>
-
-typedef struct {
-    uint16_t cutoff;
-    uint16_t feedback;
-} preset_t;
 
 class Crossfeed {
 public:
+    struct Preset {
+        uint16_t cutoff;
+        uint16_t feedback;
+    };
+
     Crossfeed();
 
     void Reset();
@@ -24,15 +23,15 @@ public:
 
     float GetLevelDelay();
 
-    preset_t GetPreset();
+    struct Preset GetPreset();
 
     void SetCutoff(uint16_t cutoff);
 
     void SetFeedback(float feedback);
 
-    void SetPreset(preset_t preset);
+    void SetPreset(struct Preset preset);
 
-    void SetSamplingRate(uint32_t samplerate);
+    void SetSamplingRate(uint32_t samplingRate);
 
     uint32_t samplerate;
     float a0_lo, b1_lo;
@@ -41,5 +40,5 @@ public:
     struct {
         float asis[2], lo[2], hi[2];
     } lfs;
-    preset_t preset;
+    struct Preset preset;
 };

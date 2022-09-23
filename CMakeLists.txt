@@ -45,6 +45,7 @@ set(FILES
 
         # Utils
         src/cpp/viper/utils/AdaptiveBuffer.cpp
+        src/cpp/viper/utils/Biquad.cpp
         src/cpp/viper/utils/CAllpassFilter.cpp
         src/cpp/viper/utils/CCombFilter.cpp
         src/cpp/viper/utils/CRevModel.cpp
@@ -52,13 +53,13 @@ set(FILES
         src/cpp/viper/utils/DepthSurround.cpp
         src/cpp/viper/utils/DynamicBass.cpp
         src/cpp/viper/utils/FIR.cpp
-        src/cpp/viper/utils/Biquad.cpp
         src/cpp/viper/utils/Harmonic.cpp
         src/cpp/viper/utils/HiFi.cpp
         src/cpp/viper/utils/HighShelf.cpp
         src/cpp/viper/utils/IIR_1st.cpp
         src/cpp/viper/utils/IIR_NOrder_BW_BP.cpp
         src/cpp/viper/utils/IIR_NOrder_BW_LH.cpp
+        src/cpp/viper/utils/MinPhaseIIRCoeffs.cpp
         src/cpp/viper/utils/MultiBiquad.cpp
         src/cpp/viper/utils/NoiseSharpening.cpp
         src/cpp/viper/utils/PassFilter.cpp

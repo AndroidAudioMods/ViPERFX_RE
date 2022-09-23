@@ -10,9 +10,9 @@ public:
 
     void Mute();
 
-    void setLPF(float frequency, uint32_t samplerate);
+    void setLPF(float frequency, uint32_t samplingRate);
 
-    void setHPF(float frequency, uint32_t samplerate);
+    void setHPF(float frequency, uint32_t samplingRate);
 
     IIR_1st *filters;
     uint32_t order;

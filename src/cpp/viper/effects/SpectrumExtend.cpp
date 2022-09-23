@@ -15,7 +15,7 @@ static float SPECTRUM_HARMONICS[10] = {
 };
 
 SpectrumExtend::SpectrumExtend() {
-    this->samplerate = DEFAULT_SAMPLERATE;
+    this->samplingRate = DEFAULT_SAMPLERATE;
     this->referenceFreq = 7600;
     this->enabled = false;
     this->exciter = 0.f;
@@ -38,14 +38,14 @@ void SpectrumExtend::Process(float *samples, uint32_t size) {
 }
 
 void SpectrumExtend::Reset() {
-    this->highpass[0].RefreshFilter(FilterType::HIGHPASS, 0.0, (float) this->referenceFreq, (float) this->samplerate,
+    this->highpass[0].RefreshFilter(MultiBiquad::FilterType::HIGHPASS, 0.0, (float) this->referenceFreq, (float) this->samplingRate,
                                     0.717, false);
-    this->highpass[1].RefreshFilter(FilterType::HIGHPASS, 0.0, (float) this->referenceFreq, (float) this->samplerate,
+    this->highpass[1].RefreshFilter(MultiBiquad::FilterType::HIGHPASS, 0.0, (float) this->referenceFreq, (float) this->samplingRate,
                                     0.717, false);
 
-    this->lowpass[0].RefreshFilter(FilterType::LOWPASS, 0.0, (float) this->referenceFreq / 2.f - 2000.f,
+    this->lowpass[0].RefreshFilter(MultiBiquad::FilterType::LOWPASS, 0.0, (float) this->referenceFreq / 2.f - 2000.f,
                                    (float) this->referenceFreq, 0.717, false);
-    this->lowpass[1].RefreshFilter(FilterType::LOWPASS, 0.0, (float) this->referenceFreq / 2.f - 2000.f,
+    this->lowpass[1].RefreshFilter(MultiBiquad::FilterType::LOWPASS, 0.0, (float) this->referenceFreq / 2.f - 2000.f,
                                    (float) this->referenceFreq, 0.717, false);
 
     this->harmonics[0].Reset();
@@ -64,17 +64,17 @@ void SpectrumExtend::SetExciter(float value) {
 }
 
 void SpectrumExtend::SetReferenceFrequency(uint32_t freq) {
-    if (this->samplerate / 2 - 100 < freq) {
-        freq = this->samplerate / 2 - 100;
+    if (this->samplingRate / 2 - 100 < freq) {
+        freq = this->samplingRate / 2 - 100;
     }
     this->referenceFreq = freq;
     Reset();
 }
 
-void SpectrumExtend::SetSamplingRate(uint32_t samplerate) {
-    this->samplerate = samplerate;
-    if (this->samplerate / 2 - 100 < this->referenceFreq) {
-        this->referenceFreq = this->samplerate / 2 - 100;
+void SpectrumExtend::SetSamplingRate(uint32_t samplingRate) {
+    this->samplingRate = samplingRate;
+    if (this->samplingRate / 2 - 100 < this->referenceFreq) {
+        this->referenceFreq = this->samplingRate / 2 - 100;
     }
     Reset();
 }

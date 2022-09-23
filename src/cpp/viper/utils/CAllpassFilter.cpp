@@ -3,9 +3,9 @@
 
 CAllpassFilter::CAllpassFilter() {
     this->buffer = nullptr;
-    this->bufidx = 0;
-    this->bufsize = 0;
-    this->feedback = 0;
+    this->feedback = 0.0;
+    this->bufferIndex = 0;
+    this->bufferSize = 0;
 }
 
 float CAllpassFilter::GetFeedback() {
@@ -13,22 +13,23 @@ float CAllpassFilter::GetFeedback() {
 }
 
 void CAllpassFilter::Mute() {
-    memset(this->buffer, 0, this->bufsize * sizeof(float));
+    memset(this->buffer, 0, this->bufferSize * sizeof(float));
 }
 
 float CAllpassFilter::Process(float sample) {
-    float outSample = this->buffer[this->bufidx];
-    this->buffer[this->bufidx] = sample + (outSample * this->feedback);
-    this->bufidx++;
-    if (this->bufidx >= this->bufsize) {
-        this->bufidx = 0;
+    float outSample = this->buffer[this->bufferIndex];
+    this->buffer[this->bufferIndex] = sample + outSample * this->feedback;
+    this->bufferIndex++;
+    if (this->bufferIndex >= this->bufferSize) {
+        this->bufferIndex = 0;
     }
     return outSample - sample;
 }
 
 void CAllpassFilter::SetBuffer(float *buffer, uint32_t size) {
     this->buffer = buffer;
-    this->bufsize = size;
+    this->bufferSize = size;
+    this->bufferIndex = 0;
 }
 
 void CAllpassFilter::SetFeedback(float feedback) {

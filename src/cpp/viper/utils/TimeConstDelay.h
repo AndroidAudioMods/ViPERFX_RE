@@ -10,7 +10,7 @@ public:
 
     float ProcessSample(float sample);
 
-    void SetParameters(uint32_t samplerate, float delay);
+    void SetParameters(uint32_t samplingRate, float delay);
 
     float *samples;
     uint32_t offset;

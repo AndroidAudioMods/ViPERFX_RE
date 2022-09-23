@@ -18,7 +18,7 @@ public:
 
     PConvSingle_F32 convLeft, convRight;
     WaveBuffer *bufA, *bufB;
-    uint32_t samplerate;
+    uint32_t samplingRate;
     bool enabled;
     int effectLevel;
     int convSize;

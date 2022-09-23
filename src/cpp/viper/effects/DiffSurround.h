@@ -12,9 +12,9 @@ public:
     void Reset();
     void SetDelayTime(float delayTime);
     void SetEnable(bool enabled);
-    void SetSamplingRate(uint32_t samplerate);
+    void SetSamplingRate(uint32_t samplingRate);
 
-    uint32_t samplerate;
+    uint32_t samplingRate;
     bool enabled;
     float delayTime;
     WaveBuffer *buffers[2];

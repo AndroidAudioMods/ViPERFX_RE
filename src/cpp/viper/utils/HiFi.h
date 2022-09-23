@@ -17,7 +17,7 @@ public:
 
     void SetClarity(float value);
 
-    void SetSamplingRate(uint32_t samplerate);
+    void SetSamplingRate(uint32_t samplingRate);
 
     WaveBuffer *buffers[2];
     struct {
@@ -26,7 +26,7 @@ public:
         IIR_NOrder_BW_BP *bandpass;
     } filters[2];
     float gain;
-    uint32_t samplerate;
+    uint32_t samplingRate;
 };
 
 

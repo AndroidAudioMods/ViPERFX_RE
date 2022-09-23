@@ -23,9 +23,9 @@ void IIR_NOrder_BW_BP::Mute() {
     }
 }
 
-void IIR_NOrder_BW_BP::setBPF(float highCut, float lowCut, uint32_t samplerate) {
+void IIR_NOrder_BW_BP::setBPF(float highCut, float lowCut, uint32_t samplingRate) {
     for (int x = 0; x < this->order; x++) {
-        this->lowpass[x].setLPF_BW(lowCut, samplerate);
-        this->highpass[x].setHPF_BW(highCut, samplerate);
+        this->lowpass[x].setLPF_BW(lowCut, samplingRate);
+        this->highpass[x].setHPF_BW(highCut, samplingRate);
     }
 }

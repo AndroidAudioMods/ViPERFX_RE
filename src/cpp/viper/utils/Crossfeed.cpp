@@ -71,18 +71,18 @@ uint16_t Crossfeed::GetCutoff() {
 }
 
 float Crossfeed::GetFeedback() {
-    return (float) this->preset.feedback / 10.f;
+    return (float) this->preset.feedback / 10.0f;
 }
 
 float Crossfeed::GetLevelDelay() {
     if (this->preset.cutoff <= 1800) {
-        return (18700.f / (float) this->preset.cutoff) * 10.f;
+        return (float) ((18700.0 / (double) this->preset.cutoff) * 10.0);
     } else {
-        return 0.f;
+        return 0.0;
     }
 }
 
-preset_t Crossfeed::GetPreset() {
+struct Crossfeed::Preset Crossfeed::GetPreset() {
     return this->preset;
 }
 
@@ -92,16 +92,16 @@ void Crossfeed::SetCutoff(uint16_t cutoff) {
 }
 
 void Crossfeed::SetFeedback(float feedback) {
-    this->preset.feedback = (uint16_t) (feedback * 10);
+    this->preset.feedback = (uint16_t) (feedback * 10.0f);
     Reset();
 }
 
-void Crossfeed::SetPreset(preset_t preset) {
+void Crossfeed::SetPreset(struct Crossfeed::Preset preset) {
     this->preset = preset;
     Reset();
 }
 
-void Crossfeed::SetSamplingRate(uint32_t samplerate) {
-    this->samplerate = samplerate;
+void Crossfeed::SetSamplingRate(uint32_t samplingRate) {
+    this->samplerate = samplingRate;
     Reset();
 }

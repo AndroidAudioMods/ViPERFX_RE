@@ -13,8 +13,8 @@ public:
 
     void ProcessFrames(float *buffer, uint32_t size);
 
-    void SetSamplingRate(uint32_t samplerate);
+    void SetSamplingRate(uint32_t samplingRate);
 
     IIR_NOrder_BW_LH *filters[4];
-    uint32_t samplerate;
+    uint32_t samplingRate;
 };

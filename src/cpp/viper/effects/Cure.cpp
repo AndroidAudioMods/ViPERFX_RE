@@ -30,9 +30,9 @@ void Cure::SetEnable(bool enabled) {
     }
 }
 
-void Cure::SetSamplingRate(uint32_t samplerate) {
-    this->crossfeed.SetSamplingRate(samplerate);
-    this->pass.SetSamplingRate(samplerate);
+void Cure::SetSamplingRate(uint32_t samplingRate) {
+    this->crossfeed.SetSamplingRate(samplingRate);
+    this->pass.SetSamplingRate(samplingRate);
 }
 
 uint16_t Cure::GetCutoff() {
@@ -47,7 +47,7 @@ float Cure::GetLevelDelay() {
     return this->crossfeed.GetLevelDelay();
 }
 
-preset_t Cure::GetPreset() {
+struct Crossfeed::Preset Cure::GetPreset() {
     return this->crossfeed.GetPreset();
 }
 
@@ -59,7 +59,7 @@ void Cure::SetFeedback(float feedback) {
     this->crossfeed.SetFeedback(feedback);
 }
 
-void Cure::SetPreset(preset_t preset) {
+void Cure::SetPreset(struct Crossfeed::Preset preset) {
     this->crossfeed.SetPreset(preset);
 }
 

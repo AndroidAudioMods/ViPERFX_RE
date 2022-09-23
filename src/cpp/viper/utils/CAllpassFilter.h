@@ -13,8 +13,8 @@ public:
     void SetFeedback(float feedback);
 
 private:
-    float *buffer;
-    uint32_t bufidx;
-    uint32_t bufsize;
     float feedback;
+    float *buffer;
+    uint32_t bufferSize;
+    uint32_t bufferIndex;
 };

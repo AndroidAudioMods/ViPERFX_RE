@@ -5,7 +5,7 @@ VHE::VHE() {
     enabled = false;
     effectLevel = 0;
     convSize = 0;
-    samplerate = DEFAULT_SAMPLERATE;
+    samplingRate = DEFAULT_SAMPLERATE;
 
     bufA = new WaveBuffer(2, 0x1000);
     bufB = new WaveBuffer(2, 0x1000);
@@ -55,6 +55,6 @@ void VHE::SetEnable(bool enabled) {
 }
 
 void VHE::SetSamplingRate(uint32_t srate) {
-    this->samplerate = srate;
+    this->samplingRate = srate;
     Reset();
 }

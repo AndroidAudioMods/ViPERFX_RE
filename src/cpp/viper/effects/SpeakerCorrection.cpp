@@ -2,7 +2,7 @@
 #include "../constants.h"
 
 SpeakerCorrection::SpeakerCorrection() {
-    this->samplerate = DEFAULT_SAMPLERATE;
+    this->samplingRate = DEFAULT_SAMPLERATE;
     this->enabled = false;
     Reset();
 }
@@ -24,12 +24,12 @@ void SpeakerCorrection::Reset() {
     this->bandpass[0].Reset();
     this->bandpass[1].Reset();
 
-    this->highpass[0].RefreshFilter(FilterType::HIGHPASS, 0.f, 80.f, (float) this->samplerate, 1.f, false);
-    this->highpass[1].RefreshFilter(FilterType::HIGHPASS, 0.f, 80.f, (float) this->samplerate, 1.f, false);
-    this->lowpass[0].SetLowPassParameter(13500.f, this->samplerate, 1.0);
-    this->lowpass[1].SetLowPassParameter(13500.f, this->samplerate, 1.0);
-    this->bandpass[0].SetBandPassParameter(420.f, this->samplerate, 3.88f);
-    this->bandpass[1].SetBandPassParameter(420.f, this->samplerate, 3.88f);
+    this->highpass[0].RefreshFilter(MultiBiquad::FilterType::HIGHPASS, 0.f, 80.f, (float) this->samplingRate, 1.f, false);
+    this->highpass[1].RefreshFilter(MultiBiquad::FilterType::HIGHPASS, 0.f, 80.f, (float) this->samplingRate, 1.f, false);
+    this->lowpass[0].SetLowPassParameter(13500.f, this->samplingRate, 1.0);
+    this->lowpass[1].SetLowPassParameter(13500.f, this->samplingRate, 1.0);
+    this->bandpass[0].SetBandPassParameter(420.f, this->samplingRate, 3.88f);
+    this->bandpass[1].SetBandPassParameter(420.f, this->samplingRate, 3.88f);
 }
 
 void SpeakerCorrection::SetEnable(bool enabled) {
@@ -39,8 +39,8 @@ void SpeakerCorrection::SetEnable(bool enabled) {
     }
 }
 
-void SpeakerCorrection::SetSamplingRate(uint32_t samplerate) {
-    this->samplerate = samplerate;
+void SpeakerCorrection::SetSamplingRate(uint32_t samplingRate) {
+    this->samplingRate = samplingRate;
     Reset();
 }
 

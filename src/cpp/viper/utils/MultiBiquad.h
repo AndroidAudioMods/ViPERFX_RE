@@ -1,18 +1,20 @@
 #pragma once
 
-enum FilterType {
-    LOWPASS = 0,
-    HIGHPASS = 1,
-    BANDPASS = 2,
-    BANDSTOP = 3,
-    ALLPASS = 4,
-    PEAK = 5,
-    LOWSHELF = 6,
-    HIGHSHELF = 7
-};
+#include <cstdint>
 
 class MultiBiquad {
 public:
+    enum FilterType {
+        LOWPASS = 0,
+        HIGHPASS = 1,
+        BANDPASS = 2,
+        BANDSTOP = 3,
+        ALLPASS = 4,
+        PEAK = 5,
+        LOWSHELF = 6,
+        HIGHSHELF = 7
+    };
+
     MultiBiquad();
 
     double ProcessSample(double sample);

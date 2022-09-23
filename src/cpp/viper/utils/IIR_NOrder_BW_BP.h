@@ -10,7 +10,7 @@ public:
 
     void Mute();
 
-    void setBPF(float highCut, float lowCut, uint32_t samplerate);
+    void setBPF(float highCut, float lowCut, uint32_t samplingRate);
 
     IIR_1st *lowpass;
     IIR_1st *highpass;

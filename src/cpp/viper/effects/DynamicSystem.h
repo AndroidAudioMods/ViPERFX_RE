@@ -12,13 +12,13 @@ public:
     void Reset();
     void SetBassGain(float gain);
     void SetEnable(bool enable);
-    void SetSamplingRate(uint32_t samplerate);
+    void SetSamplingRate(uint32_t samplingRate);
     void SetSideGain(float gainX, float gainY);
     void SetXCoeffs(uint32_t low, uint32_t high);
     void SetYCoeffs(uint32_t low, uint32_t high);
 
     DynamicBass bass;
-    uint32_t samplerate;
+    uint32_t samplingRate;
     bool enabled;
 };
 

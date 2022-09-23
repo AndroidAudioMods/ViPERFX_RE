@@ -19,14 +19,14 @@ void IIR_NOrder_BW_LH::Mute() {
     }
 }
 
-void IIR_NOrder_BW_LH::setLPF(float frequency, uint32_t samplerate) {
+void IIR_NOrder_BW_LH::setLPF(float frequency, uint32_t samplingRate) {
     for (int x = 0; x < this->order; x++) {
-        this->filters[x].setLPF_BW(frequency, samplerate);
+        this->filters[x].setLPF_BW(frequency, samplingRate);
     }
 }
 
-void IIR_NOrder_BW_LH::setHPF(float frequency, uint32_t samplerate) {
+void IIR_NOrder_BW_LH::setHPF(float frequency, uint32_t samplingRate) {
     for (int x = 0; x < this->order; x++) {
-        this->filters[x].setHPF_BW(frequency, samplerate);
+        this->filters[x].setHPF_BW(frequency, samplingRate);
     }
 }

@@ -16,12 +16,12 @@ public:
 
 private:
     float feedback;
-    float filterstore;
+    float filterStore;
     float damp;
     float damp2;
     float *buffer;
-    uint32_t size;
-    uint32_t bufidx;
+    uint32_t bufferSize;
+    uint32_t bufferIndex;
 };
 
 

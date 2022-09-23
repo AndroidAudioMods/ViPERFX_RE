@@ -26,12 +26,12 @@ public:
 
     void SetPassFilter(uint32_t lower_freq, uint32_t upper_freq);
 
-    void SetSamplingRate(uint32_t samplerate);
+    void SetSamplingRate(uint32_t samplingRate);
 
     channel channels[2];
     uint32_t lower_freq;
     uint32_t upper_freq;
-    uint32_t samplerate;
+    uint32_t samplingRate;
 };
 
 

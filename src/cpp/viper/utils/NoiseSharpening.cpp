@@ -2,7 +2,7 @@
 #include "../constants.h"
 
 NoiseSharpening::NoiseSharpening() {
-    this->samplerate = DEFAULT_SAMPLERATE;
+    this->samplingRate = DEFAULT_SAMPLERATE;
     this->gain = 0.f;
     Reset();
 }
@@ -36,7 +36,7 @@ void NoiseSharpening::Process(float *buffer, uint32_t size) {
 
 void NoiseSharpening::Reset() {
     for (int i = 0; i < 2; i++) {
-        this->filters[i].setLPF_BW(this->samplerate / 2.f - 1000.f, this->samplerate);
+        this->filters[i].setLPF_BW(this->samplingRate / 2.f - 1000.f, this->samplingRate);
         this->filters[i].Mute();
         this->in[i] = 0.f;
     }
@@ -46,7 +46,7 @@ void NoiseSharpening::SetGain(float gain) {
     this->gain = gain;
 }
 
-void NoiseSharpening::SetSamplingRate(uint32_t samplerate) {
-    this->samplerate = samplerate;
+void NoiseSharpening::SetSamplingRate(uint32_t samplingRate) {
+    this->samplingRate = samplingRate;
     Reset();
 }

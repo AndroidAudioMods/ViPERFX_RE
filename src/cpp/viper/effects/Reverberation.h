@@ -24,7 +24,7 @@ public:
     float wet;
     float dry;
     CRevModel model;
-    uint32_t samplerate;
+    uint32_t samplingRate;
     bool enabled;
 };
 

@@ -4,7 +4,7 @@
 #include <cmath>
 
 PolesFilter::PolesFilter() {
-    this->samplerate = DEFAULT_SAMPLERATE;
+    this->samplingRate = DEFAULT_SAMPLERATE;
     this->lower_freq = 160;
     this->upper_freq = 8000;
     UpdateCoeff();
@@ -18,10 +18,10 @@ void PolesFilter::UpdateCoeff() {
     memset(&this->channels[0], 0, sizeof(channel));
     memset(&this->channels[1], 0, sizeof(channel));
 
-    this->channels[0].lower_angle = ((float) this->lower_freq * M_PI / (float) this->samplerate);
-    this->channels[1].lower_angle = ((float) this->lower_freq * M_PI / (float) this->samplerate);
-    this->channels[0].upper_angle = ((float) this->upper_freq * M_PI / (float) this->samplerate);
-    this->channels[1].upper_angle = ((float) this->upper_freq * M_PI / (float) this->samplerate);
+    this->channels[0].lower_angle = ((float) this->lower_freq * M_PI / (float) this->samplingRate);
+    this->channels[1].lower_angle = ((float) this->lower_freq * M_PI / (float) this->samplingRate);
+    this->channels[0].upper_angle = ((float) this->upper_freq * M_PI / (float) this->samplingRate);
+    this->channels[1].upper_angle = ((float) this->upper_freq * M_PI / (float) this->samplingRate);
 }
 
 inline void DoFilterSide(channel *side, float sample, float *out1, float *out2, float *out3) {
@@ -59,7 +59,7 @@ void PolesFilter::SetPassFilter(uint32_t lower_freq, uint32_t upper_freq) {
     UpdateCoeff();
 }
 
-void PolesFilter::SetSamplingRate(uint32_t samplerate) {
-    this->samplerate = samplerate;
+void PolesFilter::SetSamplingRate(uint32_t samplingRate) {
+    this->samplingRate = samplingRate;
     UpdateCoeff();
 }

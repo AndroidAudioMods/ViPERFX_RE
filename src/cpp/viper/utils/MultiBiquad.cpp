@@ -1,5 +1,5 @@
-#include <cmath>
 #include "MultiBiquad.h"
+#include <cmath>
 
 MultiBiquad::MultiBiquad() {
     this->y_2 = 0;

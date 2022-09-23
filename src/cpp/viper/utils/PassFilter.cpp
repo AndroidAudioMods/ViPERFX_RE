@@ -6,7 +6,7 @@ PassFilter::PassFilter() {
     this->filters[1] = new IIR_NOrder_BW_LH(3);
     this->filters[2] = new IIR_NOrder_BW_LH(1);
     this->filters[3] = new IIR_NOrder_BW_LH(1);
-    this->samplerate = DEFAULT_SAMPLERATE;
+    this->samplingRate = DEFAULT_SAMPLERATE;
     Reset();
 }
 
@@ -19,14 +19,14 @@ PassFilter::~PassFilter() {
 
 void PassFilter::Reset() {
     uint32_t cutoff;
-    if (this->samplerate < 44100) {
-        cutoff = this->samplerate - 100;
+    if (this->samplingRate < 44100) {
+        cutoff = this->samplingRate - 100;
     } else {
         cutoff = 18000;
     }
 
-    this->filters[0]->setLPF((float) cutoff, this->samplerate);
-    this->filters[1]->setLPF((float) cutoff, this->samplerate);
+    this->filters[0]->setLPF((float) cutoff, this->samplingRate);
+    this->filters[1]->setLPF((float) cutoff, this->samplingRate);
     this->filters[2]->setLPF(10.f, cutoff);
     this->filters[3]->setLPF(10.f, cutoff);
 
@@ -51,7 +51,7 @@ void PassFilter::ProcessFrames(float *buffer, uint32_t size) {
     }
 }
 
-void PassFilter::SetSamplingRate(uint32_t samplerate) {
-    this->samplerate = samplerate;
+void PassFilter::SetSamplingRate(uint32_t samplingRate) {
+    this->samplingRate = samplingRate;
     Reset();
 }

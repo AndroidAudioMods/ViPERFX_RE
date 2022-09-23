@@ -3,7 +3,7 @@
 
 HiFi::HiFi() {
     this->gain = 1.f;
-    this->samplerate = DEFAULT_SAMPLERATE;
+    this->samplingRate = DEFAULT_SAMPLERATE;
     for (int i = 0; i < 2; i++) {
         this->buffers[i] = new WaveBuffer(2, 0x800);
         this->filters[i].lowpass = new IIR_NOrder_BW_LH(1);
@@ -54,17 +54,17 @@ void HiFi::Process(float *samples, uint32_t size) {
 
 void HiFi::Reset() {
     for (int i = 0; i < 2; i++) {
-        this->filters[i].lowpass->setLPF(120.0, this->samplerate);
+        this->filters[i].lowpass->setLPF(120.0, this->samplingRate);
         this->filters[i].lowpass->Mute();
-        this->filters[i].highpass->setHPF(1200.0, this->samplerate);
+        this->filters[i].highpass->setHPF(1200.0, this->samplingRate);
         this->filters[i].highpass->Mute();
-        this->filters[i].bandpass->setBPF(120.f, 1200.f, this->samplerate);
+        this->filters[i].bandpass->setBPF(120.f, 1200.f, this->samplingRate);
         this->filters[i].bandpass->Mute();
     }
     this->buffers[0]->Reset();
-    this->buffers[0]->PushZeros(this->samplerate / 400);
+    this->buffers[0]->PushZeros(this->samplingRate / 400);
     this->buffers[1]->Reset();
-    this->buffers[1]->PushZeros(this->samplerate / 200);
+    this->buffers[1]->PushZeros(this->samplingRate / 200);
 
 }
 
@@ -72,7 +72,7 @@ void HiFi::SetClarity(float value) {
     this->gain = value;
 }
 
-void HiFi::SetSamplingRate(uint32_t samplerate) {
-    this->samplerate = samplerate;
+void HiFi::SetSamplingRate(uint32_t samplingRate) {
+    this->samplingRate = samplingRate;
     Reset();
 }

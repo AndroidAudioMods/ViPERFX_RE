@@ -1,6 +1,5 @@
-#include <cstdlib>
-#include <cstring>
 #include "TimeConstDelay.h"
+#include <cstdlib>
 
 TimeConstDelay::TimeConstDelay() {
     this->samples = nullptr;
@@ -19,11 +18,11 @@ float TimeConstDelay::ProcessSample(float sample) {
         this->offset = (int) modf((float) this->offset + 1, (float *) &this->sampleCount); // TODO: check if this is correct
         return val;
     }
-    return 0.0f;
+    return 0.0;
 }
 
-void TimeConstDelay::SetParameters(uint32_t samplerate, float delay) {
-    this->sampleCount = (int) ((float) samplerate * delay * 0.5f);
+void TimeConstDelay::SetParameters(uint32_t samplingRate, float delay) {
+    this->sampleCount = samplingRate * (uint32_t) ceil(delay);
     delete this->samples;
     this->samples = new float[this->sampleCount]();
     this->offset = 0;

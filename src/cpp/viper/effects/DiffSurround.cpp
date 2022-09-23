@@ -3,7 +3,7 @@
 #include "../constants.h"
 
 DiffSurround::DiffSurround() {
-    this->samplerate = DEFAULT_SAMPLERATE;
+    this->samplingRate = DEFAULT_SAMPLERATE;
     this->delayTime = 0.0f;
     this->enabled = false;
     for (auto &buffer : this->buffers) {
@@ -46,7 +46,7 @@ void DiffSurround::Reset() {
         buffer->Reset();
     }
 
-    this->buffers[1]->PushZeros((uint32_t) (this->delayTime / 1000.0f * (float) this->samplerate));
+    this->buffers[1]->PushZeros((uint32_t) (this->delayTime / 1000.0f * (float) this->samplingRate));
 }
 
 void DiffSurround::SetDelayTime(float delayTime) {
@@ -65,9 +65,9 @@ void DiffSurround::SetEnable(bool enabled) {
     }
 }
 
-void DiffSurround::SetSamplingRate(uint32_t samplerate) {
-    if (this->samplerate != samplerate) {
-        this->samplerate = samplerate;
+void DiffSurround::SetSamplingRate(uint32_t samplingRate) {
+    if (this->samplingRate != samplingRate) {
+        this->samplingRate = samplingRate;
         this->Reset();
     }
 }

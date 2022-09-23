@@ -13,11 +13,11 @@ public:
 
     void SetGain(float gain);
 
-    void SetSamplingRate(uint32_t samplerate);
+    void SetSamplingRate(uint32_t samplingRate);
 
     IIR_1st filters[2];
     float in[2];
-    int32_t samplerate;
+    int32_t samplingRate;
     float gain;
 };
 
