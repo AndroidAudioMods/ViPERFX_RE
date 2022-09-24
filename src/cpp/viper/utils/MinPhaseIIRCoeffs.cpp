@@ -105,10 +105,10 @@ MinPhaseIIRCoeffs::~MinPhaseIIRCoeffs() {
     delete this->coeffs;
 }
 
-void MinPhaseIIRCoeffs::Find_F1_F2(double param_2, double param_3, double *parma_4, double *param_5) {
+void MinPhaseIIRCoeffs::Find_F1_F2(double param_2, double param_3, double *param_4, double *param_5) {
     double x = pow(2.0, param_3 / 2.0);
     *param_5 = param_2 / x;
-    *parma_4 = param_2 * x;
+    *param_4 = param_2 * x;
 }
 
 float *MinPhaseIIRCoeffs::GetCoefficients() {
@@ -159,7 +159,52 @@ int MinPhaseIIRCoeffs::UpdateCoeffs(uint32_t freqs, int samplingRate) {
     this->samplingRate = samplingRate;
 
     delete this->coeffs;
-    this->coeffs = new float[freqs * 5];
+    this->coeffs = new float[freqs * 4]();
 
-    return 0;
+    const float *coeffsArray;
+    double tmp;
+
+    switch (freqs) {
+        case 10:
+            coeffsArray = MIN_PHASE_IIR_COEFFS_FREQ_10;
+            tmp = 3.0 / 3.0;
+            break;
+        case 15:
+            coeffsArray = MIN_PHASE_IIR_COEFFS_FREQ_15;
+            tmp = 2.0 / 3.0;
+            break;
+        case 25:
+            coeffsArray = MIN_PHASE_IIR_COEFFS_FREQ_25;
+            tmp = 1.0 / 3.0;
+            break;
+        case 31:
+            coeffsArray = MIN_PHASE_IIR_COEFFS_FREQ_31;
+            tmp = 1.0 / 3.0;
+            break;
+    }
+
+    for (uint32_t i = 0; i < freqs; i++) {
+        double ret1;
+        double ret2;
+        this->Find_F1_F2(coeffsArray[i], tmp, &ret1, &ret2);
+
+        double x = (2.0 * M_PI * (double) coeffsArray[i]) / (double) this->samplingRate;
+        double y = (2.0 * M_PI * ret2) / (double) this->samplingRate;
+
+        double cosX = cos(x);
+        double cosY = cos(y);
+        double sinY = sin(y);
+
+        double a = cosX * cosY;
+        double b = pow(cosX, 2.0) / 2.0;
+        double c = pow(sinY, 2.0);
+
+        if (this->SolveRoot(((b - a) + 0.5) - c, c + (((b + pow(cosY, 2.0)) - a) - 0.5), ((pow(cosX, 2.0) / 8.0 - cosX * cosY / 4.0) + 0.125) - c / 4.0, &ret1) == 0) {
+            this->coeffs[4 * i] = (float) (ret1 * 2.0);
+            this->coeffs[4 * i + 1] = (float) (0.5 - ret1);
+            this->coeffs[4 * i + 2] = (float) ((ret1 + 0.5) * cosX);
+        }
+    }
+
+    return 1;
 }

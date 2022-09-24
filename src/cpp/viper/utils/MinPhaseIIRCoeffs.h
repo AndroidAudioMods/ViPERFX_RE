@@ -7,7 +7,7 @@ public:
     MinPhaseIIRCoeffs();
     ~MinPhaseIIRCoeffs();
 
-    void Find_F1_F2(double param_2, double param_3, double *parma_4, double *param_5);
+    void Find_F1_F2(double param_2, double param_3, double *param_4, double *param_5);
     float *GetCoefficients();
     float GetIndexFrequency(uint32_t param_1);
     int SolveRoot(double param_2, double param_3, double param_4, double *param_5);
