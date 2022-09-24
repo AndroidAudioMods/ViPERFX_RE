@@ -3,7 +3,7 @@
 
 NoiseSharpening::NoiseSharpening() {
     this->samplingRate = DEFAULT_SAMPLERATE;
-    this->gain = 0.f;
+    this->gain = 0.0;
     Reset();
 }
 
@@ -36,9 +36,9 @@ void NoiseSharpening::Process(float *buffer, uint32_t size) {
 
 void NoiseSharpening::Reset() {
     for (int i = 0; i < 2; i++) {
-        this->filters[i].setLPF_BW(this->samplingRate / 2.f - 1000.f, this->samplingRate);
+        this->filters[i].setLPF_BW((float) ((double) this->samplingRate / 2.0 - 1000.0), this->samplingRate);
         this->filters[i].Mute();
-        this->in[i] = 0.f;
+        this->in[i] = 0.0;
     }
 }
 

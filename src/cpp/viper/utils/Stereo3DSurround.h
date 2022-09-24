@@ -11,8 +11,10 @@ public:
     void SetStereoWiden(float stereoWiden);
 
 private:
+    void ConfigureVariables();
+
     float stereoWiden;
-    float midImage;
+    float middleImage;
     float unknown1;
     float unknown2;
     float coeffLeft;
