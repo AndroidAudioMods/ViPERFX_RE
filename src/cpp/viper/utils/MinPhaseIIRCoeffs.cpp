@@ -2,7 +2,7 @@
 #include "../constants.h"
 #include <cmath>
 
-static const float MIN_PHASE_IIR_COEFFS_FREQ_10[] = {
+static const float MIN_PHASE_IIR_COEFFS_FREQ_10BANDS[] = {
         31.0,
         62.0,
         125.0,
@@ -15,7 +15,7 @@ static const float MIN_PHASE_IIR_COEFFS_FREQ_10[] = {
         16000.0
 };
 
-static const float MIN_PHASE_IIR_COEFFS_FREQ_15[] = {
+static const float MIN_PHASE_IIR_COEFFS_FREQ_15BANDS[] = {
         25.0,
         40.0,
         63.0,
@@ -33,7 +33,7 @@ static const float MIN_PHASE_IIR_COEFFS_FREQ_15[] = {
         16000.0
 };
 
-static const float MIN_PHASE_IIR_COEFFS_FREQ_25[] = {
+static const float MIN_PHASE_IIR_COEFFS_FREQ_25BANDS[] = {
         20.0,
         31.5,
         40.0,
@@ -61,7 +61,7 @@ static const float MIN_PHASE_IIR_COEFFS_FREQ_25[] = {
         20000.0
 };
 
-static const float MIN_PHASE_IIR_COEFFS_FREQ_31[] = {
+static const float MIN_PHASE_IIR_COEFFS_FREQ_31BANDS[] = {
         20.0,
         25.0,
         31.5,
@@ -98,7 +98,7 @@ static const float MIN_PHASE_IIR_COEFFS_FREQ_31[] = {
 MinPhaseIIRCoeffs::MinPhaseIIRCoeffs() {
     this->coeffs = nullptr;
     this->samplingRate = DEFAULT_SAMPLERATE;
-    this->freqs = 0;
+    this->bands = 0;
 }
 
 MinPhaseIIRCoeffs::~MinPhaseIIRCoeffs() {
@@ -116,15 +116,15 @@ float *MinPhaseIIRCoeffs::GetCoefficients() {
 }
 
 float MinPhaseIIRCoeffs::GetIndexFrequency(uint32_t index) {
-    switch (this->freqs) {
+    switch (this->bands) {
         case 10:
-            return MIN_PHASE_IIR_COEFFS_FREQ_10[index];
+            return MIN_PHASE_IIR_COEFFS_FREQ_10BANDS[index];
         case 15:
-            return MIN_PHASE_IIR_COEFFS_FREQ_15[index];
+            return MIN_PHASE_IIR_COEFFS_FREQ_15BANDS[index];
         case 25:
-            return MIN_PHASE_IIR_COEFFS_FREQ_25[index];
+            return MIN_PHASE_IIR_COEFFS_FREQ_25BANDS[index];
         case 31:
-            return MIN_PHASE_IIR_COEFFS_FREQ_31[index];
+            return MIN_PHASE_IIR_COEFFS_FREQ_31BANDS[index];
         default:
             return 0.0;
     }
@@ -150,40 +150,40 @@ int MinPhaseIIRCoeffs::SolveRoot(double param_2, double param_3, double param_4,
     return 0;
 }
 
-int MinPhaseIIRCoeffs::UpdateCoeffs(uint32_t freqs, int samplingRate) {
-    if ((freqs != 10 && freqs != 15 && freqs != 25 && freqs != 31) || samplingRate != 44100) {
+int MinPhaseIIRCoeffs::UpdateCoeffs(uint32_t bands, uint32_t samplingRate) {
+    if ((bands != 10 && bands != 15 && bands != 25 && bands != 31) || samplingRate != 44100) {
         return 0;
     }
 
-    this->freqs = freqs;
+    this->bands = bands;
     this->samplingRate = samplingRate;
 
     delete this->coeffs;
-    this->coeffs = new float[freqs * 4]();
+    this->coeffs = new float[bands * 4]();
 
     const float *coeffsArray;
     double tmp;
 
-    switch (freqs) {
+    switch (bands) {
         case 10:
-            coeffsArray = MIN_PHASE_IIR_COEFFS_FREQ_10;
+            coeffsArray = MIN_PHASE_IIR_COEFFS_FREQ_10BANDS;
             tmp = 3.0 / 3.0;
             break;
         case 15:
-            coeffsArray = MIN_PHASE_IIR_COEFFS_FREQ_15;
+            coeffsArray = MIN_PHASE_IIR_COEFFS_FREQ_15BANDS;
             tmp = 2.0 / 3.0;
             break;
         case 25:
-            coeffsArray = MIN_PHASE_IIR_COEFFS_FREQ_25;
+            coeffsArray = MIN_PHASE_IIR_COEFFS_FREQ_25BANDS;
             tmp = 1.0 / 3.0;
             break;
         case 31:
-            coeffsArray = MIN_PHASE_IIR_COEFFS_FREQ_31;
+            coeffsArray = MIN_PHASE_IIR_COEFFS_FREQ_31BANDS;
             tmp = 1.0 / 3.0;
             break;
     }
 
-    for (uint32_t i = 0; i < freqs; i++) {
+    for (uint32_t i = 0; i < bands; i++) {
         double ret1;
         double ret2;
         this->Find_F1_F2(coeffsArray[i], tmp, &ret1, &ret2);
