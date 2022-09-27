@@ -1,3 +1,5 @@
+#pragma once
+
 // Source: https://android.googlesource.com/platform/system/media/+/master/audio/include/system
 
 typedef struct effect_uuid_s

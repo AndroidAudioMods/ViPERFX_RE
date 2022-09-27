@@ -3,22 +3,47 @@
 Stereo3DSurround::Stereo3DSurround() {
     this->middleImage = 1.0;
     this->stereoWiden = 0.0;
-    this->unknown1 = 1.0;
-    this->unknown2 = 0.5;
     this->coeffLeft = 0.5;
     this->coeffRight = 0.5;
 }
 
 void Stereo3DSurround::Process(float *samples, uint32_t size) {
-    if (size >= 2) {
+    if (size == 0) return;
 
+    uint32_t pairs = size / 2;
+    uint32_t remainder = size % 2;
+
+    if (pairs > 0) {
+        for (uint32_t i = 0; i < pairs; i++) {
+            float a = this->coeffLeft * (samples[4 * i] + samples[4 * i + 1]);
+            float b = this->coeffRight * (samples[4 * i + 1] - samples[4 * i]);
+            float c = this->coeffLeft * (samples[4 * i + 2] + samples[4 * i + 3]);
+            float d = this->coeffRight * (samples[4 * i + 3] - samples[4 * i + 2]);
+
+            samples[4 * i] = a - b;
+            samples[4 * i + 1] = a + b;
+            samples[4 * i + 2] = c - d;
+            samples[4 * i + 3] = c + d;
+        }
+    }
+
+    if (remainder > 0) {
+        for (uint32_t i = pairs; i < pairs + remainder; i++) {
+            float a = samples[2 * i];
+            float b = samples[2 * i + 1];
+            float c = this->coeffLeft * (a + b);
+            float d = this->coeffRight * (b - a);
+
+            samples[2 * i] = c - d;
+            samples[2 * i + 1] = c + d;
+        }
     }
 }
 
 inline void Stereo3DSurround::ConfigureVariables() {
-    this->unknown1 = this->stereoWiden + 1.0f;
+    float tmp = this->stereoWiden + 1.0f;
 
-    float x = this->unknown1 + 1.0f;
+    float x = tmp + 1.0f;
     float y;
     if (x < 2.0) {
         y = 0.5;
@@ -26,9 +51,8 @@ inline void Stereo3DSurround::ConfigureVariables() {
         y = 1.0f / x;
     }
 
-    this->unknown2 = y;
     this->coeffLeft = this->middleImage * y;
-    this->coeffRight = this->unknown1 * y;
+    this->coeffRight = tmp * y;
 }
 
 void Stereo3DSurround::SetMiddleImage(float middleImage) {

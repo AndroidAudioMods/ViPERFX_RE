@@ -1,7 +1,9 @@
 #include <cstring>
 #include <cerrno>
+#include <ctime>
 
 #include "viper/ViPER.h"
+#include "essential.h"
 #include "log.h"
 #include "viper/constants.h"
 
@@ -22,35 +24,217 @@ static effect_descriptor_t viper_descriptor = {
 extern "C" {
 struct ViperContext {
     const struct effect_interface_s *interface; // Should always be the first struct member
+    effect_config_t config;
     ViPER *viper;
 };
 
 static int32_t Viper_IProcess(effect_handle_t self, audio_buffer_t *inBuffer, audio_buffer_t *outBuffer) {
-    auto pContext = (ViperContext *) self;
+    auto pContext = reinterpret_cast<ViperContext *>(self);
 
-    if (pContext == nullptr || pContext->viper == nullptr || inBuffer == nullptr || outBuffer == nullptr) {
-        VIPER_LOGE("Viper_IProcess: pContext, pContext->viper, inBuffer or outBuffer is null!");
+    if (pContext == nullptr ||
+        inBuffer == nullptr || outBuffer == nullptr ||
+        inBuffer->raw == nullptr || outBuffer->raw == nullptr ||
+        inBuffer->frameCount != outBuffer->frameCount ||
+        inBuffer->frameCount == 0) {
         return -EINVAL;
     }
 
-    return pContext->viper->process(inBuffer, outBuffer);
+    float *inBufferPtr = inBuffer->f32;
+    float *outBufferPtr = outBuffer->f32;
+
+    if (inBufferPtr != outBufferPtr) {
+        memcpy(outBufferPtr, inBufferPtr, outBuffer->frameCount * sizeof(float) * 2);
+    }
+
+    /*return */pContext->viper->processBuffer(outBufferPtr, outBuffer->frameCount);
+    return 0; // TODO: Return code from processBuffer()
+}
+
+static int configure(ViperContext *pContext, effect_config_t *newConfig) {
+    VIPER_LOGI("Begin audio configure ...");
+    VIPER_LOGI("Checking input and output configuration ...");
+
+    if (newConfig->inputCfg.samplingRate != newConfig->outputCfg.samplingRate) {
+        VIPER_LOGE("ViPER4Android disabled, reason [in.SR = %d, out.SR = %d]",
+                   newConfig->inputCfg.samplingRate, newConfig->outputCfg.samplingRate);
+        return -EINVAL;
+    }
+
+    if (newConfig->inputCfg.samplingRate > 48000) {
+        VIPER_LOGE("ViPER4Android disabled, reason [SR out of range]");
+        return -EINVAL;
+    }
+
+    if (newConfig->inputCfg.channels != newConfig->outputCfg.channels) {
+        VIPER_LOGE("ViPER4Android disabled, reason [in.CH = %d, out.CH = %d]",
+                   newConfig->inputCfg.channels, newConfig->outputCfg.channels);
+        return -EINVAL;
+    }
+
+    if (newConfig->inputCfg.channels != AUDIO_CHANNEL_OUT_STEREO) {
+        VIPER_LOGE("ViPER4Android disabled, reason [CH != 2]");
+        return -EINVAL;
+    }
+
+    if (newConfig->inputCfg.format != AUDIO_FORMAT_PCM_FLOAT) {
+        VIPER_LOGE("ViPER4Android disabled, reason [in.FMT = %d]", newConfig->inputCfg.format);
+        VIPER_LOGE("We only accept f32 format");
+        return -EINVAL;
+    }
+
+    if (newConfig->outputCfg.format != AUDIO_FORMAT_PCM_FLOAT) {
+        VIPER_LOGE("ViPER4Android disabled, reason [out.FMT = %d]", newConfig->outputCfg.format);
+        VIPER_LOGE("We only accept f32 format");
+        return -EINVAL;
+    }
+
+    VIPER_LOGI("Input and output configuration checked.");
+
+    pContext->config = *newConfig;
+
+    VIPER_LOGI("Audio configure finished");
+
+    return 0;
 }
 
 static int32_t Viper_ICommand(effect_handle_t self,
                               uint32_t cmdCode, uint32_t cmdSize, void *pCmdData,
                               uint32_t *replySize, void *pReplyData) {
-    auto pContext = (ViperContext *) self;
+    auto pContext = reinterpret_cast<ViperContext *>(self);
 
     if (pContext == nullptr || pContext->viper == nullptr) {
         VIPER_LOGE("Viper_ICommand: pContext or pContext->viper is null!");
         return -EINVAL;
     }
 
-    return pContext->viper->command(cmdCode, cmdSize, pCmdData, replySize, pReplyData);
+    VIPER_LOGD("Viper_ICommand() called with cmdCode = %d", cmdCode);
+    switch (cmdCode) {
+        case EFFECT_CMD_INIT:
+            *((int *) pReplyData) = 0;
+            return 0;
+        case EFFECT_CMD_SET_CONFIG: {
+            auto currentSampleRate = pContext->viper->samplingRate;
+
+            *(int *) pReplyData = configure(pContext, (effect_config_t *) pCmdData);
+            if (*(int *) pReplyData == 0) {
+                if (currentSampleRate != pContext->viper->samplingRate) {
+                    pContext->viper->ResetAllEffects();
+                }
+            }
+
+            return 0;
+        }
+        case EFFECT_CMD_RESET: {
+            pContext->viper->ResetAllEffects();
+            break;
+        }
+        case EFFECT_CMD_ENABLE: {
+            if (!pContext->viper->enabled) {
+                pContext->viper->ResetAllEffects();
+            }
+            pContext->viper->enabled = true;
+            *((int *) pReplyData) = 0;
+            return 0;
+        }
+        case EFFECT_CMD_DISABLE: {
+            pContext->viper->enabled = false;
+            *((int *) pReplyData) = 0;
+            return 0;
+        }
+        case EFFECT_CMD_SET_PARAM: {
+            auto pCmdParam = (effect_param_t *) pCmdData;
+
+            if (pCmdParam->psize != sizeof(int32_t)) {
+                *(int *) pReplyData = -EINVAL;
+                return 0;
+            }
+
+            // TODO: implement
+        }
+        case EFFECT_CMD_GET_PARAM: {
+            auto *pCmdParam = (effect_param_t *) pCmdData;
+            auto *pReplyParam = (effect_param_t *) pReplyData;
+
+            if (pCmdParam->psize != sizeof(int)) break;
+
+            switch (*(int *) pCmdParam->data) {
+                case PARAM_GET_DRIVER_VERSION: {
+                    pReplyParam->status = 0;
+                    //pReplyParam->psize = sizeof(int32_t); // TODO
+                    pReplyParam->vsize = sizeof(int32_t);
+                    *(int32_t *) pReplyParam->data = 0x2050004; // As original, change as needed
+                    *replySize = 0x14; // As original, TODO: calculate correctly
+                    return 0;
+                }
+                case PARAM_GET_ENABLED: {
+                    pReplyParam->status = 0;
+                    //pReplyParam->psize = sizeof(int32_t); // TODO
+                    pReplyParam->vsize = sizeof(int32_t);
+                    *(int32_t *) pReplyParam->data = pContext->viper->enabled;
+                    *replySize = 0x14; // As original, TODO: calculate correctly
+                    return 0;
+                }
+                case PARAM_GET_CONFIGURE: {
+                    pReplyParam->status = 0;
+                    //pReplyParam->psize = sizeof(int32_t); // TODO
+                    pReplyParam->vsize = sizeof(int32_t);
+                    *(int32_t *) pReplyParam->data = 1; // TODO?
+                    *replySize = 0x14; // As original, TODO: calculate correctly
+                    return 0;
+                }
+                case PARAM_GET_DRVCANWORK: {
+                    pReplyParam->status = 0;
+                    //pReplyParam->psize = sizeof(int32_t); // TODO
+                    pReplyParam->vsize = sizeof(int32_t);
+                    *(int32_t *) pReplyParam->data = pContext->viper->init_ok;
+                    *replySize = 0x14; // As original, TODO: calculate correctly
+                    return 0;
+                }
+                case PARAM_GET_STREAMING: {
+                    struct timeval time{};
+                    gettimeofday(&time, nullptr);
+
+                    // TODO: Do some calculations
+
+                    return 0;
+                }
+                case PARAM_GET_SAMPLINGRATE: {
+                    pReplyParam->status = 0;
+                    //pReplyParam->psize = sizeof(int32_t); // TODO
+                    pReplyParam->vsize = sizeof(int32_t);
+                    *(uint32_t *) pReplyParam->data = pContext->viper->samplingRate;
+                    *replySize = 0x14; // As original, TODO: calculate correctly
+                    return 0;
+                }
+                case PARAM_GET_CONVUSABLE: {
+                    pReplyParam->status = 0;
+                    //pReplyParam->psize = sizeof(int32_t); // TODO
+                    pReplyParam->vsize = sizeof(int32_t);
+                    *(int32_t *) pReplyParam->data = 1; // TODO: Figure out what is this
+                    *replySize = 0x14; // As original, TODO: calculate correctly
+                    return 0;
+                }
+                case PARAM_GET_CONVKNLID: {
+                    pReplyParam->status = 0;
+                    //pReplyParam->psize = sizeof(int32_t); // TODO
+                    pReplyParam->vsize = sizeof(int32_t);
+                    *(uint32_t *) pReplyParam->data = pContext->viper->convolver->GetKernelID();
+                    *replySize = 0x14; // As original, TODO: calculate correctly
+                    return 0;
+                }
+            }
+        }
+        case EFFECT_CMD_GET_CONFIG: {
+            memcpy(pReplyData, &pContext->config, sizeof(effect_config_t));
+            return 0;
+        }
+    }
+
+    return -EINVAL;
 }
 
 static int32_t Viper_IGetDescriptor(effect_handle_t self, effect_descriptor_t *pDescriptor) {
-    auto *pContext = (ViperContext *) self;
+    auto pContext = reinterpret_cast<ViperContext *>(self);
 
     if (pContext == nullptr || pDescriptor == nullptr) {
         VIPER_LOGE("Viper_IGetDescriptor: pContext or pDescriptor is null!");
@@ -68,6 +252,26 @@ static const effect_interface_s viper_interface = {
         .get_descriptor = Viper_IGetDescriptor
 };
 
+static void Viper_Init(ViperContext *pContext) {
+    pContext->interface = &viper_interface;
+
+    memset(&pContext->config, 0, sizeof(effect_config_t));
+
+    pContext->config.inputCfg.accessMode = EFFECT_BUFFER_ACCESS_READ;
+    pContext->config.inputCfg.format = AUDIO_FORMAT_PCM_FLOAT;
+    pContext->config.inputCfg.samplingRate = DEFAULT_SAMPLERATE;
+    pContext->config.inputCfg.channels = AUDIO_CHANNEL_OUT_STEREO;
+    pContext->config.inputCfg.mask = AUDIO_PORT_CONFIG_ALL;
+
+    pContext->config.outputCfg.accessMode = EFFECT_BUFFER_ACCESS_WRITE;
+    pContext->config.outputCfg.format = AUDIO_FORMAT_PCM_FLOAT;
+    pContext->config.outputCfg.samplingRate = DEFAULT_SAMPLERATE;
+    pContext->config.outputCfg.channels = AUDIO_CHANNEL_OUT_STEREO;
+    pContext->config.outputCfg.mask = AUDIO_PORT_CONFIG_ALL;
+
+    pContext->viper = new ViPER();
+}
+
 static int32_t
 Viper_Create(const effect_uuid_t *uuid, int32_t sessionId __unused, int32_t ioId __unused, effect_handle_t *pHandle) {
     VIPER_LOGI("Enter Viper_Create()");
@@ -84,17 +288,15 @@ Viper_Create(const effect_uuid_t *uuid, int32_t sessionId __unused, int32_t ioId
 
     VIPER_LOGI("Viper_Create: uuid matches, creating viper...");
 
-    auto *pContext = new ViperContext();
-    pContext->interface = &viper_interface;
-    pContext->viper = new ViPER();
-
+    auto *pContext = new ViperContext;
+    Viper_Init(pContext);
     *pHandle = (effect_handle_t) pContext;
 
     return 0;
 }
 
 static int32_t Viper_Release(effect_handle_t handle) {
-    auto *pContext = (ViperContext *) handle;
+    auto pContext = reinterpret_cast<ViperContext *>(handle);
 
     VIPER_LOGI("Enter Viper_Release()");
 
@@ -105,10 +307,7 @@ static int32_t Viper_Release(effect_handle_t handle) {
 
     VIPER_LOGI("Viper_Release: deleting viper...");
 
-    if (pContext->viper != nullptr) {
-        delete pContext->viper;
-        pContext->viper = nullptr;
-    }
+    delete pContext->viper;
     delete pContext;
 
     return 0;

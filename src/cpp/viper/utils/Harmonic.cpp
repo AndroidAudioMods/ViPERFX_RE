@@ -40,18 +40,18 @@ float Harmonic::Process(float sample) {
             sample * this->coeffs[9] +
             sample * this->coeffs[10]
     );
-    this->prevOut = this->lastProcessed + this->prevOut * 0.999f - prevLast;
+    this->prevOut = (this->lastProcessed + this->prevOut * 0.999f) - prevLast;
     if (this->sampleCounter < this->buildup) {
         this->sampleCounter++;
-        return 0;
+        return 0.0;
     }
     return this->prevOut;
 }
 
 void Harmonic::Reset() {
-    this->lastProcessed = 0.f;
-    this->prevOut = 0.f;
-    this->sampleCounter = 0.f;
+    this->lastProcessed = 0.0;
+    this->prevOut = 0.0;
+    this->sampleCounter = 0;
 }
 
 void Harmonic::SetHarmonics(float *coefficients) {

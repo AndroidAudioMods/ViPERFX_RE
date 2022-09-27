@@ -15,8 +15,6 @@ private:
 
     float stereoWiden;
     float middleImage;
-    float unknown1;
-    float unknown2;
     float coeffLeft;
     float coeffRight;
 };

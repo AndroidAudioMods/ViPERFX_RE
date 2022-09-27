@@ -1,6 +1,5 @@
 #include "ViPER.h"
 #include <ctime>
-#include "Effect.h"
 #include "constants.h"
 
 ViPER::ViPER() {
@@ -12,72 +11,72 @@ ViPER::ViPER() {
 
     this->convolver = new Convolver();
     this->convolver->SetEnable(false);
-    this->convolver->SetSamplingRate(this->sampleRate);
+    this->convolver->SetSamplingRate(this->samplingRate);
     this->convolver->Reset();
 
     this->vhe = new VHE();
     this->vhe->SetEnable(false);
-    this->vhe->SetSamplingRate(this->sampleRate);
+    this->vhe->SetSamplingRate(this->samplingRate);
     this->vhe->Reset();
 
     this->viperDdc = new ViPERDDC();
     this->viperDdc->SetEnable(false);
-    this->viperDdc->SetSamplingRate(this->sampleRate);
+    this->viperDdc->SetSamplingRate(this->samplingRate);
     this->viperDdc->Reset();
 
     this->spectrumExtend = new SpectrumExtend();
     this->spectrumExtend->SetEnable(false);
-    this->spectrumExtend->SetSamplingRate(this->sampleRate);
+    this->spectrumExtend->SetSamplingRate(this->samplingRate);
     this->spectrumExtend->SetReferenceFrequency(7600);
     this->spectrumExtend->SetExciter(0);
     this->spectrumExtend->Reset();
 
-    this->iirFilter = new IIRFilter();
+    this->iirFilter = new IIRFilter(10);
     this->iirFilter->SetEnable(false);
-    this->iirFilter->SetSamplingRate(this->sampleRate);
+    this->iirFilter->SetSamplingRate(this->samplingRate);
     this->iirFilter->Reset();
 
     this->colorfulMusic = new ColorfulMusic();
     this->colorfulMusic->SetEnable(false);
-    this->colorfulMusic->SetSamplingRate(this->sampleRate);
+    this->colorfulMusic->SetSamplingRate(this->samplingRate);
     this->colorfulMusic->Reset();
 
     this->reverberation = new Reverberation();
     this->reverberation->SetEnable(false);
-    this->reverberation->SetSamplingRate(this->sampleRate);
+    this->reverberation->SetSamplingRate(this->samplingRate);
     this->reverberation->Reset();
 
     this->playbackGain = new PlaybackGain();
     this->playbackGain->SetEnable(false);
-    this->playbackGain->SetSamplingRate(this->sampleRate);
+    this->playbackGain->SetSamplingRate(this->samplingRate);
     this->playbackGain->Reset();
 
     this->fetCompressor = new FETCompressor();
     this->fetCompressor->SetParameter(0, 0.0);
-    this->fetCompressor->SetSamplingRate(this->sampleRate);
+    this->fetCompressor->SetSamplingRate(this->samplingRate);
     this->fetCompressor->Reset();
 
     this->dynamicSystem = new DynamicSystem();
     this->dynamicSystem->SetEnable(false);
-    this->dynamicSystem->SetSamplingRate(this->sampleRate);
+    this->dynamicSystem->SetSamplingRate(this->samplingRate);
     this->dynamicSystem->Reset();
 
     this->viperBass = new ViPERBass();
-    this->viperBass->SetSamplingRate(this->sampleRate);
+    this->viperBass->SetSamplingRate(this->samplingRate);
     this->viperBass->Reset();
 
     this->viperClarity = new ViPERClarity();
-    this->viperClarity->SetSamplingRate(this->sampleRate);
+    this->viperClarity->SetSamplingRate(this->samplingRate);
     this->viperClarity->Reset();
 
     this->diffSurround = new DiffSurround();
     this->diffSurround->SetEnable(false);
-    this->diffSurround->SetSamplingRate(this->sampleRate);
+    this->diffSurround->SetSamplingRate(this->samplingRate);
     this->diffSurround->Reset();
 
     this->cure = new Cure();
     this->cure->SetEnable(false);
-    this->cure->SetSamplingRate(this->sampleRate);
+    this->cure->SetSamplingRate(this->samplingRate);
     this->cure->Reset();
 
     this->tubeSimulator = new TubeSimulator();
@@ -86,13 +85,13 @@ ViPER::ViPER() {
 
     this->analogX = new AnalogX();
 //    this->analogX->SetEnable(false);
-    this->analogX->SetSamplingRate(this->sampleRate);
+    this->analogX->SetSamplingRate(this->samplingRate);
     this->analogX->SetProcessingModel(0);
     this->analogX->Reset();
 
     this->speakerCorrection = new SpeakerCorrection();
     this->speakerCorrection->SetEnable(false);
-    this->speakerCorrection->SetSamplingRate(this->sampleRate);
+    this->speakerCorrection->SetSamplingRate(this->samplingRate);
     this->speakerCorrection->Reset();
 
     for (auto &softwareLimiter: this->softwareLimiters) {
@@ -136,143 +135,10 @@ ViPER::~ViPER() {
     }
 }
 
-int32_t
-ViPER::command(uint32_t cmdCode, uint32_t cmdSize, void *pCmdData, uint32_t *replySize, void *pReplyData) {
-    switch (cmdCode) {
-        case EFFECT_CMD_ENABLE: {
-            if (!this->enabled) {
-                ResetAllEffects();
-                break;
-            }
-            return 0;
-        }
-        case EFFECT_CMD_RESET: {
-            ResetAllEffects();
-            break;
-        }
-        case EFFECT_CMD_SET_CONFIG: {
-            if (cmdSize != 64 || *replySize != 4) {
-                return -EINVAL;
-            }
-
-            auto currentSampleRate = this->sampleRate;
-
-            *(int32_t *) pReplyData = this->configure((effect_config_t *) pCmdData);
-            if (*(int32_t *) pReplyData == 0) {
-                if (currentSampleRate != this->sampleRate) {
-                    ResetAllEffects();
-                }
-            }
-
-            return 0;
-        }
-        case EFFECT_CMD_SET_PARAM: {
-            auto pCmdParam = (effect_param_t *) pCmdData;
-
-            if (pCmdParam->psize != sizeof(int32_t)) {
-                *(int32_t *) pReplyData = -EINVAL;
-                return 0;
-            }
-
-            // TODO: implement
-        }
-        case EFFECT_CMD_GET_PARAM: {
-            auto *pCmdParam = (effect_param_t *) pCmdData;
-            auto *pReplyParam = (effect_param_t *) pReplyData;
-
-            if (pCmdParam->psize != sizeof(int32_t)) break;
-
-            switch (*(int *) pCmdParam->data) {
-                case PARAM_GET_DRIVER_VERSION: {
-                    pReplyParam->status = 0;
-                    //pReplyParam->psize = sizeof(int32_t); // TODO
-                    pReplyParam->vsize = sizeof(int32_t);
-                    *(int32_t *) pReplyParam->data = 0x2050004; // As original, change as needed
-                    *replySize = 0x14; // As original, TODO: calculate correctly
-                    return 0;
-                }
-                case PARAM_GET_NEONENABLED: {
-                    pReplyParam->status = 0;
-                    //pReplyParam->psize = sizeof(int32_t); // TODO
-                    pReplyParam->vsize = sizeof(int32_t);
-                    *(int32_t *) pReplyParam->data = 1; // TODO: check if neon is enabled
-                    *replySize = 0x14; // As original, TODO: calculate correctly
-                    return 0;
-                }
-                case PARAM_GET_ENABLED: {
-                    pReplyParam->status = 0;
-                    //pReplyParam->psize = sizeof(int32_t); // TODO
-                    pReplyParam->vsize = sizeof(int32_t);
-                    *(int32_t *) pReplyParam->data = this->enabled;
-                    *replySize = 0x14; // As original, TODO: calculate correctly
-                    return 0;
-                }
-                case PARAM_GET_CONFIGURE: {
-                    pReplyParam->status = 0;
-                    //pReplyParam->psize = sizeof(int32_t); // TODO
-                    pReplyParam->vsize = sizeof(int32_t);
-                    *(int32_t *) pReplyParam->data = this->configureOk;
-                    *replySize = 0x14; // As original, TODO: calculate correctly
-                    return 0;
-                }
-                case PARAM_GET_DRVCANWORK: {
-                    pReplyParam->status = 0;
-                    //pReplyParam->psize = sizeof(int32_t); // TODO
-                    pReplyParam->vsize = sizeof(int32_t);
-                    *(int32_t *) pReplyParam->data = this->init_ok;
-                    *replySize = 0x14; // As original, TODO: calculate correctly
-                    return 0;
-                }
-                case PARAM_GET_STREAMING: {
-                    struct timeval time{};
-                    gettimeofday(&time, nullptr);
-
-                    // TODO: Do some calculations
-
-                    return 0;
-                }
-                case PARAM_GET_EFFECT_TYPE: {
-                    pReplyParam->status = 0;
-                    //pReplyParam->psize = sizeof(int32_t); // TODO
-                    pReplyParam->vsize = sizeof(int32_t);
-                    *(int32_t *) pReplyParam->data = 1; //this->mode; TODO: This driver is not using any effect type, it's completely controlled by the frontend
-                    *replySize = 0x14; // As original, TODO: calculate correctly
-                    return 0;
-                }
-                case PARAM_GET_SAMPLINGRATE: {
-                    pReplyParam->status = 0;
-                    //pReplyParam->psize = sizeof(int32_t); // TODO
-                    pReplyParam->vsize = sizeof(int32_t);
-                    *(uint32_t *) pReplyParam->data = this->sampleRate;
-                    *replySize = 0x14; // As original, TODO: calculate correctly
-                    return 0;
-                }
-                case PARAM_GET_CONVUSABLE: {
-                    pReplyParam->status = 0;
-                    //pReplyParam->psize = sizeof(int32_t); // TODO
-                    pReplyParam->vsize = sizeof(int32_t);
-                    *(int32_t *) pReplyParam->data = 1; // TODO: Figure out what is this
-                    *replySize = 0x14; // As original, TODO: calculate correctly
-                    return 0;
-                }
-                case PARAM_GET_CONVKNLID: {
-                    pReplyParam->status = 0;
-                    //pReplyParam->psize = sizeof(int32_t); // TODO
-                    pReplyParam->vsize = sizeof(int32_t);
-                    *(uint32_t *) pReplyParam->data = this->convolver->GetKernelID();
-                    *replySize = 0x14; // As original, TODO: calculate correctly
-                    return 0;
-                }
-            }
-        }
-    }
-
-    return this->Effect::command(cmdCode, cmdSize, pCmdData, replySize, pReplyData);
-}
-
-void ViPER::processBuffer(float *buffer, int frameSize) {
+// TODO: Return int
+void ViPER::processBuffer(float *buffer, uint32_t size) {
     if (!this->enabled) return;
-    if (frameSize < 1) return;
+    if (size == 0) return;
     if (!this->init_ok) return;
 
     if (this->update_status) {
@@ -284,18 +150,18 @@ void ViPER::processBuffer(float *buffer, int frameSize) {
     uint32_t ret;
 
     // if convolver is enabled
-    ret = this->waveBuffer->PushSamples(buffer, frameSize);
+    ret = this->waveBuffer->PushSamples(buffer, size);
     if (ret == 0) {
         this->waveBuffer->Reset();
         return;
     }
 
     auto pWaveBuffer = this->waveBuffer->GetBuffer();
-    this->convolver->Process(pWaveBuffer, pWaveBuffer, frameSize);
-    this->vhe->Process(pWaveBuffer, pWaveBuffer, frameSize);
-    this->waveBuffer->SetBufferOffset(frameSize);
+    this->convolver->Process(pWaveBuffer, pWaveBuffer, size);
+    this->vhe->Process(pWaveBuffer, pWaveBuffer, size);
+    this->waveBuffer->SetBufferOffset(size);
 
-    ret = this->adaptiveBuffer->PushZero(frameSize);
+    ret = this->adaptiveBuffer->PushZero(size);
     if (ret == 0) {
         this->waveBuffer->Reset();
         this->adaptiveBuffer->FlushBuffer();
@@ -303,13 +169,13 @@ void ViPER::processBuffer(float *buffer, int frameSize) {
     }
 
     auto pAdaptiveBuffer = this->adaptiveBuffer->GetBufferPointer();
-    ret = this->waveBuffer->PopSamples((float *) pAdaptiveBuffer, frameSize, true);
+    ret = this->waveBuffer->PopSamples((float *) pAdaptiveBuffer, size, true);
     this->adaptiveBuffer->SetBufferOffset(ret);
 
     pAdaptiveBuffer = this->adaptiveBuffer->GetBufferPointer();
     if (ret != 0) {
-        this->viperDdc->Process(pAdaptiveBuffer, frameSize);
-        this->spectrumExtend->Process(pAdaptiveBuffer, frameSize);
+        this->viperDdc->Process(pAdaptiveBuffer, size);
+        this->spectrumExtend->Process(pAdaptiveBuffer, size);
         this->iirFilter->Process(pAdaptiveBuffer, ret);
         this->colorfulMusic->Process(pAdaptiveBuffer, ret);
         this->diffSurround->Process(pAdaptiveBuffer, ret);
@@ -321,7 +187,7 @@ void ViPER::processBuffer(float *buffer, int frameSize) {
         this->viperBass->Process(pAdaptiveBuffer, ret);
         this->viperClarity->Process(pAdaptiveBuffer, ret);
         this->cure->Process(pAdaptiveBuffer, ret);
-        this->tubeSimulator->TubeProcess(pAdaptiveBuffer, frameSize);
+        this->tubeSimulator->TubeProcess(pAdaptiveBuffer, size);
         this->analogX->Process(pAdaptiveBuffer, ret);
     }
 
@@ -351,70 +217,70 @@ void ViPER::ResetAllEffects() {
         this->waveBuffer->Reset();
     }
     if (this->convolver != nullptr) {
-        this->convolver->SetSamplingRate(this->sampleRate);
+        this->convolver->SetSamplingRate(this->samplingRate);
         this->convolver->Reset();
     }
     if (this->vhe != nullptr) {
-        this->vhe->SetSamplingRate(this->sampleRate);
+        this->vhe->SetSamplingRate(this->samplingRate);
         this->vhe->Reset();
     }
     if (this->viperDdc != nullptr) {
-        this->viperDdc->SetSamplingRate(this->sampleRate);
+        this->viperDdc->SetSamplingRate(this->samplingRate);
         this->viperDdc->Reset();
     }
     if (this->spectrumExtend != nullptr) {
-        this->spectrumExtend->SetSamplingRate(this->sampleRate);
+        this->spectrumExtend->SetSamplingRate(this->samplingRate);
         this->spectrumExtend->Reset();
     }
     if (this->iirFilter != nullptr) {
-        this->iirFilter->SetSamplingRate(this->sampleRate);
+        this->iirFilter->SetSamplingRate(this->samplingRate);
         this->iirFilter->Reset();
     }
     if (this->colorfulMusic != nullptr) {
-        this->colorfulMusic->SetSamplingRate(this->sampleRate);
+        this->colorfulMusic->SetSamplingRate(this->samplingRate);
         this->colorfulMusic->Reset();
     }
     if (this->reverberation != nullptr) {
-        this->reverberation->SetSamplingRate(this->sampleRate);
+        this->reverberation->SetSamplingRate(this->samplingRate);
         this->reverberation->Reset();
     }
     if (this->playbackGain != nullptr) {
-        this->playbackGain->SetSamplingRate(this->sampleRate);
+        this->playbackGain->SetSamplingRate(this->samplingRate);
         this->playbackGain->Reset();
     }
     if (this->fetCompressor != nullptr) {
-        this->fetCompressor->SetSamplingRate(this->sampleRate);
+        this->fetCompressor->SetSamplingRate(this->samplingRate);
         this->fetCompressor->Reset();
     }
     if (this->dynamicSystem != nullptr) {
-        this->dynamicSystem->SetSamplingRate(this->sampleRate);
+        this->dynamicSystem->SetSamplingRate(this->samplingRate);
         this->dynamicSystem->Reset();
     }
     if (this->viperBass != nullptr) {
-        this->viperBass->SetSamplingRate(this->sampleRate);
+        this->viperBass->SetSamplingRate(this->samplingRate);
         this->viperBass->Reset();
     }
     if (this->viperClarity != nullptr) {
-        this->viperClarity->SetSamplingRate(this->sampleRate);
+        this->viperClarity->SetSamplingRate(this->samplingRate);
         this->viperClarity->Reset();
     }
     if (this->diffSurround != nullptr) {
-        this->diffSurround->SetSamplingRate(this->sampleRate);
+        this->diffSurround->SetSamplingRate(this->samplingRate);
         this->diffSurround->Reset();
     }
     if (this->cure != nullptr) {
-        this->cure->SetSamplingRate(this->sampleRate);
+        this->cure->SetSamplingRate(this->samplingRate);
         this->cure->Reset();
     }
     if (this->tubeSimulator != nullptr) {
         this->tubeSimulator->Reset();
     }
     if (this->analogX != nullptr) {
-        this->analogX->SetSamplingRate(this->sampleRate);
+        this->analogX->SetSamplingRate(this->samplingRate);
         this->analogX->Reset();
     }
     if (this->speakerCorrection != nullptr) {
-        this->speakerCorrection->SetSamplingRate(this->sampleRate);
+        this->speakerCorrection->SetSamplingRate(this->samplingRate);
         this->speakerCorrection->Reset();
     }
     for (auto &softwareLimiter: softwareLimiters) {

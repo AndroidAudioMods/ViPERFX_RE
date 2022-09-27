@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Effect.h"
 #include "utils/WaveBuffer.h"
 #include "effects/SpectrumExtend.h"
 #include "effects/Reverberation.h"
@@ -23,29 +22,22 @@
 #include "effects/PlaybackGain.h"
 #include "../ViPER4Android.h"
 
-class ViPER : public Effect {
+class ViPER {
 public:
     ViPER();
-
     ~ViPER();
 
-    int32_t command(uint32_t cmdCode, uint32_t cmdSize, void *pCmdData, uint32_t *replySize, void *pReplyData) override;
-
-    void processBuffer(float *buffer, int frameSize);
-
+    void processBuffer(float *buffer, uint32_t size);
     // TODO: Parameter types/names
     void DispatchCommand(int param_1, int param_2, int param_3, int param_4, int param_5, int param_6, int param_7);
-
     void ResetAllEffects();
 
     bool update_status;
-    // Something or padding of 3 bytes
     uint64_t process_time_ms;
     bool init_ok;
     bool enabled;
     bool force_enabled;
-    // Something or padding of 1 byte
-    // FxMode mode;
+    uint32_t samplingRate;
 
     // Effects
     AdaptiveBuffer *adaptiveBuffer;

@@ -18,9 +18,11 @@ private:
     uint32_t bands;
     uint32_t samplingRate;
     bool enable;
-    MinPhaseIIRCoeffs coeffs;
+    MinPhaseIIRCoeffs minPhaseIirCoeffs;
     float buf[496];
-    // 3 unknown
+    uint32_t unknown2;
+    uint32_t unknown3;
+    uint32_t unknown4;
     float bandLevelsWithQ[31];
 };
 

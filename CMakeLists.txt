@@ -18,7 +18,6 @@ include_directories(src/include)
 
 set(FILES
         # Main
-        src/cpp/viper/Effect.cpp
         src/cpp/viper/ViPER.cpp
         src/cpp/ViPER4Android.cpp
 
