@@ -143,10 +143,38 @@ static int32_t Viper_ICommand(effect_handle_t self,
         }
         case EFFECT_CMD_SET_PARAM: {
             auto pCmdParam = (effect_param_t *) pCmdData;
+            // The value offset of an effect parameter is computed by rounding up
+            // the parameter size to the next 32 bit alignment.
+            uint32_t vOffset = ((pCmdParam->psize + sizeof(int32_t) - 1) / sizeof(int32_t)) * sizeof(int32_t);
 
+            int param = *(int *) (pCmdParam->data);
+            *(int *) pReplyData = 0;
 
-
-            // TODO: implement
+            int *intValues = (int *) (pCmdParam->data + vOffset);
+            if (pCmdParam->vsize == sizeof(int)) {
+                pContext->viper->DispatchCommand(param, intValues[0], 0, 0, 0, 0, nullptr);
+                return 0;
+            } else if (pCmdParam->vsize == sizeof(int) * 2) {
+                pContext->viper->DispatchCommand(param, intValues[0], intValues[1], 0, 0, 0, nullptr);
+                return 0;
+            } else if (pCmdParam->vsize == sizeof(int) * 3) {
+                pContext->viper->DispatchCommand(param, intValues[0], intValues[1], intValues[2], 0, 0, nullptr);
+                return 0;
+            } else if (pCmdParam->vsize == sizeof(int) * 4) {
+                pContext->viper->DispatchCommand(param, intValues[0], intValues[1], intValues[2], intValues[3], 0, nullptr);
+                return 0;
+            } else if (pCmdParam->vsize == 256 || pCmdParam->vsize == 1024) {
+                uint32_t arrSize = *(uint32_t *) (pCmdParam->data + vOffset);
+                signed char *arr = (signed char *) (pCmdParam->data + vOffset + sizeof(uint32_t));
+                pContext->viper->DispatchCommand(param, 0, 0, 0, 0, arrSize, arr);
+                return 0;
+            } else if (pCmdParam->vsize == 8192) {
+                int value1 = *(int *) (pCmdParam->data + vOffset);
+                uint32_t arrSize = *(uint32_t *) (pCmdParam->data + vOffset + sizeof(int));
+                signed char *arr = (signed char *) (pCmdParam->data + vOffset + sizeof(int) + sizeof(uint32_t));
+                pContext->viper->DispatchCommand(param, value1, 0, 0, 0, arrSize, arr);
+                return 0;
+            }
         }
         case EFFECT_CMD_GET_PARAM: {
             auto *pCmdParam = reinterpret_cast<effect_param_t *>(pCmdData);

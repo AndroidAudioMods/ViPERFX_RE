@@ -204,8 +204,8 @@ void ViPER::processBuffer(float *buffer, uint32_t size) {
 
 }
 
-void ViPER::DispatchCommand(int param_1, int param_2, int param_3, int param_4, int param_5, int param_6,
-                            int param_7) {
+void ViPER::DispatchCommand(int param, int val1, int val2, int val3, int val4, uint32_t arrSize,
+                            signed char *arr) {
     // TODO
 }
 
