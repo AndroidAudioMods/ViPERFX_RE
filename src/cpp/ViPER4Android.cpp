@@ -43,7 +43,7 @@ static int32_t Viper_IProcess(effect_handle_t self, audio_buffer_t *inBuffer, au
     float *outBufferPtr = outBuffer->f32;
 
     if (inBufferPtr != outBufferPtr) {
-        memcpy(outBufferPtr, inBufferPtr, outBuffer->frameCount * sizeof(float) * 2);
+        memcpy(outBufferPtr, inBufferPtr, outBuffer->frameCount * 2 * sizeof(float));
     }
 
     /*return */pContext->viper->processBuffer(outBufferPtr, outBuffer->frameCount);
@@ -144,53 +144,50 @@ static int32_t Viper_ICommand(effect_handle_t self,
         case EFFECT_CMD_SET_PARAM: {
             auto pCmdParam = (effect_param_t *) pCmdData;
 
-            if (pCmdParam->psize != sizeof(int32_t)) {
-                *(int *) pReplyData = -EINVAL;
-                return 0;
-            }
+
 
             // TODO: implement
         }
         case EFFECT_CMD_GET_PARAM: {
-            auto *pCmdParam = (effect_param_t *) pCmdData;
-            auto *pReplyParam = (effect_param_t *) pReplyData;
+            auto *pCmdParam = reinterpret_cast<effect_param_t *>(pCmdData);
+            auto *pReplyParam = reinterpret_cast<effect_param_t *>(pReplyData);
 
-            if (pCmdParam->psize != sizeof(int)) break;
+            // The value offset of an effect parameter is computed by rounding up
+            // the parameter size to the next 32 bit alignment.
+            uint32_t vOffset = ((pCmdParam->psize + sizeof(int32_t) - 1) / sizeof(int32_t)) * sizeof(int32_t);
 
-            switch (*(int *) pCmdParam->data) {
+            memcpy(pReplyParam, pCmdParam, sizeof(effect_param_t) + pCmdParam->psize);
+
+            switch (*(uint32_t *) pCmdParam->data) {
                 case PARAM_GET_DRIVER_VERSION: {
                     pReplyParam->status = 0;
-                    //pReplyParam->psize = sizeof(int32_t); // TODO
-                    pReplyParam->vsize = sizeof(int32_t);
-                    *(int32_t *) pReplyParam->data = 0x2050004; // As original, change as needed
-                    *replySize = 0x14; // As original, TODO: calculate correctly
+                    pReplyParam->vsize = sizeof(uint32_t);
+                    *(uint32_t *) (pReplyParam->data + vOffset) = 0x2050004; // As original, change as needed
+                    *replySize = sizeof(effect_param_t) + pReplyParam->psize + vOffset + pReplyParam->vsize;
                     return 0;
                 }
                 case PARAM_GET_ENABLED: {
                     pReplyParam->status = 0;
-                    //pReplyParam->psize = sizeof(int32_t); // TODO
                     pReplyParam->vsize = sizeof(int32_t);
-                    *(int32_t *) pReplyParam->data = pContext->viper->enabled;
-                    *replySize = 0x14; // As original, TODO: calculate correctly
+                    *(int32_t *) (pReplyParam->data + vOffset) = pContext->viper->enabled;
+                    *replySize = sizeof(effect_param_t) + pReplyParam->psize + vOffset + pReplyParam->vsize;
                     return 0;
                 }
                 case PARAM_GET_CONFIGURE: {
                     pReplyParam->status = 0;
-                    //pReplyParam->psize = sizeof(int32_t); // TODO
                     pReplyParam->vsize = sizeof(int32_t);
-                    *(int32_t *) pReplyParam->data = 1; // TODO?
-                    *replySize = 0x14; // As original, TODO: calculate correctly
+                    *(int32_t *) (pReplyParam->data + vOffset) = 1; // TODO?
+                    *replySize = sizeof(effect_param_t) + pReplyParam->psize + vOffset + pReplyParam->vsize;
                     return 0;
                 }
                 case PARAM_GET_DRVCANWORK: {
                     pReplyParam->status = 0;
-                    //pReplyParam->psize = sizeof(int32_t); // TODO
                     pReplyParam->vsize = sizeof(int32_t);
-                    *(int32_t *) pReplyParam->data = pContext->viper->init_ok;
-                    *replySize = 0x14; // As original, TODO: calculate correctly
+                    *(int32_t *) (pReplyParam->data + vOffset) = pContext->viper->init_ok;
+                    *replySize = sizeof(effect_param_t) + pReplyParam->psize + vOffset + pReplyParam->vsize;
                     return 0;
                 }
-                case PARAM_GET_STREAMING: {
+                case PARAM_GET_STREAMING: { // Is processing
                     struct timeval time{};
                     gettimeofday(&time, nullptr);
 
@@ -200,32 +197,22 @@ static int32_t Viper_ICommand(effect_handle_t self,
                 }
                 case PARAM_GET_SAMPLINGRATE: {
                     pReplyParam->status = 0;
-                    //pReplyParam->psize = sizeof(int32_t); // TODO
-                    pReplyParam->vsize = sizeof(int32_t);
-                    *(uint32_t *) pReplyParam->data = pContext->viper->samplingRate;
-                    *replySize = 0x14; // As original, TODO: calculate correctly
-                    return 0;
-                }
-                case PARAM_GET_CONVUSABLE: {
-                    pReplyParam->status = 0;
-                    //pReplyParam->psize = sizeof(int32_t); // TODO
-                    pReplyParam->vsize = sizeof(int32_t);
-                    *(int32_t *) pReplyParam->data = 1; // TODO: Figure out what is this
-                    *replySize = 0x14; // As original, TODO: calculate correctly
+                    pReplyParam->vsize = sizeof(uint32_t);
+                    *(uint32_t *) (pReplyParam->data + vOffset) = pContext->viper->samplingRate;
+                    *replySize = sizeof(effect_param_t) + pReplyParam->psize + vOffset + pReplyParam->vsize;
                     return 0;
                 }
                 case PARAM_GET_CONVKNLID: {
                     pReplyParam->status = 0;
-                    //pReplyParam->psize = sizeof(int32_t); // TODO
-                    pReplyParam->vsize = sizeof(int32_t);
-                    *(uint32_t *) pReplyParam->data = pContext->viper->convolver->GetKernelID();
-                    *replySize = 0x14; // As original, TODO: calculate correctly
+                    pReplyParam->vsize = sizeof(uint32_t);
+                    *(uint32_t *) (pReplyParam->data + vOffset) = pContext->viper->convolver->GetKernelID();
+                    *replySize = sizeof(effect_param_t) + pReplyParam->psize + vOffset + pReplyParam->vsize;
                     return 0;
                 }
             }
         }
         case EFFECT_CMD_GET_CONFIG: {
-            memcpy(pReplyData, &pContext->config, sizeof(effect_config_t));
+            *(effect_config_t *) pReplyData = pContext->config;
             return 0;
         }
     }
@@ -290,7 +277,7 @@ Viper_Create(const effect_uuid_t *uuid, int32_t sessionId __unused, int32_t ioId
 
     auto *pContext = new ViperContext;
     Viper_Init(pContext);
-    *pHandle = (effect_handle_t) pContext;
+    *pHandle = reinterpret_cast<effect_handle_t>(pContext);
 
     return 0;
 }
