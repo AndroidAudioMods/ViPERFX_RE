@@ -6,6 +6,14 @@ add_compile_definitions(VERSION_MAJOR=1)
 add_compile_definitions(VERSION_MINOR=0)
 add_compile_definitions(VERSION_CODENAME="Reworked")
 
+# NDK Settings
+if (NOT ANDROID_ABI)
+    set(ANDROID_ABI arm64-v8a)
+endif()
+if (NOT ANDROID_PLATFORM)
+    set(ANDROID_PLATFORM android-23)
+endif()
+
 # KISS FFT
 set(KISSFFT_PKGCONFIG OFF)
 set(KISSFFT_STATIC ON)

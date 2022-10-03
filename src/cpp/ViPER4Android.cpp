@@ -142,7 +142,7 @@ static int32_t Viper_ICommand(effect_handle_t self,
             return 0;
         }
         case EFFECT_CMD_SET_PARAM: {
-            auto pCmdParam = (effect_param_t *) pCmdData;
+            auto *pCmdParam = reinterpret_cast<effect_param_t *>(pCmdData);
             // The value offset of an effect parameter is computed by rounding up
             // the parameter size to the next 32 bit alignment.
             uint32_t vOffset = ((pCmdParam->psize + sizeof(int32_t) - 1) / sizeof(int32_t)) * sizeof(int32_t);
@@ -179,7 +179,6 @@ static int32_t Viper_ICommand(effect_handle_t self,
         case EFFECT_CMD_GET_PARAM: {
             auto *pCmdParam = reinterpret_cast<effect_param_t *>(pCmdData);
             auto *pReplyParam = reinterpret_cast<effect_param_t *>(pReplyData);
-
             // The value offset of an effect parameter is computed by rounding up
             // the parameter size to the next 32 bit alignment.
             uint32_t vOffset = ((pCmdParam->psize + sizeof(int32_t) - 1) / sizeof(int32_t)) * sizeof(int32_t);
