@@ -20,10 +20,6 @@ IIRFilter::IIRFilter(uint32_t bands) {
     this->Reset();
 }
 
-IIRFilter::~IIRFilter() {
-
-}
-
 void IIRFilter::Process(float *samples, uint32_t size) {
     if (!this->enable) return;
 
@@ -32,9 +28,20 @@ void IIRFilter::Process(float *samples, uint32_t size) {
 
     for (uint32_t i = 0; i < size; i++) {
         for (uint32_t j = 0; j < 2; j++) {
+            float sample = samples[i * 2 + j];
             float tmp = 0.0;
-            for (uint32_t k = 0; k < this->bands * 16; k++) {
-                samples[2 * i + j];
+            for (uint32_t k = 0; k < this->bands; k++) {
+                uint32_t bufIdx = this->unknown2 + j * 8 + k * 16;
+                this->buf[bufIdx] = sample;
+
+                float coeff1 = coeffs[k * 4];
+                float coeff2 = coeffs[k * 4 + 1];
+                float coeff3 = coeffs[k * 4 + 2];
+
+                float tmp2 = ((coeff3 * this->buf[bufIdx + ((this->unknown3 + 3) - this->unknown2)] + (sample - this->buf[bufIdx + (unknown4 - unknown2)]) * coeff2) - coeff1 * this->buf[bufIdx + ((unknown4 - unknown2) + 3)]);
+
+                this->buf[bufIdx + 3] = tmp2;
+                tmp += tmp2 * this->bandLevelsWithQ[k];
             }
 
             samples[2 * i + j] = tmp;
@@ -58,16 +65,20 @@ void IIRFilter::SetBandLevel(uint32_t band, float level) {
 }
 
 void IIRFilter::SetEnable(bool enable) {
-    this->enable = enable;
-    if (enable) {
-        Reset();
+    if (this->enable != enable) {
+        this->enable = enable;
+        if (enable) {
+            this->Reset();
+        }
     }
 }
 
 void IIRFilter::SetSamplingRate(uint32_t samplingRate) {
-    this->samplingRate = samplingRate;
-    if (this->bands != 0) {
-        this->minPhaseIirCoeffs.UpdateCoeffs(bands, samplingRate);
+    if (this->samplingRate != samplingRate) {
+        this->samplingRate = samplingRate;
+        if (this->bands != 0) {
+            this->minPhaseIirCoeffs.UpdateCoeffs(this->bands, this->samplingRate);
+        }
+        this->Reset();
     }
-    this->Reset();
 }

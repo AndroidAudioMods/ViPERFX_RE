@@ -7,7 +7,6 @@
 class AnalogX {
 public:
     AnalogX();
-    ~AnalogX();
 
     void Process(float *samples, uint32_t size);
     void Reset();

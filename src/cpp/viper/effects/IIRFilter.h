@@ -6,7 +6,6 @@
 class IIRFilter {
 public:
     IIRFilter(uint32_t bands);
-    ~IIRFilter();
 
     void Process(float *samples, uint32_t size);
     void Reset();
