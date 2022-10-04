@@ -206,7 +206,423 @@ void ViPER::processBuffer(float *buffer, uint32_t size) {
 
 void ViPER::DispatchCommand(int param, int val1, int val2, int val3, int val4, uint32_t arrSize,
                             signed char *arr) {
-    // TODO
+    switch (param) {
+        case PARAM_SET_UNKNOWN: {
+            break;
+        }
+        case PARAM_SET_UPDATE_STATUS: {
+            break;
+        }
+        case PARAM_SET_RESET_STATUS: {
+            break;
+        }
+        case PARAM_SET_DOPROCESS_STATUS: {
+            break;
+        }
+        case PARAM_SET_FORCEENABLE_STATUS: {
+            break;
+        }
+        case PARAM_SET_SELFDIAGNOSE_STATUS: {
+            break;
+        }
+        case PARAM_FX_TYPE_SWITCH: {
+            // Unused
+            // TODO: Remove
+            break;
+        } // 0x10001
+        case PARAM_HPFX_CONV_PROCESS_ENABLED: {
+            break;
+        } // 0x10002
+        case PARAM_HPFX_CONV_UPDATEKERNEL: {
+            break;
+        } // 0x10003
+        case PARAM_HPFX_CONV_PREPAREBUFFER: {
+            this->convolver->PrepareKernelBuffer(val1, val2, val3);
+            break;
+        } // 0x10004
+        case PARAM_HPFX_CONV_SETBUFFER: {
+            break;
+        } // 0x10005
+        case PARAM_HPFX_CONV_COMMITBUFFER: {
+            this->convolver->CommitKernelBuffer(val1, val2, val3);
+            break;
+        } // 0x10006
+        case PARAM_HPFX_CONV_CROSSCHANNEL: {
+            break;
+        } // 0x10007
+        case PARAM_HPFX_VHE_PROCESS_ENABLED: {
+            this->vhe->SetEnable(val1 != 0);
+            break;
+        } // 0x10008
+        case PARAM_HPFX_VHE_EFFECT_LEVEL: {
+            this->vhe->SetEffectLevel(val1);
+            break;
+        } // 0x10009
+        case PARAM_HPFX_VDDC_PROCESS_ENABLED: {
+            this->viperDdc->SetEnable(val1 != 0);
+            break;
+        } // 0x1000A
+        case PARAM_HPFX_VDDC_COEFFS: {
+            // TODO: Finish
+            //this->viperDdc->SetCoeffs();
+            break;
+        } // 0x1000B
+        case PARAM_HPFX_VSE_PROCESS_ENABLED: {
+            this->spectrumExtend->SetEnable(val1 != 0);
+            break;
+        } // 0x1000C
+        case PARAM_HPFX_VSE_REFERENCE_BARK: {
+            this->spectrumExtend->SetReferenceFrequency(val1);
+            break;
+        } // 0x1000D
+        case PARAM_HPFX_VSE_BARK_RECONSTRUCT: {
+            this->spectrumExtend->SetExciter((float) val1 / 100.0f);
+            break;
+        } // 0x1000E
+        case PARAM_HPFX_FIREQ_PROCESS_ENABLED: {
+            this->iirFilter->SetEnable(val1 != 0);
+            break;
+        } // 0x1000F
+        case PARAM_HPFX_FIREQ_BANDLEVEL: {
+            this->iirFilter->SetBandLevel(val1, (float) val2 / 100.0f);
+            break;
+        } // 0x10010
+        case PARAM_HPFX_COLM_PROCESS_ENABLED: {
+            this->colorfulMusic->SetEnable(val1 != 0);
+            break;
+        } // 0x10011
+        case PARAM_HPFX_COLM_WIDENING: {
+            this->colorfulMusic->SetWidenValue((float) val1 / 100.0f);
+            break;
+        } // 0x10012
+        case PARAM_HPFX_COLM_MIDIMAGE: {
+            this->colorfulMusic->SetMidImageValue((float) val1 / 100.0f);
+            break;
+        } // 0x10013
+        case PARAM_HPFX_COLM_DEPTH: {
+            this->colorfulMusic->SetDepthValue((short) val1);
+            break;
+        } // 0x10014
+        case PARAM_HPFX_DIFFSURR_PROCESS_ENABLED: {
+            break;
+        } // 0x10015
+        case PARAM_HPFX_DIFFSURR_DELAYTIME: {
+            this->diffSurround->SetDelayTime((float) val1 / 100.0f);
+            break;
+        } // 0x10016
+        case PARAM_HPFX_REVB_PROCESS_ENABLED: {
+            break;
+        } // 0x10017
+        case PARAM_HPFX_REVB_ROOMSIZE: {
+            break;
+        } // 0x10018
+        case PARAM_HPFX_REVB_WIDTH: {
+            this->reverberation->SetWidth((float) val1 / 100.0f);
+            break;
+        } // 0x10019
+        case PARAM_HPFX_REVB_DAMP: {
+            break;
+        } // 0x1001A
+        case PARAM_HPFX_REVB_WET: {
+            break;
+        } // 0x1001B
+        case PARAM_HPFX_REVB_DRY: {
+            break;
+        } // 0x1001C
+        case PARAM_HPFX_AGC_PROCESS_ENABLED: {
+            this->playbackGain->SetEnable(val1 != 0);
+            break;
+        } // 0x1001D
+        case PARAM_HPFX_AGC_RATIO: {
+            this->playbackGain->SetRatio((float) val1 / 100.0f);
+            break;
+        } // 0x1001E
+        case PARAM_HPFX_AGC_VOLUME: {
+            this->playbackGain->SetVolume((float) val1 / 100.0f);
+            break;
+        } // 0x1001F
+        case PARAM_HPFX_AGC_MAXSCALER: {
+            this->playbackGain->SetMaxGainFactor((float) val1 / 100.0f);
+            break;
+        } // 0x10020
+        case PARAM_HPFX_DYNSYS_PROCESS_ENABLED: {
+            this->dynamicSystem->SetEnable(val1 != 0);
+            break;
+        } // 0x10021
+        case PARAM_HPFX_DYNSYS_XCOEFFS: {
+            this->dynamicSystem->SetXCoeffs(val1, val2);
+            break;
+        } // 0x10022
+        case PARAM_HPFX_DYNSYS_YCOEFFS: {
+            this->dynamicSystem->SetYCoeffs(val1, val2);
+            break;
+        } // 0x10023
+        case PARAM_HPFX_DYNSYS_SIDEGAIN: {
+            this->dynamicSystem->SetSideGain((float) val1 / 100.0f, (float) val2 / 100.0f);
+            break;
+        } // 0x10024
+        case PARAM_HPFX_DYNSYS_BASSGAIN: {
+            this->dynamicSystem->SetBassGain((float) val1 / 100.0f);
+            break;
+        } // 0x10025
+        case PARAM_HPFX_VIPERBASS_PROCESS_ENABLED: {
+//            this->viperBass->SetEnable(val1 != 0);
+            break;
+        } // 0x10026
+        case PARAM_HPFX_VIPERBASS_MODE: {
+            this->viperBass->SetProcessMode(static_cast<ViPERBass::ProcessMode>(val1));
+            break;
+        } // 0x10027
+        case PARAM_HPFX_VIPERBASS_SPEAKER: {
+            this->viperBass->SetSpeaker(val1);
+            break;
+        } // 0x10028
+        case PARAM_HPFX_VIPERBASS_BASSGAIN: {
+            this->viperBass->SetBassFactor((float) val1 / 100.0f);
+            break;
+        } // 0x10029
+        case PARAM_HPFX_VIPERCLARITY_PROCESS_ENABLED: {
+            //this->viperClarity->SetEnable(val1 != 0);
+            break;
+        } // 0x1002A
+        case PARAM_HPFX_VIPERCLARITY_MODE: {
+            this->viperClarity->SetProcessMode(static_cast<ViPERClarity::ClarityMode>(val1));
+            break;
+        } // 0x1002B
+        case PARAM_HPFX_VIPERCLARITY_CLARITY: {
+            this->viperClarity->SetClarity((float) val1 / 100.0f);
+            break;
+        } // 0x1002C
+        case PARAM_HPFX_CURE_PROCESS_ENABLED: {
+            this->cure->SetEnable(val1 != 0);
+            break;
+        } // 0x1002D
+        case PARAM_HPFX_CURE_CROSSFEED: {
+            switch (val1) {
+                case 0:
+                    // Cure_R::SetPreset(pCVar17,0x5f028a);
+                    break;
+                case 1:
+                    // Cure_R::SetPreset(pCVar17,0x3c02bc);
+                    break;
+                case 2:
+                    // Cure_R::SetPreset(pCVar17,0x2d02bc);
+                    break;
+            }
+            break;
+        } // 0x1002E
+        case PARAM_HPFX_TUBE_PROCESS_ENABLED: {
+            // TODO: Enable
+            break;
+        } // 0x1002F
+        case PARAM_HPFX_ANALOGX_PROCESS_ENABLED: {
+            // TODO: Enable
+            break;
+        } // 0x10030
+        case PARAM_HPFX_ANALOGX_MODE: {
+            this->analogX->SetProcessingModel(val1);
+            break;
+        } // 0x10031
+        case PARAM_HPFX_OUTPUT_VOLUME: {
+
+            break;
+        } // 0x10032
+        case PARAM_HPFX_OUTPUT_PAN: {
+            float tmp = (float) val1 / 100.0f;
+            if (tmp < 0.0f) {
+                this->left_pan = 1.0f;
+                this->right_pan = 1.0f + tmp;
+            } else {
+                this->left_pan = 1.0f - tmp;
+                this->right_pan = 1.0f;
+            }
+            break;
+        } // 0x10033
+        case PARAM_HPFX_LIMITER_THRESHOLD: {
+            this->softwareLimiters[0]->SetGate((float) val1 / 100.0f);
+            this->softwareLimiters[1]->SetGate((float) val1 / 100.0f);
+            break;
+        } // 0x10034
+        case PARAM_SPKFX_CONV_PROCESS_ENABLED: {
+            break;
+        } // 0x10035
+        case PARAM_SPKFX_CONV_UPDATEKERNEL: {
+            break;
+        } // 0x10036
+        case PARAM_SPKFX_CONV_PREPAREBUFFER: {
+            break;
+        } // 0x10037
+        case PARAM_SPKFX_CONV_SETBUFFER: {
+            break;
+        } // 0x10038
+        case PARAM_SPKFX_CONV_COMMITBUFFER: {
+            break;
+        } // 0x10039
+        case PARAM_SPKFX_CONV_CROSSCHANNEL: {
+            this->convolver->SetCrossChannel((float) val1 / 100.0f);
+            break;
+        } // 0x1003A
+        case PARAM_SPKFX_FIREQ_PROCESS_ENABLED: {
+            break;
+        } // 0x1003B
+        case PARAM_SPKFX_FIREQ_BANDLEVEL: {
+            break;
+        } // 0x1003C
+        case PARAM_SPKFX_REVB_PROCESS_ENABLED: {
+            this->reverberation->SetEnable(val1 != 0);
+            break;
+        } // 0x1003D
+        case PARAM_SPKFX_REVB_ROOMSIZE: {
+            this->reverberation->SetRoomSize((float) val1 / 100.0f);
+            break;
+        } // 0x1003E
+        case PARAM_SPKFX_REVB_WIDTH: {
+            break;
+        } // 0x1003F
+        case PARAM_SPKFX_REVB_DAMP: {
+            this->reverberation->SetDamp((float) val1 / 100.0f);
+            break;
+        } // 0x10040
+        case PARAM_SPKFX_REVB_WET: {
+            this->reverberation->SetWet((float) val1 / 100.0f);
+            break;
+        } // 0x10041
+        case PARAM_SPKFX_REVB_DRY: {
+            this->reverberation->SetDry((float) val1 / 100.0f);
+            break;
+        } // 0x10042
+        case PARAM_SPKFX_AGC_PROCESS_ENABLED: {
+            this->speakerCorrection->SetEnable(val1 != 0);
+            break;
+        } // 0x10043
+        case PARAM_SPKFX_AGC_RATIO: {
+            break;
+        } // 0x10044
+        case PARAM_SPKFX_AGC_VOLUME: {
+            this->playbackGain->SetVolume((float) val1 / 100.0f);
+            break;
+        } // 0x10045
+        case PARAM_SPKFX_AGC_MAXSCALER: {
+            this->playbackGain->SetMaxGainFactor((float) val1 / 100.0f);
+            break;
+        } // 0x10046
+        case PARAM_SPKFX_OUTPUT_VOLUME: {
+            this->frame_scale = (float) val1 / 100.0f;
+            break;
+        } // 0x10047
+        case PARAM_SPKFX_LIMITER_THRESHOLD: {
+            this->frame_scale = (float) val1 / 100.0f;
+            break;
+        } // 0x10048
+        case PARAM_HPFX_FETCOMP_PROCESS_ENABLED: {
+            break;
+        } // 0x10049
+        case PARAM_HPFX_FETCOMP_THRESHOLD: {
+            break;
+        } // 0x1004A
+        case PARAM_HPFX_FETCOMP_RATIO: {
+            this->fetCompressor->SetParameter(1, (float) val1 / 100.0f);
+            break;
+        } // 0x1004B
+        case PARAM_HPFX_FETCOMP_KNEEWIDTH: {
+            break;
+        } // 0x1004C
+        case PARAM_HPFX_FETCOMP_AUTOKNEE_ENABLED: {
+            break;
+        } // 0x1004D
+        case PARAM_HPFX_FETCOMP_GAIN: {
+            break;
+        } // 0x1004E
+        case PARAM_HPFX_FETCOMP_AUTOGAIN_ENABLED: {
+            this->fetCompressor->SetParameter(5, (float) val1 / 100.0f);
+            break;
+        } // 0x1004F
+        case PARAM_HPFX_FETCOMP_ATTACK: {
+            break;
+        } // 0x10050
+        case PARAM_HPFX_FETCOMP_AUTOATTACK_ENABLED: {
+            break;
+        } // 0x10051
+        case PARAM_HPFX_FETCOMP_RELEASE: {
+            break;
+        } // 0x10052
+        case PARAM_HPFX_FETCOMP_AUTORELEASE_ENABLED: {
+            break;
+        } // 0x10053
+        case PARAM_HPFX_FETCOMP_META_KNEEMULTI: {
+            break;
+        } // 0x10054
+        case PARAM_HPFX_FETCOMP_META_MAXATTACK: {
+            break;
+        } // 0x10055
+        case PARAM_HPFX_FETCOMP_META_MAXRELEASE: {
+            this->fetCompressor->SetParameter(12, (float) val1 / 100.0f);
+            break;
+        } // 0x10056
+        case PARAM_HPFX_FETCOMP_META_CREST: {
+            break;
+        } // 0x10057
+        case PARAM_HPFX_FETCOMP_META_ADAPT: {
+            break;
+        } // 0x10058
+        case PARAM_HPFX_FETCOMP_META_NOCLIP_ENABLED: {
+            this->fetCompressor->SetParameter(15, (float) val1 / 100.0f);
+            break;
+        } // 0x10059
+        case PARAM_SPKFX_FETCOMP_PROCESS_ENABLED: {
+            break;
+        } // 0x1005A
+        case PARAM_SPKFX_FETCOMP_THRESHOLD: {
+
+            break;
+        } // 0x1005B
+        case PARAM_SPKFX_FETCOMP_RATIO: {
+            break;
+        } // 0x1005C
+        case PARAM_SPKFX_FETCOMP_KNEEWIDTH: {
+            this->fetCompressor->SetParameter(2, (float) val1 / 100.0f);
+            break;
+        } // 0x1005D
+        case PARAM_SPKFX_FETCOMP_AUTOKNEE_ENABLED: {
+            break;
+        } // 0x1005E
+        case PARAM_SPKFX_FETCOMP_GAIN: {
+            break;
+        } // 0x1005F
+        case PARAM_SPKFX_FETCOMP_AUTOGAIN_ENABLED: {
+            break;
+        } // 0x10060
+        case PARAM_SPKFX_FETCOMP_ATTACK: {
+            break;
+        } // 0x10061
+        case PARAM_SPKFX_FETCOMP_AUTOATTACK_ENABLED: {
+            break;
+        } // 0x10062
+        case PARAM_SPKFX_FETCOMP_RELEASE: {
+            break;
+        } // 0x10063
+        case PARAM_SPKFX_FETCOMP_AUTORELEASE_ENABLED: {
+            break;
+        } // 0x10064
+        case PARAM_SPKFX_FETCOMP_META_KNEEMULTI: {
+            break;
+        } // 0x10065
+        case PARAM_SPKFX_FETCOMP_META_MAXATTACK: {
+            break;
+        } // 0x10066
+        case PARAM_SPKFX_FETCOMP_META_MAXRELEASE: {
+            break;
+        } // 0x10067
+        case PARAM_SPKFX_FETCOMP_META_CREST: {
+            break;
+        } // 0x10068
+        case PARAM_SPKFX_FETCOMP_META_ADAPT: {
+            break;
+        } // 0x10069
+        case PARAM_SPKFX_FETCOMP_META_NOCLIP_ENABLED: {
+            break;
+        } // 0x1006A
+    }
 }
 
 void ViPER::ResetAllEffects() {

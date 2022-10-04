@@ -10,11 +10,10 @@
 #define VIPER_EFFECT_NAME "ViPER4Android"
 
 static effect_descriptor_t viper_descriptor = {
-        // Identical type/uuid to original ViPER4Android
-        .type = {0x00000000, 0x0000, 0x0000, 0x0000, {0x00, 0x00, 0x00, 0x00, 0x00, 0x00}},
-        .uuid = {0x41d3c987, 0xe6cf, 0x11e3, 0xa88a, {0x11, 0xab, 0xa5, 0xd5, 0xc5, 0x1b}},
+        .type = EFFECT_UUID_INITIALIZER,
+        .uuid = {0x90380da3, 0x8536, 0x4744, 0xa6a3, {0x57, 0x31, 0x97, 0x0e, 0x64, 0x0f}},
         .apiVersion = EFFECT_CONTROL_API_VERSION,
-        .flags = EFFECT_FLAG_OUTPUT_BOTH | EFFECT_FLAG_INPUT_BOTH | EFFECT_FLAG_INSERT_LAST | EFFECT_FLAG_TYPE_INSERT,
+        .flags = EFFECT_FLAG_OUTPUT_DIRECT | EFFECT_FLAG_INPUT_DIRECT | EFFECT_FLAG_INSERT_LAST | EFFECT_FLAG_TYPE_INSERT,
         .cpuLoad = 8, // In 0.1 MIPS units as estimated on an ARM9E core (ARMv5TE) with 0 WS
         .memoryUsage = 1, // In KB and includes only dynamically allocated memory
         .name = VIPER_EFFECT_NAME,
@@ -218,8 +217,20 @@ static int32_t Viper_ICommand(effect_handle_t self,
                     struct timeval time{};
                     gettimeofday(&time, nullptr);
 
-                    // TODO: Do some calculations
+                    uint64_t currentMs = (time.tv_sec * 1000) + (time.tv_usec / 1000);
+                    uint64_t lastProcessTime = pContext->viper->process_time_ms;
 
+                    uint64_t diff;
+                    if (currentMs > lastProcessTime) {
+                        diff = currentMs - lastProcessTime;
+                    } else {
+                        diff = lastProcessTime - currentMs;
+                    }
+
+                    pReplyParam->status = 0;
+                    pReplyParam->vsize = sizeof(int32_t);
+                    *(int32_t *) (pReplyParam->data + vOffset) = diff > 5000 ? 0 : 1;
+                    *replySize = sizeof(effect_param_t) + pReplyParam->psize + vOffset + pReplyParam->vsize;
                     return 0;
                 }
                 case PARAM_GET_SAMPLINGRATE: {
