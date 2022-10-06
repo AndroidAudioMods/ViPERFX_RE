@@ -6,7 +6,7 @@ class SoftwareLimiter {
 public:
     SoftwareLimiter();
 
-    void Process(float *samples, uint32_t size);
+    float Process(float sample);
     void ResetLimiter();
     void SetGate(float gate);
 

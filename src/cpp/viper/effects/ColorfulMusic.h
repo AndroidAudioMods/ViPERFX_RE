@@ -7,7 +7,6 @@
 class ColorfulMusic {
 public:
     ColorfulMusic();
-    ~ColorfulMusic();
 
     void Process(float *samples, uint32_t size);
     void Reset();
@@ -18,8 +17,8 @@ public:
     void SetWidenValue(float widenValue);
 
 private:
-    Stereo3DSurround *stereo3DSurround;
-    DepthSurround *depthSurround;
+    Stereo3DSurround stereo3DSurround;
+    DepthSurround depthSurround;
     uint32_t samplingRate;
     bool enabled;
 

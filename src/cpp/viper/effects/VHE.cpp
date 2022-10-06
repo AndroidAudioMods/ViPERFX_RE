@@ -17,7 +17,7 @@ VHE::~VHE() {
     delete bufB;
 }
 
-void VHE::Process(float *source, float *dest, int frameSize) {
+uint32_t VHE::Process(float *source, float *dest, uint32_t frameSize) {
     if (enabled && convLeft.InstanceUsable() && convRight.InstanceUsable()) {
         if (bufA->PushSamples(source, frameSize) != 0) {
             while (bufA->GetBufferOffset() > convSize) {
@@ -27,9 +27,10 @@ void VHE::Process(float *source, float *dest, int frameSize) {
                 bufB->PushSamples(buffer, convSize);
                 bufA->PopSamples(convSize, true);
             }
-            bufB->PopSamples(dest, frameSize, false);
+            return bufB->PopSamples(dest, frameSize, false);
         }
     }
+    return frameSize;
 }
 
 void VHE::Reset() {

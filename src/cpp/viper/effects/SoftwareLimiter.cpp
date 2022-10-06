@@ -11,8 +11,8 @@ SoftwareLimiter::SoftwareLimiter() {
     this->ResetLimiter();
 }
 
-void SoftwareLimiter::Process(float *samples, uint32_t size) {
-
+float SoftwareLimiter::Process(float sample) {
+    return sample;
 }
 
 void SoftwareLimiter::ResetLimiter() {

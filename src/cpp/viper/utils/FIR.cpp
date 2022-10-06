@@ -11,9 +11,9 @@ FIR::FIR() {
 }
 
 FIR::~FIR() {
-    delete this->offsetBlock;
-    delete this->coeffs;
-    delete this->block;
+    delete[] this->offsetBlock;
+    delete[] this->coeffs;
+    delete[] this->block;
 }
 
 void FIR::FilterSamples(float *samples, uint32_t size) {
@@ -57,9 +57,9 @@ uint32_t FIR::GetBlockLength() {
 int FIR::LoadCoefficients(const float *coeffs, uint32_t coeffsSize, uint32_t blockLength) {
     if (coeffs == nullptr || coeffsSize == 0 || blockLength == 0) return 0;
 
-    delete this->offsetBlock;
-    delete this->coeffs;
-    delete this->block;
+    delete[] this->offsetBlock;
+    delete[] this->coeffs;
+    delete[] this->block;
 
     this->offsetBlock = new float[coeffsSize + blockLength + 1];
     this->coeffs = new float[coeffsSize];

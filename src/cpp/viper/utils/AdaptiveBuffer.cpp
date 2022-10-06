@@ -28,7 +28,7 @@ uint32_t AdaptiveBuffer::GetBufferOffset() const {
     return this->offset;
 }
 
-float *AdaptiveBuffer::GetBufferPointer() const {
+float *AdaptiveBuffer::GetBuffer() const {
     return this->buffer;
 }
 

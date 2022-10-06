@@ -24,8 +24,8 @@ void Convolver::PrepareKernelBuffer(uint32_t param_1, uint32_t param_2, int32_t 
 
 }
 
-void Convolver::Process(float *source, float *dest, int32_t frameSize) {
-
+uint32_t Convolver::Process(float *source, float *dest, uint32_t frameSize) {
+    return frameSize;
 }
 
 void Convolver::Reset() {

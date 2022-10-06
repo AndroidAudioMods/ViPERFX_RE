@@ -155,7 +155,7 @@ Polyphase::~Polyphase() {
     delete this->fir2;
     delete this->waveBuffer1;
     delete this->waveBuffer2;
-    delete this->buffer;
+    delete[] this->buffer;
 }
 
 uint32_t Polyphase::GetLatency() {

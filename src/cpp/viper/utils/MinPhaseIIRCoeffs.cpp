@@ -102,7 +102,7 @@ MinPhaseIIRCoeffs::MinPhaseIIRCoeffs() {
 }
 
 MinPhaseIIRCoeffs::~MinPhaseIIRCoeffs() {
-    delete this->coeffs;
+    delete[] this->coeffs;
 }
 
 void MinPhaseIIRCoeffs::Find_F1_F2(double param_2, double param_3, double *param_4, double *param_5) {
@@ -158,7 +158,7 @@ int MinPhaseIIRCoeffs::UpdateCoeffs(uint32_t bands, uint32_t samplingRate) {
     this->bands = bands;
     this->samplingRate = samplingRate;
 
-    delete this->coeffs;
+    delete[] this->coeffs;
     this->coeffs = new float[bands * 4]();
 
     const float *coeffsArray;

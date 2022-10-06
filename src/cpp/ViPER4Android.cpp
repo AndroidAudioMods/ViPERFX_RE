@@ -10,8 +10,12 @@
 #define VIPER_EFFECT_NAME "ViPER4Android"
 
 static effect_descriptor_t viper_descriptor = {
+        // ee48cf24-9221-4095-2cb9-40faa133111b
         .type = EFFECT_UUID_INITIALIZER,
-        .uuid = {0x90380da3, 0x8536, 0x4744, 0xa6a3, {0x57, 0x31, 0x97, 0x0e, 0x64, 0x0f}},
+        // 41d3c987-e6cf-11e3-a88a-11aba5d5c51b
+        // Original: {0x41d3c987, 0xe6cf, 0x11e3, 0xa88a, {0x11, 0xab, 0xa5, 0xd5, 0xc5, 0x1b}}
+        // New: {0x90380da3, 0x8536, 0x4744, 0xa6a3, {0x57, 0x31, 0x97, 0x0e, 0x64, 0x0f}}
+        .uuid = {0x41d3c987, 0xe6cf, 0x11e3, 0xa88a, {0x11, 0xab, 0xa5, 0xd5, 0xc5, 0x1b}},
         .apiVersion = EFFECT_CONTROL_API_VERSION,
         .flags = EFFECT_FLAG_OUTPUT_DIRECT | EFFECT_FLAG_INPUT_DIRECT | EFFECT_FLAG_INSERT_LAST | EFFECT_FLAG_TYPE_INSERT,
         .cpuLoad = 8, // In 0.1 MIPS units as estimated on an ARM9E core (ARMv5TE) with 0 WS
@@ -29,6 +33,12 @@ struct ViperContext {
 
 static int32_t Viper_IProcess(effect_handle_t self, audio_buffer_t *inBuffer, audio_buffer_t *outBuffer) {
     auto pContext = reinterpret_cast<ViperContext *>(self);
+
+    static uint32_t tmp = 0;
+    if (tmp % 50 == 0) {
+        VIPER_LOGD("Viper_IProcess called!");
+    }
+    tmp++;
 
     if (pContext == nullptr ||
         inBuffer == nullptr || outBuffer == nullptr ||
@@ -53,6 +63,13 @@ static int configure(ViperContext *pContext, effect_config_t *newConfig) {
     VIPER_LOGI("Begin audio configure ...");
     VIPER_LOGI("Checking input and output configuration ...");
 
+    VIPER_LOGD("Input sampling rate: %d", newConfig->inputCfg.samplingRate);
+    VIPER_LOGD("Input channels: %d", newConfig->inputCfg.channels);
+    VIPER_LOGD("Input format: %d", newConfig->inputCfg.format);
+    VIPER_LOGD("Output sampling rate: %d", newConfig->outputCfg.samplingRate);
+    VIPER_LOGD("Output channels: %d", newConfig->outputCfg.channels);
+    VIPER_LOGD("Output format: %d", newConfig->outputCfg.format);
+
     if (newConfig->inputCfg.samplingRate != newConfig->outputCfg.samplingRate) {
         VIPER_LOGE("ViPER4Android disabled, reason [in.SR = %d, out.SR = %d]",
                    newConfig->inputCfg.samplingRate, newConfig->outputCfg.samplingRate);
@@ -75,12 +92,14 @@ static int configure(ViperContext *pContext, effect_config_t *newConfig) {
         return -EINVAL;
     }
 
+    // AUDIO_FORMAT_PCM_16_BIT
     if (newConfig->inputCfg.format != AUDIO_FORMAT_PCM_FLOAT) {
         VIPER_LOGE("ViPER4Android disabled, reason [in.FMT = %d]", newConfig->inputCfg.format);
         VIPER_LOGE("We only accept f32 format");
         return -EINVAL;
     }
 
+    // AUDIO_FORMAT_PCM_16_BIT
     if (newConfig->outputCfg.format != AUDIO_FORMAT_PCM_FLOAT) {
         VIPER_LOGE("ViPER4Android disabled, reason [out.FMT = %d]", newConfig->outputCfg.format);
         VIPER_LOGE("We only accept f32 format");
@@ -182,13 +201,15 @@ static int32_t Viper_ICommand(effect_handle_t self,
             // the parameter size to the next 32 bit alignment.
             uint32_t vOffset = ((pCmdParam->psize + sizeof(int32_t) - 1) / sizeof(int32_t)) * sizeof(int32_t);
 
-            memcpy(pReplyParam, pCmdParam, sizeof(effect_param_t) + pCmdParam->psize);
+            VIPER_LOGD("Viper_ICommand() EFFECT_CMD_GET_PARAM called with data = %d, psize = %d, vsize = %d", *(uint32_t *) pCmdParam->data, pCmdParam->psize, pCmdParam->vsize);
+
+            //memcpy(pReplyParam, pCmdParam, sizeof(effect_param_t) + pCmdParam->psize);
 
             switch (*(uint32_t *) pCmdParam->data) {
                 case PARAM_GET_DRIVER_VERSION: {
                     pReplyParam->status = 0;
                     pReplyParam->vsize = sizeof(uint32_t);
-                    *(uint32_t *) (pReplyParam->data + vOffset) = 0x2050004; // As original, change as needed
+                    *(uint32_t *) (pReplyParam->data + vOffset) = 0x2050005; // As original, change as needed
                     *replySize = sizeof(effect_param_t) + pReplyParam->psize + vOffset + pReplyParam->vsize;
                     return 0;
                 }
@@ -203,13 +224,6 @@ static int32_t Viper_ICommand(effect_handle_t self,
                     pReplyParam->status = 0;
                     pReplyParam->vsize = sizeof(int32_t);
                     *(int32_t *) (pReplyParam->data + vOffset) = 1; // TODO?
-                    *replySize = sizeof(effect_param_t) + pReplyParam->psize + vOffset + pReplyParam->vsize;
-                    return 0;
-                }
-                case PARAM_GET_DRVCANWORK: {
-                    pReplyParam->status = 0;
-                    pReplyParam->vsize = sizeof(int32_t);
-                    *(int32_t *) (pReplyParam->data + vOffset) = pContext->viper->init_ok;
                     *replySize = sizeof(effect_param_t) + pReplyParam->psize + vOffset + pReplyParam->vsize;
                     return 0;
                 }
@@ -260,6 +274,8 @@ static int32_t Viper_ICommand(effect_handle_t self,
 
 static int32_t Viper_IGetDescriptor(effect_handle_t self, effect_descriptor_t *pDescriptor) {
     auto pContext = reinterpret_cast<ViperContext *>(self);
+
+    VIPER_LOGD("Viper_IGetDescriptor called");
 
     if (pContext == nullptr || pDescriptor == nullptr) {
         VIPER_LOGE("Viper_IGetDescriptor: pContext or pDescriptor is null!");

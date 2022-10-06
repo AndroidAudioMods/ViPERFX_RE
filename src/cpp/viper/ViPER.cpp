@@ -1,5 +1,6 @@
 #include "ViPER.h"
 #include <ctime>
+#include <cstring>
 #include "constants.h"
 
 ViPER::ViPER() {
@@ -99,14 +100,11 @@ ViPER::ViPER() {
         softwareLimiter->ResetLimiter();
     }
 
-    this->fetcomp_enabled = false;
-    this->init_ok = true;
     this->frame_scale = 1.0;
     this->left_pan = 1.0;
     this->process_time_ms = 0;
     this->right_pan = 1.0;
     this->enabled = false;
-    this->force_enabled = false;
     this->update_status = false;
 }
 
@@ -137,9 +135,14 @@ ViPER::~ViPER() {
 
 // TODO: Return int
 void ViPER::processBuffer(float *buffer, uint32_t size) {
-    if (!this->enabled) return;
-    if (size == 0) return;
-    if (!this->init_ok) return;
+    if (!this->enabled) {
+        VIPER_LOGD("ViPER is disabled, skip processing");
+        return;
+    }
+    if (size == 0) {
+        VIPER_LOGD("Buffer size is 0, skip processing");
+        return;
+    }
 
     if (this->update_status) {
         struct timeval time{};
@@ -148,60 +151,86 @@ void ViPER::processBuffer(float *buffer, uint32_t size) {
     }
 
     uint32_t ret;
+    float *tmpBuf;
+    uint32_t tmpBufSize;
 
-    // if convolver is enabled
-    ret = this->waveBuffer->PushSamples(buffer, size);
-    if (ret == 0) {
-        this->waveBuffer->Reset();
-        return;
+    if (this->convolver->GetEnabled() || this->vhe->GetEnabled()) {
+        if (!this->waveBuffer->PushSamples(buffer, size)) {
+            this->waveBuffer->Reset();
+            return;
+        }
+
+        float *ptr = this->waveBuffer->GetBuffer();
+        ret = this->convolver->Process(ptr, ptr, size);
+        ret = this->vhe->Process(ptr, ptr, ret);
+        this->waveBuffer->SetBufferOffset(ret);
+
+        if (!this->adaptiveBuffer->PushZero(ret)) {
+            this->waveBuffer->Reset();
+            this->adaptiveBuffer->FlushBuffer();
+            return;
+        }
+
+        ptr = this->adaptiveBuffer->GetBuffer();
+        ret = this->waveBuffer->PopSamples(ptr, ret, true);
+        this->adaptiveBuffer->SetBufferOffset(ret);
+
+        tmpBuf = ptr;
+        tmpBufSize = ret;
+    } else {
+        if (this->adaptiveBuffer->PushFrames(buffer, size)) {
+            this->adaptiveBuffer->SetBufferOffset(size);
+
+            tmpBuf = this->adaptiveBuffer->GetBuffer();
+            tmpBufSize = size;
+        } else {
+            this->adaptiveBuffer->FlushBuffer();
+            return;
+        }
     }
 
-    auto pWaveBuffer = this->waveBuffer->GetBuffer();
-    this->convolver->Process(pWaveBuffer, pWaveBuffer, size);
-    this->vhe->Process(pWaveBuffer, pWaveBuffer, size);
-    this->waveBuffer->SetBufferOffset(size);
+    if (tmpBufSize != 0) {
+        this->viperDdc->Process(tmpBuf, size);
+        this->spectrumExtend->Process(tmpBuf, size);
+        this->iirFilter->Process(tmpBuf, tmpBufSize);
+        this->colorfulMusic->Process(tmpBuf, tmpBufSize);
+        this->diffSurround->Process(tmpBuf, tmpBufSize);
+        this->reverberation->Process(tmpBuf, tmpBufSize);
+        this->speakerCorrection->Process(tmpBuf, tmpBufSize);
+        this->playbackGain->Process(tmpBuf, tmpBufSize);
+        this->fetCompressor->Process(tmpBuf, tmpBufSize); // TODO: enable check
+        this->dynamicSystem->Process(tmpBuf, tmpBufSize);
+        this->viperBass->Process(tmpBuf, tmpBufSize);
+        this->viperClarity->Process(tmpBuf, tmpBufSize);
+        this->cure->Process(tmpBuf, tmpBufSize);
+        this->tubeSimulator->TubeProcess(tmpBuf, size);
+        this->analogX->Process(tmpBuf, tmpBufSize);
 
-    ret = this->adaptiveBuffer->PushZero(size);
-    if (ret == 0) {
-        this->waveBuffer->Reset();
-        this->adaptiveBuffer->FlushBuffer();
-        return;
+        if (this->frame_scale != 1.0) {
+            this->adaptiveBuffer->ScaleFrames(this->frame_scale);
+        }
+
+        if (this->left_pan < 1.0 || this->right_pan < 1.0) {
+            this->adaptiveBuffer->PanFrames(this->left_pan, this->right_pan);
+        }
+
+        for (uint32_t i = 0; i < tmpBufSize * 2; i += 2) {
+            tmpBuf[i] = this->softwareLimiters[0]->Process(tmpBuf[i]);
+            tmpBuf[i + 1] = this->softwareLimiters[1]->Process(tmpBuf[i + 1]);
+        }
+
+        if (!this->adaptiveBuffer->PopFrames(buffer, tmpBufSize)) {
+            this->adaptiveBuffer->FlushBuffer();
+            return;
+        }
+
+        if (size <= tmpBufSize) {
+            return;
+        }
     }
 
-    auto pAdaptiveBuffer = this->adaptiveBuffer->GetBufferPointer();
-    ret = this->waveBuffer->PopSamples((float *) pAdaptiveBuffer, size, true);
-    this->adaptiveBuffer->SetBufferOffset(ret);
-
-    pAdaptiveBuffer = this->adaptiveBuffer->GetBufferPointer();
-    if (ret != 0) {
-        this->viperDdc->Process(pAdaptiveBuffer, size);
-        this->spectrumExtend->Process(pAdaptiveBuffer, size);
-        this->iirFilter->Process(pAdaptiveBuffer, ret);
-        this->colorfulMusic->Process(pAdaptiveBuffer, ret);
-        this->diffSurround->Process(pAdaptiveBuffer, ret);
-        this->reverberation->Process(pAdaptiveBuffer, ret);
-        this->speakerCorrection->Process(pAdaptiveBuffer, ret);
-        this->playbackGain->Process(pAdaptiveBuffer, ret);
-        this->fetCompressor->Process(pAdaptiveBuffer, ret);
-        this->dynamicSystem->Process(pAdaptiveBuffer, ret);
-        this->viperBass->Process(pAdaptiveBuffer, ret);
-        this->viperClarity->Process(pAdaptiveBuffer, ret);
-        this->cure->Process(pAdaptiveBuffer, ret);
-        this->tubeSimulator->TubeProcess(pAdaptiveBuffer, size);
-        this->analogX->Process(pAdaptiveBuffer, ret);
-    }
-
-    if (this->frame_scale != 1.0) {
-        this->adaptiveBuffer->ScaleFrames(this->frame_scale);
-    }
-    if (this->left_pan < 1.0 || this->right_pan < 1.0) {
-        this->adaptiveBuffer->PanFrames(this->left_pan, this->right_pan);
-    }
-
-    if (ret << 1 != 0) {
-
-    }
-
+    memmove(buffer + (size - tmpBufSize) * 2, buffer, tmpBufSize * sizeof(float));
+    memset(buffer, 0, (size - tmpBufSize) * sizeof(float));
 }
 
 void ViPER::DispatchCommand(int param, int val1, int val2, int val3, int val4, uint32_t arrSize,

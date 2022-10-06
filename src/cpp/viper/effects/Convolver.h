@@ -11,7 +11,7 @@ public:
     bool GetEnabled();
     uint32_t GetKernelID();
     void PrepareKernelBuffer(uint32_t param_1, uint32_t param_2, int32_t kernelId);
-    void Process(float *source, float *dest, int32_t frameSize);
+    uint32_t Process(float *source, float *dest, uint32_t frameSize);
     void Reset();
     void SetCrossChannel(float param_1);
     void SetEnable(bool enabled);

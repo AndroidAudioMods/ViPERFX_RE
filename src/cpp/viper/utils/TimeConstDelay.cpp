@@ -8,7 +8,7 @@ TimeConstDelay::TimeConstDelay() {
 }
 
 TimeConstDelay::~TimeConstDelay() {
-    delete this->samples;
+    delete[] this->samples;
 }
 
 float TimeConstDelay::ProcessSample(float sample) {
@@ -22,8 +22,8 @@ float TimeConstDelay::ProcessSample(float sample) {
 }
 
 void TimeConstDelay::SetParameters(uint32_t samplingRate, float delay) {
-    this->sampleCount = samplingRate * (uint32_t) ceil(delay);
-    delete this->samples;
+    this->sampleCount = (uint32_t) ((float) samplingRate * delay);
+    delete[] this->samples;
     this->samples = new float[this->sampleCount]();
     this->offset = 0;
 }

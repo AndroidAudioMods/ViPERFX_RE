@@ -10,7 +10,7 @@ public:
     ~VHE();
 
     bool GetEnabled();
-    void Process(float *source, float *dest, int frameSize);
+    uint32_t Process(float *source, float *dest, uint32_t frameSize);
     void Reset();
     void SetEffectLevel(uint32_t level);
     void SetEnable(bool enabled);

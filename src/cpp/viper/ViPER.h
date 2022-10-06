@@ -32,17 +32,15 @@ public:
     void DispatchCommand(int param, int val1, int val2, int val3, int val4, uint32_t arrSize, signed char *arr);
     void ResetAllEffects();
 
+//private:
     bool update_status;
     uint64_t process_time_ms;
-    bool init_ok;
     bool enabled;
-    bool force_enabled;
     uint32_t samplingRate;
 
     // Effects
     AdaptiveBuffer *adaptiveBuffer;
     WaveBuffer *waveBuffer;
-    bool fetcomp_enabled;
     Convolver *convolver;
     VHE *vhe;
     ViPERDDC *viperDdc;

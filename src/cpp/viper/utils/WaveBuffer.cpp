@@ -9,7 +9,7 @@ WaveBuffer::WaveBuffer(uint32_t channels, uint32_t size) {
 }
 
 WaveBuffer::~WaveBuffer() {
-    delete this->buffer;
+    delete[] this->buffer;
 }
 
 uint32_t WaveBuffer::GetBufferOffset() {
@@ -76,7 +76,7 @@ int WaveBuffer::PushSamples(float *source, uint32_t size) {
         if (this->size < requiredSize) {
             auto *buf = new float[requiredSize];
             memcpy(buf, this->buffer, this->index * sizeof(float));
-            delete this->buffer;
+            delete[] this->buffer;
             this->buffer = buf;
             this->size = requiredSize;
         }
@@ -97,7 +97,7 @@ int WaveBuffer::PushZeros(uint32_t size) {
         if (this->size < requiredSize) {
             auto *buf = new float[requiredSize];
             memcpy(buf, this->buffer, this->index * sizeof(float));
-            delete this->buffer;
+            delete[] this->buffer;
             this->buffer = buf;
             this->size = requiredSize;
         }
@@ -120,7 +120,7 @@ float *WaveBuffer::PushZerosGetBuffer(uint32_t size) {
         if (this->size < requiredSize) {
             auto *buf = new float[requiredSize];
             memcpy(buf, this->buffer, this->index * sizeof(float));
-            delete this->buffer;
+            delete[] this->buffer;
             this->buffer = buf;
             this->size = requiredSize;
         }
