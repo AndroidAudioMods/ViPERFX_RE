@@ -10,6 +10,7 @@ public:
 
     void Process(float *samples, uint32_t size);
     void Reset();
+    void SetEnable(bool enable);
     void SetProcessingModel(int processingModel);
     void SetSamplingRate(uint32_t samplingRate);
 
@@ -23,7 +24,7 @@ private:
     uint32_t freqRange;
     int processingModel;
     uint32_t samplingRate;
-    bool enabled;
+    bool enable;
 };
 
 

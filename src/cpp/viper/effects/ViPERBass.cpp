@@ -2,9 +2,10 @@
 #include "../constants.h"
 
 ViPERBass::ViPERBass() {
+    this->enable = false;
     this->samplingRate = DEFAULT_SAMPLERATE;
     this->speaker = 60;
-    this->invertedSamplingRate = 1.0 / DEFAULT_SAMPLERATE;
+    this->samplingRatePeriod = 1.0 / DEFAULT_SAMPLERATE;
     this->antiPop = 0.0;
     this->processMode = ProcessMode::NATURAL_BASS;
     this->bassFactor = 0.0;
@@ -27,6 +28,10 @@ ViPERBass::~ViPERBass() {
 }
 
 void ViPERBass::Process(float *samples, uint32_t size) {
+    if (!this->enable) {
+        return;
+    }
+
     if (size == 0) {
         return;
     }
@@ -36,7 +41,7 @@ void ViPERBass::Process(float *samples, uint32_t size) {
             samples[i] *= this->antiPop;
             samples[i + 1] *= this->antiPop;
             
-            float x = this->antiPop + this->invertedSamplingRate;
+            float x = this->antiPop + this->samplingRatePeriod;
             if (x > 1.0) {
                 x = 1.0;
             }
@@ -48,14 +53,14 @@ void ViPERBass::Process(float *samples, uint32_t size) {
         case ProcessMode::NATURAL_BASS: {
             for (uint32_t i = 0; i < size * 2; i += 2) {
                 double sample = ((double) samples[i] + (double) samples[i + 1]) / 2.0;
-                auto x = (float) this->biquad->ProcessSample(sample);
+                float x = (float) this->biquad->ProcessSample(sample) * this->bassFactor;
                 samples[i] += x;
                 samples[i + 1] += x;
             }
             break;
         }
         case ProcessMode::PURE_BASS_PLUS: {
-            if (this->waveBuffer->PushSamples(samples, size) != 0) {
+            if (this->waveBuffer->PushSamples(samples, size)) {
                 float *buffer = this->waveBuffer->GetBuffer();
                 uint32_t bufferOffset = this->waveBuffer->GetBufferOffset();
 
@@ -90,14 +95,23 @@ void ViPERBass::Reset() {
     this->waveBuffer->PushZeros(this->polyphase->GetLatency());
     this->subwoofer->SetBassGain(this->samplingRate, this->bassFactor * 2.5f);
     this->biquad->SetLowPassParameter((float) this->speaker, this->samplingRate, 0.53);
+    this->samplingRatePeriod = 1.0f / (float) this->samplingRate;
     this->antiPop = 0.0f;
-    this->invertedSamplingRate = 1.0f / (float) this->samplingRate;
 }
 
 void ViPERBass::SetBassFactor(float bassFactor) {
     if (this->bassFactor != bassFactor) {
         this->bassFactor = bassFactor;
         this->subwoofer->SetBassGain(this->samplingRate, this->bassFactor * 2.5f);
+    }
+}
+
+void ViPERBass::SetEnable(bool enable) {
+    if (this->enable != enable) {
+        if (!this->enable) {
+            Reset();
+        }
+        this->enable = enable;
     }
 }
 
@@ -111,10 +125,10 @@ void ViPERBass::SetProcessMode(ProcessMode processMode) {
 void ViPERBass::SetSamplingRate(uint32_t samplingRate) {
     if (this->samplingRate != samplingRate) {
         this->samplingRate = samplingRate;
-        this->invertedSamplingRate = 1.0f / (float) samplingRate;
-        this->polyphase->SetSamplingRate(samplingRate);
-        this->biquad->SetLowPassParameter((float) this->speaker, samplingRate, 0.53);
-        this->subwoofer->SetBassGain(samplingRate, this->bassFactor * 2.5f);
+        this->samplingRatePeriod = 1.0f / (float) samplingRate;
+        this->polyphase->SetSamplingRate(this->samplingRate);
+        this->biquad->SetLowPassParameter((float) this->speaker, this->samplingRate, 0.53);
+        this->subwoofer->SetBassGain(this->samplingRate, this->bassFactor * 2.5f);
     }
 }
 

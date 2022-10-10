@@ -8,7 +8,7 @@ IIRFilter::IIRFilter(uint32_t bands) {
     this->samplingRate = DEFAULT_SAMPLERATE;
     if (bands == 10 || bands == 15 || bands == 25 || bands == 31) {
         this->bands = bands;
-        this->minPhaseIirCoeffs.UpdateCoeffs(bands, this->samplingRate);
+        this->minPhaseIirCoeffs.UpdateCoeffs(this->bands, this->samplingRate);
     } else {
         this->bands = 0;
     }
@@ -17,7 +17,7 @@ IIRFilter::IIRFilter(uint32_t bands) {
         bandLevelWithQ = 0.636;
     }
 
-    this->Reset();
+    Reset();
 }
 
 void IIRFilter::Process(float *samples, uint32_t size) {
@@ -54,14 +54,16 @@ void IIRFilter::Process(float *samples, uint32_t size) {
 }
 
 void IIRFilter::Reset() {
-    memset(this->buf,0,0x7c0);
+    memset(this->buf,0,sizeof(buf)); // size should be 0x7c0
     this->unknown3 = 1;
     this->unknown2 = 2;
     this->unknown4 = 0;
 }
 
 void IIRFilter::SetBandLevel(uint32_t band, float level) {
-    this->bandLevelsWithQ[band] = (float) (pow(10.0, level / 20.0) * 0.636);
+    if (band > 30) return;
+    double bandLevel = pow(10.0, level / 20.0);
+    this->bandLevelsWithQ[band] = (float) (bandLevel * 0.636);
 }
 
 void IIRFilter::SetEnable(bool enable) {

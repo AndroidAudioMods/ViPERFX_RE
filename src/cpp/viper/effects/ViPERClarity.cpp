@@ -8,13 +8,18 @@ ViPERClarity::ViPERClarity() {
         highShelf.SetSamplingRate(DEFAULT_SAMPLERATE);
     }
 
+    this->enable = false;
     this->processMode = ClarityMode::NATURAL;
     this->samplingRate = DEFAULT_SAMPLERATE;
     this->clarityGainPercent = 0.0;
-    this->Reset();
+    Reset();
 }
 
 void ViPERClarity::Process(float *samples, uint32_t size) {
+    if (!this->enable) {
+        return;
+    }
+
     switch (this->processMode) {
         case ClarityMode::NATURAL: {
             this->noiseSharpening.Process(samples, size);
@@ -50,7 +55,7 @@ void ViPERClarity::SetClarity(float gainPercent) {
     if (this->processMode != ClarityMode::OZONE) {
         this->SetClarityToFilter();
     } else {
-        this->Reset();
+        Reset();
     }
 }
 
@@ -61,16 +66,25 @@ void ViPERClarity::SetClarityToFilter() {
     this->hifi.SetClarity(this->clarityGainPercent + 1.0f);
 }
 
+void ViPERClarity::SetEnable(bool enable) {
+    if (this->enable != enable) {
+        if (!this->enable) {
+            Reset();
+        }
+        this->enable = enable;
+    }
+}
+
 void ViPERClarity::SetProcessMode(ClarityMode processMode) {
     if (this->processMode != processMode) {
         this->processMode = processMode;
-        this->Reset();
+        Reset();
     }
 }
 
 void ViPERClarity::SetSamplingRate(uint32_t samplingRate) {
     if (this->samplingRate != samplingRate) {
         this->samplingRate = samplingRate;
-        this->Reset();
+        Reset();
     }
 }

@@ -144,7 +144,7 @@ Polyphase::Polyphase(int unknown1) {
     if (unknown1 == 2) {
         this->fir1->LoadCoefficients(POLYPHASE_COEFFICIENTS_2, sizeof(POLYPHASE_COEFFICIENTS_2) / sizeof(float), 1008);
         this->fir2->LoadCoefficients(POLYPHASE_COEFFICIENTS_2, sizeof(POLYPHASE_COEFFICIENTS_2) / sizeof(float), 1008);
-    } else if (unknown1 > 2) {
+    } else { // if (unknown1 < 2)
         this->fir1->LoadCoefficients(POLYPHASE_COEFFICIENTS_OTHER, sizeof(POLYPHASE_COEFFICIENTS_OTHER) / sizeof(float), 1008);
         this->fir2->LoadCoefficients(POLYPHASE_COEFFICIENTS_OTHER, sizeof(POLYPHASE_COEFFICIENTS_OTHER) / sizeof(float), 1008);
     }
@@ -163,21 +163,23 @@ uint32_t Polyphase::GetLatency() {
 }
 
 uint32_t Polyphase::Process(float *samples, uint32_t size) {
-    if (this->waveBuffer1->PushSamples(samples, size) != 0) {
-        uint32_t bufferOffset = this->waveBuffer1->GetBufferOffset();
-        while (bufferOffset >= 1008) {
+    if (this->waveBuffer1->PushSamples(samples, size)) {
+        while (this->waveBuffer1->GetBufferOffset() >= 1008) {
             if (this->waveBuffer1->PopSamples(this->buffer, 1008, false) == 1008) {
                 this->fir1->FilterSamplesInterleaved(this->buffer, 1008, 2);
                 this->fir2->FilterSamplesInterleaved(this->buffer + 1, 1008, 2);
                 this->waveBuffer2->PushSamples(this->buffer, 1008);
             }
-            bufferOffset = this->waveBuffer1->GetBufferOffset();
         }
-        if (this->waveBuffer2->GetBufferOffset() >= size) {
-            this->waveBuffer2->PopSamples(samples, size, true);
+
+        if (this->waveBuffer2->GetBufferOffset() < size) {
+            return 0;
         }
+
+        this->waveBuffer2->PopSamples(samples, size, true);
     }
-    return 0;
+
+    return size;
 }
 
 void Polyphase::Reset() {

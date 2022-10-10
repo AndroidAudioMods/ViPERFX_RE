@@ -19,6 +19,7 @@ public:
     void Reset();
     void SetClarity(float gainPercent);
     void SetClarityToFilter();
+    void SetEnable(bool enable);
     void SetProcessMode(ClarityMode processMode);
     void SetSamplingRate(uint32_t samplingRate);
 
@@ -26,6 +27,7 @@ private:
     NoiseSharpening noiseSharpening;
     HighShelf highShelf[2];
     HiFi hifi;
+    bool enable;
     ClarityMode processMode;
     uint32_t samplingRate;
     float clarityGainPercent;

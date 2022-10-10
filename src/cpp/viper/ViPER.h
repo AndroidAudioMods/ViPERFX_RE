@@ -33,8 +33,8 @@ public:
     void ResetAllEffects();
 
 //private:
-    bool update_status;
-    uint64_t process_time_ms;
+    bool updateProcessTime;
+    uint64_t processTimeMs;
     bool enabled;
     uint32_t samplingRate;
 
@@ -60,7 +60,7 @@ public:
     SpeakerCorrection *speakerCorrection;
     SoftwareLimiter *softwareLimiters[2];
 
-    float frame_scale;
-    float left_pan;
-    float right_pan;
+    float frameScale;
+    float leftPan;
+    float rightPan;
 };

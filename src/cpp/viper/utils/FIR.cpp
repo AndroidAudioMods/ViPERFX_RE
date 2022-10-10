@@ -28,10 +28,10 @@ void FIR::FilterSamplesInterleaved(float *samples, uint32_t size, uint32_t chann
     }
 
     if (this->blockLength > size) {
-        memset(&this->block[size], 0, (this->blockLength - size) * sizeof(float));
+        memset(this->block + size, 0, (this->blockLength - size) * sizeof(float));
     }
 
-    memcpy(&this->offsetBlock[this->coeffsSize - 1], this->block, this->blockLength * sizeof(float));
+    memcpy(this->offsetBlock + this->coeffsSize - 1, this->block, this->blockLength * sizeof(float));
 
     for (uint32_t i = 0; i < this->blockLength; i++) {
         float sample = 0.0f;
@@ -46,7 +46,7 @@ void FIR::FilterSamplesInterleaved(float *samples, uint32_t size, uint32_t chann
     }
 
     if (this->coeffsSize > 1) {
-        memcpy(&this->offsetBlock[this->coeffsSize - 2], &this->block[this->blockLength - 1], this->blockLength - (this->coeffsSize - 1) * sizeof(float));
+        memcpy(this->offsetBlock + this->coeffsSize - 2, this->block + this->blockLength - 1, this->blockLength - (this->coeffsSize - 1) * sizeof(float));
     }
 }
 

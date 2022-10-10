@@ -27,13 +27,15 @@ SpectrumExtend::~SpectrumExtend() {
 }
 
 void SpectrumExtend::Process(float *samples, uint32_t size) {
-    for (int i = 0; i < size * 2; i++) {
-        float sample = samples[i];
-        int index = i % 2;
-        float tmp = this->highpass[index].ProcessSample(sample);
-        tmp = this->harmonics[index].Process(tmp);
-        tmp = this->lowpass[index].ProcessSample(tmp * this->exciter);
-        samples[i] = samples[i] + tmp;
+    if (this->enabled) {
+        for (int i = 0; i < size * 2; i++) {
+            float sample = samples[i];
+            int index = i % 2;
+            float tmp = this->highpass[index].ProcessSample(sample);
+            tmp = this->harmonics[index].Process(tmp);
+            tmp = this->lowpass[index].ProcessSample(tmp * this->exciter);
+            samples[i] = samples[i] + tmp;
+        }
     }
 }
 

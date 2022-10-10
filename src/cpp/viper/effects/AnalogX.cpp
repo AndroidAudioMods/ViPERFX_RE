@@ -18,27 +18,29 @@ static float ANALOGX_HARMONICS[10] = {
 AnalogX::AnalogX() {
     this->samplingRate = DEFAULT_SAMPLERATE;
     this->processingModel = 0;
-    this->enabled = false;
+    this->enable = false;
     Reset();
 }
 
 void AnalogX::Process(float *samples, uint32_t size) {
-    for (int i = 0; i < size * 2; i++) {
-        float sample = samples[i];
-        int channel = i % 2;
+    if (this->enable) {
+        for (int i = 0; i < size * 2; i++) {
+            float sample = samples[i];
+            int channel = i % 2;
 
-        float tmp = this->highpass[channel].ProcessSample(sample);
-        tmp = this->harmonic[channel].Process(tmp);
+            float tmp = this->highpass[channel].ProcessSample(sample);
+            tmp = this->harmonic[channel].Process(tmp);
 
-        tmp = this->lowpass[channel].ProcessSample(sample + tmp * this->gain);
-        tmp = this->peak->ProcessSample(tmp * 0.8f);
+            tmp = this->lowpass[channel].ProcessSample(sample + tmp * this->gain);
+            tmp = this->peak->ProcessSample(tmp * 0.8f);
 
-        samples[i] = tmp;
-    }
+            samples[i] = tmp;
+        }
 
-    if (this->freqRange < this->samplingRate / 4) {
-        this->freqRange += size;
-        memset(samples, 0, size * 2 * sizeof(float));
+        if (this->freqRange < this->samplingRate / 4) {
+            this->freqRange += size;
+            memset(samples, 0, size * 2 * sizeof(float));
+        }
     }
 }
 
@@ -88,6 +90,15 @@ void AnalogX::Reset() {
     }
 
     this->freqRange = 0;
+}
+
+void AnalogX::SetEnable(bool enable) {
+    if (this->enable != enable) {
+        if (!this->enable) {
+            Reset();
+        }
+        this->enable = enable;
+    }
 }
 
 void AnalogX::SetProcessingModel(int processingModel) {

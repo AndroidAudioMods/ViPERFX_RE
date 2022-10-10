@@ -20,6 +20,7 @@ public:
     void Process(float *samples, uint32_t size);
     void Reset();
     void SetBassFactor(float bassFactor);
+    void SetEnable(bool enable);
     void SetProcessMode(ProcessMode processMode);
     void SetSamplingRate(uint32_t samplingRate);
     void SetSpeaker(uint32_t speaker);
@@ -29,9 +30,10 @@ private:
     Biquad *biquad;
     Subwoofer *subwoofer;
     WaveBuffer *waveBuffer;
+    bool enable;
     ProcessMode processMode;
     uint32_t samplingRate;
-    float invertedSamplingRate;
+    float samplingRatePeriod;
     float antiPop;
     uint32_t speaker;
     float bassFactor;

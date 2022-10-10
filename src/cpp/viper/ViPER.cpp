@@ -7,6 +7,8 @@ ViPER::ViPER() {
     VIPER_LOGI("Welcome to ViPER FX");
     VIPER_LOGI("Current version is %s %s", VERSION_STRING, VERSION_CODENAME);
 
+    this->samplingRate = DEFAULT_SAMPLERATE;
+
     this->adaptiveBuffer = new AdaptiveBuffer(2, 4096);
     this->waveBuffer = new WaveBuffer(2, 4096);
 
@@ -81,11 +83,11 @@ ViPER::ViPER() {
     this->cure->Reset();
 
     this->tubeSimulator = new TubeSimulator();
-    this->tubeSimulator->enabled = false; //SetEnable(false);
+    this->tubeSimulator->SetEnable(false);
     this->tubeSimulator->Reset();
 
     this->analogX = new AnalogX();
-//    this->analogX->SetEnable(false);
+    this->analogX->SetEnable(false);
     this->analogX->SetSamplingRate(this->samplingRate);
     this->analogX->SetProcessingModel(0);
     this->analogX->Reset();
@@ -100,12 +102,12 @@ ViPER::ViPER() {
         softwareLimiter->ResetLimiter();
     }
 
-    this->frame_scale = 1.0;
-    this->left_pan = 1.0;
-    this->process_time_ms = 0;
-    this->right_pan = 1.0;
+    this->frameScale = 1.0;
+    this->leftPan = 1.0;
+    this->rightPan = 1.0;
+    this->updateProcessTime = false;
+    this->processTimeMs = 0;
     this->enabled = false;
-    this->update_status = false;
 }
 
 ViPER::~ViPER() {
@@ -144,10 +146,10 @@ void ViPER::processBuffer(float *buffer, uint32_t size) {
         return;
     }
 
-    if (this->update_status) {
+    if (this->updateProcessTime) {
         struct timeval time{};
         gettimeofday(&time, nullptr);
-        this->process_time_ms = time.tv_sec * 1000 + time.tv_usec / 1000;
+        this->processTimeMs = time.tv_sec * 1000 + time.tv_usec / 1000;
     }
 
     uint32_t ret;
@@ -155,6 +157,8 @@ void ViPER::processBuffer(float *buffer, uint32_t size) {
     uint32_t tmpBufSize;
 
     if (this->convolver->GetEnabled() || this->vhe->GetEnabled()) {
+        VIPER_LOGD("Convolver or VHE is enable, use wave buffer");
+
         if (!this->waveBuffer->PushSamples(buffer, size)) {
             this->waveBuffer->Reset();
             return;
@@ -178,6 +182,8 @@ void ViPER::processBuffer(float *buffer, uint32_t size) {
         tmpBuf = ptr;
         tmpBufSize = ret;
     } else {
+        VIPER_LOGD("Convolver and VHE are disabled, use adaptive buffer");
+
         if (this->adaptiveBuffer->PushFrames(buffer, size)) {
             this->adaptiveBuffer->SetBufferOffset(size);
 
@@ -189,6 +195,7 @@ void ViPER::processBuffer(float *buffer, uint32_t size) {
         }
     }
 
+//    VIPER_LOGD("Process buffer size: %d", tmpBufSize);
     if (tmpBufSize != 0) {
         this->viperDdc->Process(tmpBuf, size);
         this->spectrumExtend->Process(tmpBuf, size);
@@ -206,12 +213,12 @@ void ViPER::processBuffer(float *buffer, uint32_t size) {
         this->tubeSimulator->TubeProcess(tmpBuf, size);
         this->analogX->Process(tmpBuf, tmpBufSize);
 
-        if (this->frame_scale != 1.0) {
-            this->adaptiveBuffer->ScaleFrames(this->frame_scale);
+        if (this->frameScale != 1.0) {
+            this->adaptiveBuffer->ScaleFrames(this->frameScale);
         }
 
-        if (this->left_pan < 1.0 || this->right_pan < 1.0) {
-            this->adaptiveBuffer->PanFrames(this->left_pan, this->right_pan);
+        if (this->leftPan < 1.0 || this->rightPan < 1.0) {
+            this->adaptiveBuffer->PanFrames(this->leftPan, this->rightPan);
         }
 
         for (uint32_t i = 0; i < tmpBufSize * 2; i += 2) {
@@ -235,41 +242,26 @@ void ViPER::processBuffer(float *buffer, uint32_t size) {
 
 void ViPER::DispatchCommand(int param, int val1, int val2, int val3, int val4, uint32_t arrSize,
                             signed char *arr) {
+    VIPER_LOGD("Dispatch command: %d, %d, %d, %d, %d, %d, %p", param, val1, val2, val3, val4, arrSize, arr);
     switch (param) {
-        case PARAM_SET_UNKNOWN: {
-            break;
-        }
         case PARAM_SET_UPDATE_STATUS: {
+            this->updateProcessTime = val1 != 0;
             break;
         }
         case PARAM_SET_RESET_STATUS: {
+            this->ResetAllEffects();
             break;
         }
-        case PARAM_SET_DOPROCESS_STATUS: {
-            break;
-        }
-        case PARAM_SET_FORCEENABLE_STATUS: {
-            break;
-        }
-        case PARAM_SET_SELFDIAGNOSE_STATUS: {
-            break;
-        }
-        case PARAM_FX_TYPE_SWITCH: {
-            // Unused
-            // TODO: Remove
-            break;
-        } // 0x10001
         case PARAM_HPFX_CONV_PROCESS_ENABLED: {
+//            this->convolver->SetEnabled(val1 != 0);
             break;
         } // 0x10002
-        case PARAM_HPFX_CONV_UPDATEKERNEL: {
-            break;
-        } // 0x10003
         case PARAM_HPFX_CONV_PREPAREBUFFER: {
             this->convolver->PrepareKernelBuffer(val1, val2, val3);
             break;
         } // 0x10004
         case PARAM_HPFX_CONV_SETBUFFER: {
+            this->convolver->SetKernelBuffer(val1, (float *) arr, arrSize);
             break;
         } // 0x10005
         case PARAM_HPFX_CONV_COMMITBUFFER: {
@@ -277,6 +269,7 @@ void ViPER::DispatchCommand(int param, int val1, int val2, int val3, int val4, u
             break;
         } // 0x10006
         case PARAM_HPFX_CONV_CROSSCHANNEL: {
+            this->convolver->SetCrossChannel((float) val1 / 100.0f);
             break;
         } // 0x10007
         case PARAM_HPFX_VHE_PROCESS_ENABLED: {
@@ -333,6 +326,7 @@ void ViPER::DispatchCommand(int param, int val1, int val2, int val3, int val4, u
             break;
         } // 0x10014
         case PARAM_HPFX_DIFFSURR_PROCESS_ENABLED: {
+            this->diffSurround->SetEnable(val1 != 0);
             break;
         } // 0x10015
         case PARAM_HPFX_DIFFSURR_DELAYTIME: {
@@ -340,9 +334,11 @@ void ViPER::DispatchCommand(int param, int val1, int val2, int val3, int val4, u
             break;
         } // 0x10016
         case PARAM_HPFX_REVB_PROCESS_ENABLED: {
+            this->reverberation->SetEnable(val1 != 0);
             break;
         } // 0x10017
         case PARAM_HPFX_REVB_ROOMSIZE: {
+            this->reverberation->SetRoomSize((float) val1 / 100.0f);
             break;
         } // 0x10018
         case PARAM_HPFX_REVB_WIDTH: {
@@ -350,12 +346,15 @@ void ViPER::DispatchCommand(int param, int val1, int val2, int val3, int val4, u
             break;
         } // 0x10019
         case PARAM_HPFX_REVB_DAMP: {
+            this->reverberation->SetDamp((float) val1 / 100.0f);
             break;
         } // 0x1001A
         case PARAM_HPFX_REVB_WET: {
+            this->reverberation->SetWet((float) val1 / 100.0f);
             break;
         } // 0x1001B
         case PARAM_HPFX_REVB_DRY: {
+            this->reverberation->SetDry((float) val1 / 100.0f);
             break;
         } // 0x1001C
         case PARAM_HPFX_AGC_PROCESS_ENABLED: {
@@ -395,11 +394,11 @@ void ViPER::DispatchCommand(int param, int val1, int val2, int val3, int val4, u
             break;
         } // 0x10025
         case PARAM_HPFX_VIPERBASS_PROCESS_ENABLED: {
-//            this->viperBass->SetEnable(val1 != 0);
+            this->viperBass->SetEnable(val1 != 0);
             break;
         } // 0x10026
         case PARAM_HPFX_VIPERBASS_MODE: {
-            this->viperBass->SetProcessMode(static_cast<ViPERBass::ProcessMode>(val1));
+            this->viperBass->SetProcessMode((ViPERBass::ProcessMode) val1);
             break;
         } // 0x10027
         case PARAM_HPFX_VIPERBASS_SPEAKER: {
@@ -411,11 +410,11 @@ void ViPER::DispatchCommand(int param, int val1, int val2, int val3, int val4, u
             break;
         } // 0x10029
         case PARAM_HPFX_VIPERCLARITY_PROCESS_ENABLED: {
-            //this->viperClarity->SetEnable(val1 != 0);
+            this->viperClarity->SetEnable(val1 != 0);
             break;
         } // 0x1002A
         case PARAM_HPFX_VIPERCLARITY_MODE: {
-            this->viperClarity->SetProcessMode(static_cast<ViPERClarity::ClarityMode>(val1));
+            this->viperClarity->SetProcessMode((ViPERClarity::ClarityMode) val1);
             break;
         } // 0x1002B
         case PARAM_HPFX_VIPERCLARITY_CLARITY: {
@@ -441,11 +440,11 @@ void ViPER::DispatchCommand(int param, int val1, int val2, int val3, int val4, u
             break;
         } // 0x1002E
         case PARAM_HPFX_TUBE_PROCESS_ENABLED: {
-            // TODO: Enable
+            this->tubeSimulator->SetEnable(val1 != 0);
             break;
         } // 0x1002F
         case PARAM_HPFX_ANALOGX_PROCESS_ENABLED: {
-            // TODO: Enable
+            this->analogX->SetEnable(val1 != 0);
             break;
         } // 0x10030
         case PARAM_HPFX_ANALOGX_MODE: {
@@ -453,17 +452,17 @@ void ViPER::DispatchCommand(int param, int val1, int val2, int val3, int val4, u
             break;
         } // 0x10031
         case PARAM_HPFX_OUTPUT_VOLUME: {
-
+            this->frameScale = (float) val1 / 100.0f;
             break;
         } // 0x10032
         case PARAM_HPFX_OUTPUT_PAN: {
             float tmp = (float) val1 / 100.0f;
             if (tmp < 0.0f) {
-                this->left_pan = 1.0f;
-                this->right_pan = 1.0f + tmp;
+                this->leftPan = 1.0f;
+                this->rightPan = 1.0f + tmp;
             } else {
-                this->left_pan = 1.0f - tmp;
-                this->right_pan = 1.0f;
+                this->leftPan = 1.0f - tmp;
+                this->rightPan = 1.0f;
             }
             break;
         } // 0x10033
@@ -472,77 +471,10 @@ void ViPER::DispatchCommand(int param, int val1, int val2, int val3, int val4, u
             this->softwareLimiters[1]->SetGate((float) val1 / 100.0f);
             break;
         } // 0x10034
-        case PARAM_SPKFX_CONV_PROCESS_ENABLED: {
-            break;
-        } // 0x10035
-        case PARAM_SPKFX_CONV_UPDATEKERNEL: {
-            break;
-        } // 0x10036
-        case PARAM_SPKFX_CONV_PREPAREBUFFER: {
-            break;
-        } // 0x10037
-        case PARAM_SPKFX_CONV_SETBUFFER: {
-            break;
-        } // 0x10038
-        case PARAM_SPKFX_CONV_COMMITBUFFER: {
-            break;
-        } // 0x10039
-        case PARAM_SPKFX_CONV_CROSSCHANNEL: {
-            this->convolver->SetCrossChannel((float) val1 / 100.0f);
-            break;
-        } // 0x1003A
-        case PARAM_SPKFX_FIREQ_PROCESS_ENABLED: {
-            break;
-        } // 0x1003B
-        case PARAM_SPKFX_FIREQ_BANDLEVEL: {
-            break;
-        } // 0x1003C
-        case PARAM_SPKFX_REVB_PROCESS_ENABLED: {
-            this->reverberation->SetEnable(val1 != 0);
-            break;
-        } // 0x1003D
-        case PARAM_SPKFX_REVB_ROOMSIZE: {
-            this->reverberation->SetRoomSize((float) val1 / 100.0f);
-            break;
-        } // 0x1003E
-        case PARAM_SPKFX_REVB_WIDTH: {
-            break;
-        } // 0x1003F
-        case PARAM_SPKFX_REVB_DAMP: {
-            this->reverberation->SetDamp((float) val1 / 100.0f);
-            break;
-        } // 0x10040
-        case PARAM_SPKFX_REVB_WET: {
-            this->reverberation->SetWet((float) val1 / 100.0f);
-            break;
-        } // 0x10041
-        case PARAM_SPKFX_REVB_DRY: {
-            this->reverberation->SetDry((float) val1 / 100.0f);
-            break;
-        } // 0x10042
         case PARAM_SPKFX_AGC_PROCESS_ENABLED: {
             this->speakerCorrection->SetEnable(val1 != 0);
             break;
         } // 0x10043
-        case PARAM_SPKFX_AGC_RATIO: {
-            break;
-        } // 0x10044
-        case PARAM_SPKFX_AGC_VOLUME: {
-            this->playbackGain->SetVolume((float) val1 / 100.0f);
-            break;
-        } // 0x10045
-        case PARAM_SPKFX_AGC_MAXSCALER: {
-            this->playbackGain->SetMaxGainFactor((float) val1 / 100.0f);
-            break;
-        } // 0x10046
-        case PARAM_SPKFX_OUTPUT_VOLUME: {
-            this->frame_scale = (float) val1 / 100.0f;
-            break;
-        } // 0x10047
-        case PARAM_SPKFX_LIMITER_THRESHOLD: {
-            this->frame_scale = (float) val1 / 100.0f;
-            break;
-        } // 0x10048
         case PARAM_HPFX_FETCOMP_PROCESS_ENABLED: {
             break;
         } // 0x10049
@@ -598,59 +530,6 @@ void ViPER::DispatchCommand(int param, int val1, int val2, int val3, int val4, u
             this->fetCompressor->SetParameter(15, (float) val1 / 100.0f);
             break;
         } // 0x10059
-        case PARAM_SPKFX_FETCOMP_PROCESS_ENABLED: {
-            break;
-        } // 0x1005A
-        case PARAM_SPKFX_FETCOMP_THRESHOLD: {
-
-            break;
-        } // 0x1005B
-        case PARAM_SPKFX_FETCOMP_RATIO: {
-            break;
-        } // 0x1005C
-        case PARAM_SPKFX_FETCOMP_KNEEWIDTH: {
-            this->fetCompressor->SetParameter(2, (float) val1 / 100.0f);
-            break;
-        } // 0x1005D
-        case PARAM_SPKFX_FETCOMP_AUTOKNEE_ENABLED: {
-            break;
-        } // 0x1005E
-        case PARAM_SPKFX_FETCOMP_GAIN: {
-            break;
-        } // 0x1005F
-        case PARAM_SPKFX_FETCOMP_AUTOGAIN_ENABLED: {
-            break;
-        } // 0x10060
-        case PARAM_SPKFX_FETCOMP_ATTACK: {
-            break;
-        } // 0x10061
-        case PARAM_SPKFX_FETCOMP_AUTOATTACK_ENABLED: {
-            break;
-        } // 0x10062
-        case PARAM_SPKFX_FETCOMP_RELEASE: {
-            break;
-        } // 0x10063
-        case PARAM_SPKFX_FETCOMP_AUTORELEASE_ENABLED: {
-            break;
-        } // 0x10064
-        case PARAM_SPKFX_FETCOMP_META_KNEEMULTI: {
-            break;
-        } // 0x10065
-        case PARAM_SPKFX_FETCOMP_META_MAXATTACK: {
-            break;
-        } // 0x10066
-        case PARAM_SPKFX_FETCOMP_META_MAXRELEASE: {
-            break;
-        } // 0x10067
-        case PARAM_SPKFX_FETCOMP_META_CREST: {
-            break;
-        } // 0x10068
-        case PARAM_SPKFX_FETCOMP_META_ADAPT: {
-            break;
-        } // 0x10069
-        case PARAM_SPKFX_FETCOMP_META_NOCLIP_ENABLED: {
-            break;
-        } // 0x1006A
     }
 }
 

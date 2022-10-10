@@ -38,7 +38,7 @@ uint32_t AdaptiveBuffer::GetChannels() const {
 
 void AdaptiveBuffer::PanFrames(float left, float right) {
     if (this->buffer != nullptr && this->channels == 2) {
-        for (int i = 0; i < this->offset * this->channels; i++) {
+        for (uint32_t i = 0; i < this->offset * this->channels; i++) {
             if (i % 2 == 0) {
                 this->buffer[i] = this->buffer[i] * left;
             } else {
@@ -57,7 +57,7 @@ int AdaptiveBuffer::PopFrames(float *frames, uint32_t length) {
         memcpy(frames, this->buffer, length * this->channels * sizeof(*frames));
         this->offset = this->offset - length;
         if (this->offset != 0) {
-            memmove(this->buffer, &this->buffer[length * this->channels], this->offset * this->channels * sizeof(float));
+            memmove(this->buffer, this->buffer + (length * this->channels), this->offset * this->channels * sizeof(float));
         }
     }
 
@@ -78,7 +78,7 @@ int AdaptiveBuffer::PushFrames(const float *frames, uint32_t length) {
             this->length = this->offset + length;
         }
 
-        memcpy(&this->buffer[this->offset * this->channels], frames, length * this->channels * sizeof(float));
+        memcpy(this->buffer + (this->offset * this->channels), frames, length * this->channels * sizeof(float));
         this->offset = this->offset + length;
     }
 
@@ -98,7 +98,7 @@ int AdaptiveBuffer::PushZero(uint32_t length) {
         this->length = this->offset + length;
     }
 
-    memset(&this->buffer[this->offset * this->channels], 0, length * this->channels * sizeof(float));
+    memset(this->buffer + (this->offset * this->channels), 0, length * this->channels * sizeof(float));
     this->offset = this->offset + length;
 
     return 1;

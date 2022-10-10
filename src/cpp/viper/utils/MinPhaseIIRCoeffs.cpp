@@ -131,7 +131,7 @@ float MinPhaseIIRCoeffs::GetIndexFrequency(uint32_t index) {
 }
 
 int MinPhaseIIRCoeffs::SolveRoot(double param_2, double param_3, double param_4, double *param_5) {
-    double x = (param_4 - pow(param_3, 2.0) / (param_2 * 4.0)) / param_2;
+    double x = (param_4 - pow(param_3, 2) / (param_2 * 4.0)) / param_2;
     double y = param_3 / (param_2 * 2.0);
 
     if (x >= 0.0) {
@@ -151,7 +151,7 @@ int MinPhaseIIRCoeffs::SolveRoot(double param_2, double param_3, double param_4,
 }
 
 int MinPhaseIIRCoeffs::UpdateCoeffs(uint32_t bands, uint32_t samplingRate) {
-    if ((bands != 10 && bands != 15 && bands != 25 && bands != 31) || samplingRate != 44100) {
+    if ((bands != 10 && bands != 15 && bands != 25 && bands != 31) || samplingRate < 44100) {
         return 0;
     }
 
@@ -159,7 +159,7 @@ int MinPhaseIIRCoeffs::UpdateCoeffs(uint32_t bands, uint32_t samplingRate) {
     this->samplingRate = samplingRate;
 
     delete[] this->coeffs;
-    this->coeffs = new float[bands * 4]();
+    this->coeffs = new float[bands * 4](); // TODO: Check this array size
 
     const float *coeffsArray;
     double tmp;
@@ -186,7 +186,8 @@ int MinPhaseIIRCoeffs::UpdateCoeffs(uint32_t bands, uint32_t samplingRate) {
     for (uint32_t i = 0; i < bands; i++) {
         double ret1;
         double ret2;
-        this->Find_F1_F2(coeffsArray[i], tmp, &ret1, &ret2);
+
+        Find_F1_F2(coeffsArray[i], tmp, &ret1, &ret2);
 
         double x = (2.0 * M_PI * (double) coeffsArray[i]) / (double) this->samplingRate;
         double y = (2.0 * M_PI * ret2) / (double) this->samplingRate;
@@ -199,10 +200,17 @@ int MinPhaseIIRCoeffs::UpdateCoeffs(uint32_t bands, uint32_t samplingRate) {
         double b = pow(cosX, 2.0) / 2.0;
         double c = pow(sinY, 2.0);
 
-        if (this->SolveRoot(((b - a) + 0.5) - c, c + (((b + pow(cosY, 2.0)) - a) - 0.5), ((pow(cosX, 2.0) / 8.0 - cosX * cosY / 4.0) + 0.125) - c / 4.0, &ret1) == 0) {
+        // ((b - a) + 0.5) - c
+        double d = ((b - a) + 0.5) - c;
+        // c + (((b + pow(cosY, 2.0)) - a) - 0.5)
+        double e = c + (((b + pow(cosY, 2.0)) - a) - 0.5);
+        // ((pow(cosX, 2.0) / 8.0 - cosX * cosY / 4.0) + 0.125) - c / 4.0
+        double f = ((pow(cosX, 2.0) * 0.125 - cosX * cosY * 0.25) + 0.125) - c * 0.25;
+
+        if (SolveRoot(d, e, f, &ret1) == 0) {
             this->coeffs[4 * i] = (float) (ret1 * 2.0);
-            this->coeffs[4 * i + 1] = (float) (0.5 - ret1);
-            this->coeffs[4 * i + 2] = (float) ((ret1 + 0.5) * cosX);
+            this->coeffs[4 * i + 1] = (float) (((0.5 - ret1) * 0.5) * 2.0);
+            this->coeffs[4 * i + 2] = (float) (((ret1 + 0.5) * cosX) * 2.0);
         }
     }
 

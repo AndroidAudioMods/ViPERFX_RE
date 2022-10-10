@@ -8,13 +8,15 @@ SpeakerCorrection::SpeakerCorrection() {
 }
 
 void SpeakerCorrection::Process(float *samples, uint32_t size) {
-    for (int i = 0; i < size * 2; i++) {
-        float sample = samples[i];
-        int index = i % 2;
-        sample = this->lowpass[index].ProcessSample(sample);
-        sample = this->highpass[index].ProcessSample(sample);
-        float tmp = sample / 2.f;
-        samples[i] = tmp + this->bandpass[index].ProcessSample(tmp);
+    if (this->enabled) {
+        for (int i = 0; i < size * 2; i++) {
+            float sample = samples[i];
+            int index = i % 2;
+            sample = this->lowpass[index].ProcessSample(sample);
+            sample = this->highpass[index].ProcessSample(sample);
+            float tmp = sample / 2.f;
+            samples[i] = tmp + this->bandpass[index].ProcessSample(tmp);
+        }
     }
 }
 
