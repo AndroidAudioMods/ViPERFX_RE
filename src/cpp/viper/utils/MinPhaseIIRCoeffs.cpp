@@ -111,7 +111,7 @@ void MinPhaseIIRCoeffs::Find_F1_F2(double param_2, double param_3, double *param
     *param_4 = param_2 * x;
 }
 
-float *MinPhaseIIRCoeffs::GetCoefficients() {
+double *MinPhaseIIRCoeffs::GetCoefficients() {
     return this->coeffs;
 }
 
@@ -159,7 +159,7 @@ int MinPhaseIIRCoeffs::UpdateCoeffs(uint32_t bands, uint32_t samplingRate) {
     this->samplingRate = samplingRate;
 
     delete[] this->coeffs;
-    this->coeffs = new float[bands * 4](); // TODO: Check this array size
+    this->coeffs = new double[bands * 4](); // TODO: Check this array size, original type: float
 
     const float *coeffsArray;
     double tmp;
@@ -208,9 +208,9 @@ int MinPhaseIIRCoeffs::UpdateCoeffs(uint32_t bands, uint32_t samplingRate) {
         double f = ((pow(cosX, 2.0) * 0.125 - cosX * cosY * 0.25) + 0.125) - c * 0.25;
 
         if (SolveRoot(d, e, f, &ret1) == 0) {
-            this->coeffs[4 * i] = (float) (ret1 * 2.0);
-            this->coeffs[4 * i + 1] = (float) (((0.5 - ret1) * 0.5) * 2.0);
-            this->coeffs[4 * i + 2] = (float) (((ret1 + 0.5) * cosX) * 2.0);
+            this->coeffs[4 * i] = ret1 * 2.0;
+            this->coeffs[4 * i + 1] = ((0.5 - ret1) * 0.5) * 2.0;
+            this->coeffs[4 * i + 2] = ((ret1 + 0.5) * cosX) * 2.0;
         }
     }
 

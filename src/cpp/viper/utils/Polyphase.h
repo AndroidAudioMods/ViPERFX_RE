@@ -6,7 +6,7 @@
 
 class Polyphase {
 public:
-    Polyphase(int unknown1);
+    Polyphase(int param_1);
     ~Polyphase();
 
     uint32_t GetLatency();
@@ -15,8 +15,8 @@ public:
     void SetSamplingRate(uint32_t samplingRate);
 
 private:
-    FIR *fir1;
-    FIR *fir2;
+    FIR fir1;
+    FIR fir2;
     WaveBuffer *waveBuffer1;
     WaveBuffer *waveBuffer2;
     float *buffer;

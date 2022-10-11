@@ -133,26 +133,22 @@ static const float POLYPHASE_COEFFICIENTS_OTHER[] = {
         -0.032919
 };
 
-Polyphase::Polyphase(int unknown1) {
+Polyphase::Polyphase(int param_1) {
     this->samplingRate = DEFAULT_SAMPLERATE;
-    this->fir1 = new FIR();
-    this->fir2 = new FIR();
     this->waveBuffer1 = new WaveBuffer(2, 0x1000);
     this->waveBuffer2 = new WaveBuffer(2, 0x1000);
     this->buffer = new float[0x7e0];
 
-    if (unknown1 == 2) {
-        this->fir1->LoadCoefficients(POLYPHASE_COEFFICIENTS_2, sizeof(POLYPHASE_COEFFICIENTS_2) / sizeof(float), 1008);
-        this->fir2->LoadCoefficients(POLYPHASE_COEFFICIENTS_2, sizeof(POLYPHASE_COEFFICIENTS_2) / sizeof(float), 1008);
-    } else { // if (unknown1 < 2)
-        this->fir1->LoadCoefficients(POLYPHASE_COEFFICIENTS_OTHER, sizeof(POLYPHASE_COEFFICIENTS_OTHER) / sizeof(float), 1008);
-        this->fir2->LoadCoefficients(POLYPHASE_COEFFICIENTS_OTHER, sizeof(POLYPHASE_COEFFICIENTS_OTHER) / sizeof(float), 1008);
+    if (param_1 == 2) {
+        this->fir1.LoadCoefficients(POLYPHASE_COEFFICIENTS_2, 63, 1008);
+        this->fir2.LoadCoefficients(POLYPHASE_COEFFICIENTS_2, 63, 1008);
+    } else { // if (param_1 < 2)
+        this->fir1.LoadCoefficients(POLYPHASE_COEFFICIENTS_OTHER, 63, 1008);
+        this->fir2.LoadCoefficients(POLYPHASE_COEFFICIENTS_OTHER, 63, 1008);
     }
 }
 
 Polyphase::~Polyphase() {
-    delete this->fir1;
-    delete this->fir2;
     delete this->waveBuffer1;
     delete this->waveBuffer2;
     delete[] this->buffer;
@@ -166,8 +162,8 @@ uint32_t Polyphase::Process(float *samples, uint32_t size) {
     if (this->waveBuffer1->PushSamples(samples, size)) {
         while (this->waveBuffer1->GetBufferOffset() >= 1008) {
             if (this->waveBuffer1->PopSamples(this->buffer, 1008, false) == 1008) {
-                this->fir1->FilterSamplesInterleaved(this->buffer, 1008, 2);
-                this->fir2->FilterSamplesInterleaved(this->buffer + 1, 1008, 2);
+                this->fir1.FilterSamplesInterleaved(this->buffer, 1008, 2);
+                this->fir2.FilterSamplesInterleaved(this->buffer + 1, 1008, 2);
                 this->waveBuffer2->PushSamples(this->buffer, 1008);
             }
         }
@@ -183,8 +179,8 @@ uint32_t Polyphase::Process(float *samples, uint32_t size) {
 }
 
 void Polyphase::Reset() {
-    this->fir1->Reset();
-    this->fir2->Reset();
+    this->fir1.Reset();
+    this->fir2.Reset();
     this->waveBuffer1->Reset();
     this->waveBuffer2->Reset();
 }

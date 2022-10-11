@@ -5,7 +5,7 @@
 
 class WaveBuffer {
 public:
-    WaveBuffer(uint32_t channels, uint32_t size);
+    WaveBuffer(uint32_t channels, uint32_t length);
 
     ~WaveBuffer();
 

@@ -23,28 +23,33 @@ IIRFilter::IIRFilter(uint32_t bands) {
 void IIRFilter::Process(float *samples, uint32_t size) {
     if (!this->enable) return;
 
-    float *coeffs = this->minPhaseIirCoeffs.GetCoefficients();
+    double *coeffs = this->minPhaseIirCoeffs.GetCoefficients();
     if (coeffs == nullptr || size == 0) return;
 
     for (uint32_t i = 0; i < size; i++) {
         for (uint32_t j = 0; j < 2; j++) {
-            float sample = samples[i * 2 + j];
-            float tmp = 0.0;
+            double sample = samples[i * 2 + j];
+            double accumulated = 0.0;
+
             for (uint32_t k = 0; k < this->bands; k++) {
                 uint32_t bufIdx = this->unknown2 + j * 8 + k * 16;
                 this->buf[bufIdx] = sample;
 
-                float coeff1 = coeffs[k * 4];
-                float coeff2 = coeffs[k * 4 + 1];
-                float coeff3 = coeffs[k * 4 + 2];
+                double coeff1 = coeffs[k * 4];
+                double coeff2 = coeffs[k * 4 + 1];
+                double coeff3 = coeffs[k * 4 + 2];
 
-                float tmp2 = ((coeff3 * this->buf[bufIdx + ((this->unknown3 + 3) - this->unknown2)] + (sample - this->buf[bufIdx + (unknown4 - unknown2)]) * coeff2) - coeff1 * this->buf[bufIdx + ((unknown4 - unknown2) + 3)]);
+                double a = coeff3 * this->buf[bufIdx + ((this->unknown3 + 3) - this->unknown2)];
+                double b = coeff2 * (sample - this->buf[bufIdx + (unknown4 - unknown2)]);
+                double c = coeff1 * this->buf[bufIdx + ((unknown4 - unknown2) + 3)];
 
-                this->buf[bufIdx + 3] = tmp2;
-                tmp += tmp2 * this->bandLevelsWithQ[k];
+                double tmp = (a + b) - c;
+
+                this->buf[bufIdx + 3] = tmp;
+                accumulated += tmp * this->bandLevelsWithQ[k];
             }
 
-            samples[2 * i + j] = tmp;
+            samples[i * 2 + j] = (float) accumulated;
         }
 
         this->unknown2 = (this->unknown2 + 1) % 3;
@@ -54,9 +59,9 @@ void IIRFilter::Process(float *samples, uint32_t size) {
 }
 
 void IIRFilter::Reset() {
-    memset(this->buf,0,sizeof(buf)); // size should be 0x7c0
-    this->unknown3 = 1;
+    memset(this->buf,0,sizeof(buf));
     this->unknown2 = 2;
+    this->unknown3 = 1;
     this->unknown4 = 0;
 }
 

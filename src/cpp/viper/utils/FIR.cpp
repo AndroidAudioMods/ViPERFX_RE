@@ -37,16 +37,25 @@ void FIR::FilterSamplesInterleaved(float *samples, uint32_t size, uint32_t chann
         float sample = 0.0f;
 
         for (uint32_t j = 0; j < this->coeffsSize; j++) {
-            sample += this->coeffs[j] * this->offsetBlock[this->coeffsSize + i - 1 - j];
+            sample += this->coeffs[j] * this->offsetBlock[this->coeffsSize + i - j - 1];
         }
 
         if (i < size) {
-            samples[channels * i] = sample;
+            samples[i * channels] = sample;
         }
     }
 
     if (this->coeffsSize > 1) {
-        memcpy(this->offsetBlock + this->coeffsSize - 2, this->block + this->blockLength - 1, this->blockLength - (this->coeffsSize - 1) * sizeof(float));
+        // TODO: Replace this with memcpy
+        float *pfVar1 = this->block;
+        float *pfVar6 = pfVar1 + blockLength;
+        float *pfVar2 = this->offsetBlock + this->coeffsSize;
+        do {
+            pfVar6 = pfVar6 + -1;
+            pfVar2[-2] = *pfVar6;
+            pfVar2 = pfVar2 + -1;
+        } while (pfVar6 != pfVar1 + blockLength + (1 - this->coeffsSize));
+        //memcpy(this->offsetBlock + this->coeffsSize - 2 - (this->coeffsSize - 1), this->block + this->blockLength - 1 - (this->coeffsSize - 1), (this->coeffsSize - 1) * sizeof(float));
     }
 }
 
@@ -70,7 +79,7 @@ int FIR::LoadCoefficients(const float *coeffs, uint32_t coeffsSize, uint32_t blo
 
     memcpy(this->coeffs, coeffs, coeffsSize * sizeof(float));
 
-    this->Reset();
+    Reset();
     this->hasCoefficients = true;
 
     return 1;
@@ -78,6 +87,6 @@ int FIR::LoadCoefficients(const float *coeffs, uint32_t coeffsSize, uint32_t blo
 
 void FIR::Reset() {
     if (this->offsetBlock != nullptr && this->coeffsSize + this->blockLength > 0) {
-        memset(this->offsetBlock, 0, (this->coeffsSize + this->blockLength) * sizeof(float));
+        memset(this->offsetBlock, 0, (this->coeffsSize + this->blockLength + 1) * sizeof(float));
     }
 }

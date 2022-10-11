@@ -18,7 +18,7 @@ private:
     uint32_t samplingRate;
     bool enable;
     MinPhaseIIRCoeffs minPhaseIirCoeffs;
-    float buf[496];
+    double buf[496];
     uint32_t unknown2;
     uint32_t unknown3;
     uint32_t unknown4;
