@@ -33,8 +33,8 @@ void SpeakerCorrection::Reset() {
     this->bandPass[0].Reset();
     this->bandPass[1].Reset();
 
-    this->highPass[0].RefreshFilter(MultiBiquad::FilterType::HIGHPASS, 0.0, 80.0, this->samplingRate, 1.0, false);
-    this->highPass[1].RefreshFilter(MultiBiquad::FilterType::HIGHPASS, 0.0, 80.0, this->samplingRate, 1.0, false);
+    this->highPass[0].RefreshFilter(MultiBiquad::FilterType::HIGH_PASS, 0.0, 80.0, this->samplingRate, 1.0, false);
+    this->highPass[1].RefreshFilter(MultiBiquad::FilterType::HIGH_PASS, 0.0, 80.0, this->samplingRate, 1.0, false);
     this->lowPass[0].SetLowPassParameter(13500.0, this->samplingRate, 1.0);
     this->lowPass[1].SetLowPassParameter(13500.0, this->samplingRate, 1.0);
     this->bandPass[0].SetBandPassParameter(420.0, this->samplingRate, 3.88);

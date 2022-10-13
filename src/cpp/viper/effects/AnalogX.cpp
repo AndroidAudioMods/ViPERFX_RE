@@ -46,7 +46,7 @@ void AnalogX::Process(float *samples, uint32_t size) {
 
 void AnalogX::Reset() {
     for (auto &highpass : this->highpass) {
-        highpass.RefreshFilter(MultiBiquad::FilterType::HIGHPASS, 0.0f, 240.0f, this->samplingRate, 0.717f, false);
+        highpass.RefreshFilter(MultiBiquad::FilterType::HIGH_PASS, 0.0f, 240.0f, this->samplingRate, 0.717f, false);
     }
 
     for (auto &peak : this->peak) {
@@ -65,7 +65,7 @@ void AnalogX::Reset() {
         this->gain = 0.6f;
 
         for (auto &lowpass : this->lowpass) {
-            lowpass.RefreshFilter(MultiBiquad::FilterType::LOWPASS, 0.0f, 19650.0f, this->samplingRate, 0.717f, false);
+            lowpass.RefreshFilter(MultiBiquad::FilterType::LOW_PASS, 0.0f, 19650.0f, this->samplingRate, 0.717f, false);
         }
     } else if (this->processingModel == 1) {
         for (auto &harmonic : this->harmonic) {
@@ -75,7 +75,7 @@ void AnalogX::Reset() {
         this->gain = 1.2f;
 
         for (auto &lowpass : this->lowpass) {
-            lowpass.RefreshFilter(MultiBiquad::FilterType::LOWPASS, 0.0f, 18233.0f, this->samplingRate, 0.717f, false);
+            lowpass.RefreshFilter(MultiBiquad::FilterType::LOW_PASS, 0.0f, 18233.0f, this->samplingRate, 0.717f, false);
         }
     } else if (this->processingModel == 2) {
         for (auto &harmonic : this->harmonic) {
@@ -85,7 +85,7 @@ void AnalogX::Reset() {
         this->gain = 2.4f;
 
         for (auto &lowpass : this->lowpass) {
-            lowpass.RefreshFilter(MultiBiquad::FilterType::LOWPASS, 0.0f, 16307.0f, this->samplingRate, 0.717f, false);
+            lowpass.RefreshFilter(MultiBiquad::FilterType::LOW_PASS, 0.0f, 16307.0f, this->samplingRate, 0.717f, false);
         }
     }
 

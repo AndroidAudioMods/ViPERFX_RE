@@ -31,12 +31,12 @@ double MultiBiquad::ProcessSample(double sample) {
 
 void
 MultiBiquad::RefreshFilter(FilterType type, float gainAmp, float frequency, uint32_t samplingRate, float qFactor, bool param_7) {
-    float gain;
+    double gain;
 
-    if (type - 5 < 3) { // type - 5 < 3 is always true... right?
-        gain = pow(10.0f, gainAmp / 40.0f);
+    if (type == FilterType::PEAK || type == FilterType::LOW_SHELF || type == HIGH_SHELF) {
+        gain = pow(10.0, (double) gainAmp / 40.0);
     } else {
-        gain = pow(10.0f, gainAmp / 20.0f);
+        gain = pow(10.0, (double) gainAmp / 20.0);
     }
 
     double omega = (2.0 * M_PI * (double) frequency) / (double) samplingRate;
@@ -46,15 +46,15 @@ MultiBiquad::RefreshFilter(FilterType type, float gainAmp, float frequency, uint
     double y;
     double z;
 
-    if (type - 6 < 2) {
-        y = sinOmega / 2.0 * sqrt((1.0 / ((double) gain * 2.0)) * (1.0 / (double) qFactor - 1.0) + 2.0);
-        z = sqrt((double) gain) * y;
+    if (type == FilterType::LOW_SHELF || type == FilterType::HIGH_SHELF) {
+        y = sinOmega / 2.0 * sqrt((1.0 / gain + gain) * (1.0 / (double) qFactor - 1.0) + 2.0);
+        z = sqrt(gain) * 2.0 * y;
     } else if (!param_7) {
-        y = sinOmega / ((double) qFactor / 2.0);
-        z = -1.0;
+        y = sinOmega / ((double) qFactor * 2.0);
+        z = -1.0; // Unused in this case
     } else {
-        y = sinh(((double) qFactor * (log(2.0) / 2.0) * omega) / sinOmega);
-        z = -1.0;
+        y = sinh(((double) qFactor * log(2.0) * omega / 2.0) / sinOmega) * sinOmega;
+        z = -1.0; // Unused in this case
     }
 
     double a0;
@@ -65,7 +65,7 @@ MultiBiquad::RefreshFilter(FilterType type, float gainAmp, float frequency, uint
     double b2;
 
     switch (type) {
-        case LOWPASS: {
+        case LOW_PASS: { // OK
             a0 = 1.0 + y;
             a1 = -2.0 * cosOmega;
             a2 = 1.0 - y;
@@ -74,16 +74,16 @@ MultiBiquad::RefreshFilter(FilterType type, float gainAmp, float frequency, uint
             b2 = (1.0 - cosOmega) / 2.0;
             break;
         }
-        case HIGHPASS: {
+        case HIGH_PASS: {
             a0 = 1.0 + y;
             a1 = -2.0 * cosOmega;
             a2 = 1.0 - y;
             b0 = (1.0 + cosOmega) / 2.0;
-            b1 = -1.0 - cosOmega;
+            b1 = -(1.0 + cosOmega);
             b2 = (1.0 + cosOmega) / 2.0;
             break;
         }
-        case BANDPASS: {
+        case BAND_PASS: {
             a0 = 1.0 + y;
             a1 = -2.0 * cosOmega;
             a2 = 1.0 - y;
@@ -92,7 +92,7 @@ MultiBiquad::RefreshFilter(FilterType type, float gainAmp, float frequency, uint
             b2 = -y;
             break;
         }
-        case BANDSTOP: {
+        case BAND_STOP: {
             a0 = 1.0 + y;
             a1 = -2.0 * cosOmega;
             a2 = 1.0 - y;
@@ -101,7 +101,7 @@ MultiBiquad::RefreshFilter(FilterType type, float gainAmp, float frequency, uint
             b2 = 1.0;
             break;
         }
-        case ALLPASS: {
+        case ALL_PASS: {
             a0 = 1.0 + y;
             a1 = -2.0 * cosOmega;
             a2 = 1.0 - y;
@@ -111,15 +111,15 @@ MultiBiquad::RefreshFilter(FilterType type, float gainAmp, float frequency, uint
             break;
         }
         case PEAK: {
-            a0 = 1.0 + y / (double) gain;
+            a0 = 1.0 + y / gain;
             a1 = -2.0 * cosOmega;
-            a2 = 1.0 - y / (double) gain;
-            b0 = 1.0 + y * (double) gain;
+            a2 = 1.0 - y / gain;
+            b0 = 1.0 + y * gain;
             b1 = -2.0 * cosOmega;
-            b2 = 1.0 - y * (double) gain;
+            b2 = 1.0 - y * gain;
             break;
         }
-        case LOWSHELF: {
+        case LOW_SHELF: { // TODO: Check me!
             double tmp1 = (gain + 1.0) - (gain - 1.0) * cosOmega;
             double tmp2 = (gain + 1.0) + (gain - 1.0) * cosOmega;
             a1 = ((gain - 1.0) + (gain + 1.0) * cosOmega) * -2.0;
@@ -130,7 +130,7 @@ MultiBiquad::RefreshFilter(FilterType type, float gainAmp, float frequency, uint
             b2 = (tmp1 - z) * gain;
             break;
         }
-        case HIGHSHELF: {
+        case HIGH_SHELF: { // TODO: Check me!
             double tmp1 = (gain + 1.0) + (gain - 1.0) * cosOmega;
             double tmp2 = (gain + 1.0) - (gain - 1.0) * cosOmega;
             a2 = tmp2 - z;

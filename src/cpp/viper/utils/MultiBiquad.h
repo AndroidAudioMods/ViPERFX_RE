@@ -5,14 +5,14 @@
 class MultiBiquad {
 public:
     enum FilterType {
-        LOWPASS = 0,
-        HIGHPASS = 1,
-        BANDPASS = 2,
-        BANDSTOP = 3,
-        ALLPASS = 4,
-        PEAK = 5,
-        LOWSHELF = 6,
-        HIGHSHELF = 7
+        LOW_PASS,
+        HIGH_PASS,
+        BAND_PASS,
+        BAND_STOP,
+        ALL_PASS,
+        PEAK,
+        LOW_SHELF,
+        HIGH_SHELF
     };
 
     MultiBiquad();
