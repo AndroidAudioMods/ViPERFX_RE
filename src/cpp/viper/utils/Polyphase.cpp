@@ -134,7 +134,7 @@ static const float POLYPHASE_COEFFICIENTS_OTHER[] = {
 };
 
 Polyphase::Polyphase(int param_1) {
-    this->samplingRate = DEFAULT_SAMPLERATE;
+    this->samplingRate = VIPER_DEFAULT_SAMPLING_RATE;
     this->waveBuffer1 = new WaveBuffer(2, 0x1000);
     this->waveBuffer2 = new WaveBuffer(2, 0x1000);
     this->buffer = new float[0x7e0];

@@ -6,52 +6,37 @@
 class CRevModel {
 public:
     CRevModel();
-
     ~CRevModel();
 
     void Mute();
-
     void ProcessReplace(float *bufL, float *bufR, uint32_t size);
-
     void UpdateCoeffs();
-
     void Reset();
-
-    void SetRoomSize(float value);
-
-    void SetDamp(float value);
-
-    void SetWet(float value);
-
-    void SetDry(float value);
-
-    void SetWidth(float value);
-
-    void SetMode(int value);
-
+    void SetRoomSize(float roomSize);
+    void SetDamp(float damp);
+    void SetWet(float wet);
+    void SetDry(float dry);
+    void SetWidth(float width);
+    void SetMode(float mode);
     float GetRoomSize();
-
     float GetDamp();
-
     float GetWet();
-
     float GetDry();
-
     float GetWidth();
+    float GetMode();
 
-    int GetMode();
-
+private:
     float gain;
-    float roomsize;
-    float roomsize1;
+    float roomSize;
+    float internalRoomSize;
     float damp;
-    float damp1;
+    float internalDamp;
     float wet;
-    float wet1;
-    float wet2;
+    float unknown1;
+    float unknown2;
     float dry;
     float width;
-    int mode;
+    float mode;
 
     CCombFilter combL[8];
     CCombFilter combR[8];

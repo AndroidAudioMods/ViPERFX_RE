@@ -10,7 +10,7 @@ DepthSurround::DepthSurround() {
     for (auto &prev : this->prev) {
         prev = 0.0f;
     }
-    this->SetSamplingRate(DEFAULT_SAMPLERATE);
+    this->SetSamplingRate(VIPER_DEFAULT_SAMPLING_RATE);
     this->RefreshStrength(this->strength);
 }
 

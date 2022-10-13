@@ -3,7 +3,7 @@
 
 DynamicBass::DynamicBass() {
     this->qPeak = 0;
-    SetSamplingRate(DEFAULT_SAMPLERATE);
+    SetSamplingRate(VIPER_DEFAULT_SAMPLING_RATE);
     this->bassGain = 1.f;
     this->sideGainX = 1.f;
     this->sideGainY = 1.f;

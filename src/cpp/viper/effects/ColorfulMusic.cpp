@@ -2,7 +2,7 @@
 #include "../constants.h"
 
 ColorfulMusic::ColorfulMusic() {
-    this->samplingRate = DEFAULT_SAMPLERATE;
+    this->samplingRate = VIPER_DEFAULT_SAMPLING_RATE;
     this->enabled = false;
     this->stereo3DSurround.SetStereoWiden(0.0f);
     this->depthSurround.SetSamplingRate(this->samplingRate);

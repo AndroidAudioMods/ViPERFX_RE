@@ -7,7 +7,7 @@ ViPER::ViPER() {
     VIPER_LOGI("Welcome to ViPER FX");
     VIPER_LOGI("Current version is %s %s", VERSION_STRING, VERSION_CODENAME);
 
-    this->samplingRate = DEFAULT_SAMPLERATE;
+    this->samplingRate = VIPER_DEFAULT_SAMPLING_RATE;
 
     this->adaptiveBuffer = new AdaptiveBuffer(2, 4096);
     this->waveBuffer = new WaveBuffer(2, 4096);
@@ -46,7 +46,6 @@ ViPER::ViPER() {
 
     this->reverberation = new Reverberation();
     this->reverberation->SetEnable(false);
-    this->reverberation->SetSamplingRate(this->samplingRate);
     this->reverberation->Reset();
 
     this->playbackGain = new PlaybackGain();
@@ -252,180 +251,172 @@ void ViPER::DispatchCommand(int param, int val1, int val2, int val3, int val4, u
             this->ResetAllEffects();
             break;
         }
-        case PARAM_HPFX_CONV_PROCESS_ENABLED: {
+        case PARAM_CONV_PROCESS_ENABLED: {
 //            this->convolver->SetEnabled(val1 != 0);
             break;
         } // 0x10002
-        case PARAM_HPFX_CONV_PREPAREBUFFER: {
-            this->convolver->PrepareKernelBuffer(val1, val2, val3);
+        case PARAM_CONV_UPDATEKERNEL: {
+//            this->convolver->SetKernel(arr, arrSize);
             break;
-        } // 0x10004
-        case PARAM_HPFX_CONV_SETBUFFER: {
-            this->convolver->SetKernelBuffer(val1, (float *) arr, arrSize);
-            break;
-        } // 0x10005
-        case PARAM_HPFX_CONV_COMMITBUFFER: {
-            this->convolver->CommitKernelBuffer(val1, val2, val3);
-            break;
-        } // 0x10006
-        case PARAM_HPFX_CONV_CROSSCHANNEL: {
+        }
+        case PARAM_CONV_CROSSCHANNEL: {
             this->convolver->SetCrossChannel((float) val1 / 100.0f);
             break;
         } // 0x10007
-        case PARAM_HPFX_VHE_PROCESS_ENABLED: {
+        case PARAM_VHE_PROCESS_ENABLED: {
             this->vhe->SetEnable(val1 != 0);
             break;
         } // 0x10008
-        case PARAM_HPFX_VHE_EFFECT_LEVEL: {
+        case PARAM_VHE_EFFECT_LEVEL: {
             this->vhe->SetEffectLevel(val1);
             break;
         } // 0x10009
-        case PARAM_HPFX_VDDC_PROCESS_ENABLED: {
+        case PARAM_VDDC_PROCESS_ENABLED: {
             this->viperDdc->SetEnable(val1 != 0);
             break;
         } // 0x1000A
-        case PARAM_HPFX_VDDC_COEFFS: {
+        case PARAM_VDDC_COEFFS: {
             // TODO: Finish
             //this->viperDdc->SetCoeffs();
             break;
         } // 0x1000B
-        case PARAM_HPFX_VSE_PROCESS_ENABLED: {
+        case PARAM_VSE_PROCESS_ENABLED: {
             this->spectrumExtend->SetEnable(val1 != 0);
             break;
         } // 0x1000C
-        case PARAM_HPFX_VSE_REFERENCE_BARK: {
+        case PARAM_VSE_REFERENCE_BARK: {
             this->spectrumExtend->SetReferenceFrequency(val1);
             break;
         } // 0x1000D
-        case PARAM_HPFX_VSE_BARK_RECONSTRUCT: {
+        case PARAM_VSE_BARK_RECONSTRUCT: {
             this->spectrumExtend->SetExciter((float) val1 / 100.0f);
             break;
         } // 0x1000E
-        case PARAM_HPFX_FIREQ_PROCESS_ENABLED: {
+        case PARAM_FIREQ_PROCESS_ENABLED: {
             this->iirFilter->SetEnable(val1 != 0);
             break;
         } // 0x1000F
-        case PARAM_HPFX_FIREQ_BANDLEVEL: {
+        case PARAM_FIREQ_BANDLEVEL: {
             this->iirFilter->SetBandLevel(val1, (float) val2 / 100.0f);
             break;
         } // 0x10010
-        case PARAM_HPFX_COLM_PROCESS_ENABLED: {
+        case PARAM_COLM_PROCESS_ENABLED: {
             this->colorfulMusic->SetEnable(val1 != 0);
             break;
         } // 0x10011
-        case PARAM_HPFX_COLM_WIDENING: {
+        case PARAM_COLM_WIDENING: {
             this->colorfulMusic->SetWidenValue((float) val1 / 100.0f);
             break;
         } // 0x10012
-        case PARAM_HPFX_COLM_MIDIMAGE: {
+        case PARAM_COLM_MIDIMAGE: {
             this->colorfulMusic->SetMidImageValue((float) val1 / 100.0f);
             break;
         } // 0x10013
-        case PARAM_HPFX_COLM_DEPTH: {
+        case PARAM_COLM_DEPTH: {
             this->colorfulMusic->SetDepthValue((short) val1);
             break;
         } // 0x10014
-        case PARAM_HPFX_DIFFSURR_PROCESS_ENABLED: {
+        case PARAM_DIFFSURR_PROCESS_ENABLED: {
             this->diffSurround->SetEnable(val1 != 0);
             break;
         } // 0x10015
-        case PARAM_HPFX_DIFFSURR_DELAYTIME: {
+        case PARAM_DIFFSURR_DELAYTIME: {
             this->diffSurround->SetDelayTime((float) val1 / 100.0f);
             break;
         } // 0x10016
-        case PARAM_HPFX_REVB_PROCESS_ENABLED: {
+        case PARAM_REVB_PROCESS_ENABLED: {
             this->reverberation->SetEnable(val1 != 0);
             break;
         } // 0x10017
-        case PARAM_HPFX_REVB_ROOMSIZE: {
+        case PARAM_REVB_ROOMSIZE: {
             this->reverberation->SetRoomSize((float) val1 / 100.0f);
             break;
         } // 0x10018
-        case PARAM_HPFX_REVB_WIDTH: {
+        case PARAM_REVB_WIDTH: {
             this->reverberation->SetWidth((float) val1 / 100.0f);
             break;
         } // 0x10019
-        case PARAM_HPFX_REVB_DAMP: {
+        case PARAM_REVB_DAMP: {
             this->reverberation->SetDamp((float) val1 / 100.0f);
             break;
         } // 0x1001A
-        case PARAM_HPFX_REVB_WET: {
+        case PARAM_REVB_WET: {
             this->reverberation->SetWet((float) val1 / 100.0f);
             break;
         } // 0x1001B
-        case PARAM_HPFX_REVB_DRY: {
+        case PARAM_REVB_DRY: {
             this->reverberation->SetDry((float) val1 / 100.0f);
             break;
         } // 0x1001C
-        case PARAM_HPFX_AGC_PROCESS_ENABLED: {
+        case PARAM_AGC_PROCESS_ENABLED: {
             this->playbackGain->SetEnable(val1 != 0);
             break;
         } // 0x1001D
-        case PARAM_HPFX_AGC_RATIO: {
+        case PARAM_AGC_RATIO: {
             this->playbackGain->SetRatio((float) val1 / 100.0f);
             break;
         } // 0x1001E
-        case PARAM_HPFX_AGC_VOLUME: {
+        case PARAM_AGC_VOLUME: {
             this->playbackGain->SetVolume((float) val1 / 100.0f);
             break;
         } // 0x1001F
-        case PARAM_HPFX_AGC_MAXSCALER: {
+        case PARAM_AGC_MAXSCALER: {
             this->playbackGain->SetMaxGainFactor((float) val1 / 100.0f);
             break;
         } // 0x10020
-        case PARAM_HPFX_DYNSYS_PROCESS_ENABLED: {
+        case PARAM_DYNSYS_PROCESS_ENABLED: {
             this->dynamicSystem->SetEnable(val1 != 0);
             break;
         } // 0x10021
-        case PARAM_HPFX_DYNSYS_XCOEFFS: {
+        case PARAM_DYNSYS_XCOEFFS: {
             this->dynamicSystem->SetXCoeffs(val1, val2);
             break;
         } // 0x10022
-        case PARAM_HPFX_DYNSYS_YCOEFFS: {
+        case PARAM_DYNSYS_YCOEFFS: {
             this->dynamicSystem->SetYCoeffs(val1, val2);
             break;
         } // 0x10023
-        case PARAM_HPFX_DYNSYS_SIDEGAIN: {
+        case PARAM_DYNSYS_SIDEGAIN: {
             this->dynamicSystem->SetSideGain((float) val1 / 100.0f, (float) val2 / 100.0f);
             break;
         } // 0x10024
-        case PARAM_HPFX_DYNSYS_BASSGAIN: {
+        case PARAM_DYNSYS_BASSGAIN: {
             this->dynamicSystem->SetBassGain((float) val1 / 100.0f);
             break;
         } // 0x10025
-        case PARAM_HPFX_VIPERBASS_PROCESS_ENABLED: {
+        case PARAM_VIPERBASS_PROCESS_ENABLED: {
             this->viperBass->SetEnable(val1 != 0);
             break;
         } // 0x10026
-        case PARAM_HPFX_VIPERBASS_MODE: {
+        case PARAM_VIPERBASS_MODE: {
             this->viperBass->SetProcessMode((ViPERBass::ProcessMode) val1);
             break;
         } // 0x10027
-        case PARAM_HPFX_VIPERBASS_SPEAKER: {
+        case PARAM_VIPERBASS_SPEAKER: {
             this->viperBass->SetSpeaker(val1);
             break;
         } // 0x10028
-        case PARAM_HPFX_VIPERBASS_BASSGAIN: {
+        case PARAM_VIPERBASS_BASSGAIN: {
             this->viperBass->SetBassFactor((float) val1 / 100.0f);
             break;
         } // 0x10029
-        case PARAM_HPFX_VIPERCLARITY_PROCESS_ENABLED: {
+        case PARAM_VIPERCLARITY_PROCESS_ENABLED: {
             this->viperClarity->SetEnable(val1 != 0);
             break;
         } // 0x1002A
-        case PARAM_HPFX_VIPERCLARITY_MODE: {
+        case PARAM_VIPERCLARITY_MODE: {
             this->viperClarity->SetProcessMode((ViPERClarity::ClarityMode) val1);
             break;
         } // 0x1002B
-        case PARAM_HPFX_VIPERCLARITY_CLARITY: {
+        case PARAM_VIPERCLARITY_CLARITY: {
             this->viperClarity->SetClarity((float) val1 / 100.0f);
             break;
         } // 0x1002C
-        case PARAM_HPFX_CURE_PROCESS_ENABLED: {
+        case PARAM_CURE_PROCESS_ENABLED: {
             this->cure->SetEnable(val1 != 0);
             break;
         } // 0x1002D
-        case PARAM_HPFX_CURE_CROSSFEED: {
+        case PARAM_CURE_CROSSFEED: {
             switch (val1) {
                 case 0:
                     // Cure_R::SetPreset(pCVar17,0x5f028a);
@@ -439,23 +430,23 @@ void ViPER::DispatchCommand(int param, int val1, int val2, int val3, int val4, u
             }
             break;
         } // 0x1002E
-        case PARAM_HPFX_TUBE_PROCESS_ENABLED: {
+        case PARAM_TUBE_PROCESS_ENABLED: {
             this->tubeSimulator->SetEnable(val1 != 0);
             break;
         } // 0x1002F
-        case PARAM_HPFX_ANALOGX_PROCESS_ENABLED: {
+        case PARAM_ANALOGX_PROCESS_ENABLED: {
             this->analogX->SetEnable(val1 != 0);
             break;
         } // 0x10030
-        case PARAM_HPFX_ANALOGX_MODE: {
+        case PARAM_ANALOGX_MODE: {
             this->analogX->SetProcessingModel(val1);
             break;
         } // 0x10031
-        case PARAM_HPFX_OUTPUT_VOLUME: {
+        case PARAM_OUTPUT_VOLUME: {
             this->frameScale = (float) val1 / 100.0f;
             break;
         } // 0x10032
-        case PARAM_HPFX_OUTPUT_PAN: {
+        case PARAM_OUTPUT_PAN: {
             float tmp = (float) val1 / 100.0f;
             if (tmp < 0.0f) {
                 this->leftPan = 1.0f;
@@ -466,7 +457,7 @@ void ViPER::DispatchCommand(int param, int val1, int val2, int val3, int val4, u
             }
             break;
         } // 0x10033
-        case PARAM_HPFX_LIMITER_THRESHOLD: {
+        case PARAM_LIMITER_THRESHOLD: {
             this->softwareLimiters[0]->SetGate((float) val1 / 100.0f);
             this->softwareLimiters[1]->SetGate((float) val1 / 100.0f);
             break;
@@ -475,58 +466,58 @@ void ViPER::DispatchCommand(int param, int val1, int val2, int val3, int val4, u
             this->speakerCorrection->SetEnable(val1 != 0);
             break;
         } // 0x10043
-        case PARAM_HPFX_FETCOMP_PROCESS_ENABLED: {
+        case PARAM_FETCOMP_PROCESS_ENABLED: {
             break;
         } // 0x10049
-        case PARAM_HPFX_FETCOMP_THRESHOLD: {
+        case PARAM_FETCOMP_THRESHOLD: {
             break;
         } // 0x1004A
-        case PARAM_HPFX_FETCOMP_RATIO: {
+        case PARAM_FETCOMP_RATIO: {
             this->fetCompressor->SetParameter(1, (float) val1 / 100.0f);
             break;
         } // 0x1004B
-        case PARAM_HPFX_FETCOMP_KNEEWIDTH: {
+        case PARAM_FETCOMP_KNEEWIDTH: {
             break;
         } // 0x1004C
-        case PARAM_HPFX_FETCOMP_AUTOKNEE_ENABLED: {
+        case PARAM_FETCOMP_AUTOKNEE_ENABLED: {
             break;
         } // 0x1004D
-        case PARAM_HPFX_FETCOMP_GAIN: {
+        case PARAM_FETCOMP_GAIN: {
             break;
         } // 0x1004E
-        case PARAM_HPFX_FETCOMP_AUTOGAIN_ENABLED: {
+        case PARAM_FETCOMP_AUTOGAIN_ENABLED: {
             this->fetCompressor->SetParameter(5, (float) val1 / 100.0f);
             break;
         } // 0x1004F
-        case PARAM_HPFX_FETCOMP_ATTACK: {
+        case PARAM_FETCOMP_ATTACK: {
             break;
         } // 0x10050
-        case PARAM_HPFX_FETCOMP_AUTOATTACK_ENABLED: {
+        case PARAM_FETCOMP_AUTOATTACK_ENABLED: {
             break;
         } // 0x10051
-        case PARAM_HPFX_FETCOMP_RELEASE: {
+        case PARAM_FETCOMP_RELEASE: {
             break;
         } // 0x10052
-        case PARAM_HPFX_FETCOMP_AUTORELEASE_ENABLED: {
+        case PARAM_FETCOMP_AUTORELEASE_ENABLED: {
             break;
         } // 0x10053
-        case PARAM_HPFX_FETCOMP_META_KNEEMULTI: {
+        case PARAM_FETCOMP_META_KNEEMULTI: {
             break;
         } // 0x10054
-        case PARAM_HPFX_FETCOMP_META_MAXATTACK: {
+        case PARAM_FETCOMP_META_MAXATTACK: {
             break;
         } // 0x10055
-        case PARAM_HPFX_FETCOMP_META_MAXRELEASE: {
+        case PARAM_FETCOMP_META_MAXRELEASE: {
             this->fetCompressor->SetParameter(12, (float) val1 / 100.0f);
             break;
         } // 0x10056
-        case PARAM_HPFX_FETCOMP_META_CREST: {
+        case PARAM_FETCOMP_META_CREST: {
             break;
         } // 0x10057
-        case PARAM_HPFX_FETCOMP_META_ADAPT: {
+        case PARAM_FETCOMP_META_ADAPT: {
             break;
         } // 0x10058
-        case PARAM_HPFX_FETCOMP_META_NOCLIP_ENABLED: {
+        case PARAM_FETCOMP_META_NOCLIP_ENABLED: {
             this->fetCompressor->SetParameter(15, (float) val1 / 100.0f);
             break;
         } // 0x10059
@@ -565,7 +556,6 @@ void ViPER::ResetAllEffects() {
         this->colorfulMusic->Reset();
     }
     if (this->reverberation != nullptr) {
-        this->reverberation->SetSamplingRate(this->samplingRate);
         this->reverberation->Reset();
     }
     if (this->playbackGain != nullptr) {

@@ -2,7 +2,7 @@
 #include "../constants.h"
 
 NoiseSharpening::NoiseSharpening() {
-    this->samplingRate = DEFAULT_SAMPLERATE;
+    this->samplingRate = VIPER_DEFAULT_SAMPLING_RATE;
     this->gain = 0.0;
     Reset();
 }

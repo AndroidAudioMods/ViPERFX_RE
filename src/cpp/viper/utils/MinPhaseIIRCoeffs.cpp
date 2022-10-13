@@ -97,7 +97,7 @@ static const float MIN_PHASE_IIR_COEFFS_FREQ_31BANDS[] = {
 
 MinPhaseIIRCoeffs::MinPhaseIIRCoeffs() {
     this->coeffs = nullptr;
-    this->samplingRate = DEFAULT_SAMPLERATE;
+    this->samplingRate = VIPER_DEFAULT_SAMPLING_RATE;
     this->bands = 0;
 }
 

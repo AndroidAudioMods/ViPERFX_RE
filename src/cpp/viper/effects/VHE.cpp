@@ -5,7 +5,7 @@ VHE::VHE() {
     enabled = false;
     effectLevel = 0;
     convSize = 0;
-    samplingRate = DEFAULT_SAMPLERATE;
+    samplingRate = VIPER_DEFAULT_SAMPLING_RATE;
 
     bufA = new WaveBuffer(2, 0x1000);
     bufB = new WaveBuffer(2, 0x1000);

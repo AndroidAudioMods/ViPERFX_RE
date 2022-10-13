@@ -2,24 +2,30 @@
 #include <cmath>
 
 MultiBiquad::MultiBiquad() {
-    this->y_2 = 0;
-    this->y_1 = 0;
-    this->x_2 = 0;
-    this->x_1 = 0;
-    this->b0 = 0;
-    this->b1 = 0;
-    this->b2 = 0;
-    this->a1 = 0;
-    this->a2 = 0;
+    this->a1 = 0.0;
+    this->a2 = 0.0;
+    this->b0 = 0.0;
+    this->b1 = 0.0;
+    this->b2 = 0.0;
+    this->x1 = 0.0;
+    this->x2 = 0.0;
+    this->y1 = 0.0;
+    this->y2 = 0.0;
 }
 
 double MultiBiquad::ProcessSample(double sample) {
-    double out = sample * this->b0 + this->x_1 * this->b1 + this->x_2 * this->b2 + this->y_1 * this->a1 +
-                this->y_2 * this->a2;
-    this->y_2 = this->y_1;
-    this->y_1 = out;
-    this->x_2 = this->x_1;
-    this->x_1 = sample;
+    double out =
+            sample * this->b0 +
+            this->x1 * this->b1 +
+            this->x2 * this->b2 +
+            this->y1 * this->a1 +
+            this->y2 * this->a2;
+
+    this->x2 = this->x1;
+    this->x1 = sample;
+    this->y2 = this->y1;
+    this->y1 = out;
+
     return out;
 }
 
@@ -33,21 +39,21 @@ MultiBiquad::RefreshFilter(FilterType type, float gainAmp, float frequency, uint
         gain = pow(10.0f, gainAmp / 20.0f);
     }
 
-    double x = (2.0 * M_PI * (double) frequency) / (double) samplingRate;
-    double sinX = sin(x);
-    double cosX = cos(x);
+    double omega = (2.0 * M_PI * (double) frequency) / (double) samplingRate;
+    double sinOmega = sin(omega);
+    double cosOmega = cos(omega);
 
     double y;
     double z;
 
     if (type - 6 < 2) {
-        y = sinX / 2.0 * sqrt((1.0 / ((double) gain * 2.0)) * (1.0 / (double) qFactor - 1.0) + 2.0);
+        y = sinOmega / 2.0 * sqrt((1.0 / ((double) gain * 2.0)) * (1.0 / (double) qFactor - 1.0) + 2.0);
         z = sqrt((double) gain) * y;
     } else if (!param_7) {
-        y = sinX / ((double) qFactor / 2.0);
+        y = sinOmega / ((double) qFactor / 2.0);
         z = -1.0;
     } else {
-        y = sinh(((double) qFactor * (log(2.0) / 2.0) * x) / sinX);
+        y = sinh(((double) qFactor * (log(2.0) / 2.0) * omega) / sinOmega);
         z = -1.0;
     }
 
@@ -60,87 +66,87 @@ MultiBiquad::RefreshFilter(FilterType type, float gainAmp, float frequency, uint
 
     switch (type) {
         case LOWPASS: {
-            b1 = 1.0 - cosX;
-            b0 = (1.0 - cosX) / 2.0;
-            a1 = -cosX * 2.0;
-            a2 = 1.0 - y;
             a0 = 1.0 + y;
-            b2 = b0;
+            a1 = -2.0 * cosOmega;
+            a2 = 1.0 - y;
+            b0 = (1.0 - cosOmega) / 2.0;
+            b1 = 1.0 - cosOmega;
+            b2 = (1.0 - cosOmega) / 2.0;
             break;
         }
         case HIGHPASS: {
-            b1 = -1.0 - cosX;
-            b0 = (1.0 + cosX) / 2.0;
-            a1 = -cosX * 2.0;
-            a2 = 1.0 - y;
             a0 = 1.0 + y;
-            b2 = b0;
+            a1 = -2.0 * cosOmega;
+            a2 = 1.0 - y;
+            b0 = (1.0 + cosOmega) / 2.0;
+            b1 = -1.0 - cosOmega;
+            b2 = (1.0 + cosOmega) / 2.0;
             break;
         }
         case BANDPASS: {
-            b1 = 0.0;
-            a1 = -cosX * 2.0;
-            a2 = 1.0 - y;
             a0 = 1.0 + y;
+            a1 = -2.0 * cosOmega;
+            a2 = 1.0 - y;
             b0 = y;
+            b1 = 0.0;
             b2 = -y;
             break;
         }
         case BANDSTOP: {
-            b1 = -cosX * 2.0;
-            a2 = 1.0 - y;
             a0 = 1.0 + y;
+            a1 = -2.0 * cosOmega;
+            a2 = 1.0 - y;
             b0 = 1.0;
+            b1 = -2.0 * cosOmega;
             b2 = 1.0;
-            a1 = b1;
             break;
         }
         case ALLPASS: {
-            b1 = -cosX * 2.0;
-            a2 = 1.0 - y;
             a0 = 1.0 + y;
-            b0 = a2;
-            b2 = a0;
-            a1 = b1;
+            a1 = -2.0 * cosOmega;
+            a2 = 1.0 - y;
+            b0 = 1.0 - y;
+            b1 = -2.0 * cosOmega;
+            b2 = 1.0 + y;
             break;
         }
         case PEAK: {
-            b1 = -cosX * 2.0;
-            a2 = 1.0 - y / (double) gain;
             a0 = 1.0 + y / (double) gain;
+            a1 = -2.0 * cosOmega;
+            a2 = 1.0 - y / (double) gain;
             b0 = 1.0 + y * (double) gain;
+            b1 = -2.0 * cosOmega;
             b2 = 1.0 - y * (double) gain;
-            a1 = b1;
             break;
         }
         case LOWSHELF: {
-            double tmp1 = (gain + 1.0) - (gain - 1.0) * cosX;
-            double tmp2 = (gain + 1.0) + (gain - 1.0) * cosX;
-            a1 = ((gain - 1.0) + (gain + 1.0) * cosX) * -2.0;
+            double tmp1 = (gain + 1.0) - (gain - 1.0) * cosOmega;
+            double tmp2 = (gain + 1.0) + (gain - 1.0) * cosOmega;
+            a1 = ((gain - 1.0) + (gain + 1.0) * cosOmega) * -2.0;
             a2 = tmp2 - z;
-            b1 = (gain * 2.0) * ((gain - 1.0) - (gain + 1.0) * cosX);
+            b1 = (gain * 2.0) * ((gain - 1.0) - (gain + 1.0) * cosOmega);
             a0 = tmp2 + z;
             b0 = (tmp1 + z) * gain;
             b2 = (tmp1 - z) * gain;
             break;
         }
         case HIGHSHELF: {
-            double tmp1 = (gain + 1.0) + (gain - 1.0) * cosX;
-            double tmp2 = (gain + 1.0) - (gain - 1.0) * cosX;
+            double tmp1 = (gain + 1.0) + (gain - 1.0) * cosOmega;
+            double tmp2 = (gain + 1.0) - (gain - 1.0) * cosOmega;
             a2 = tmp2 - z;
             a0 = tmp2 + z;
-            a1 = ((gain - 1.0) - (gain + 1.0) * cosX) * 2.0;
-            b1 = gain * -2.0 * ((gain - 1.0) + (gain + 1.0) * cosX);
+            a1 = ((gain - 1.0) - (gain + 1.0) * cosOmega) * 2.0;
+            b1 = gain * -2.0 * ((gain - 1.0) + (gain + 1.0) * cosOmega);
             b0 = (tmp1 + z) * gain;
             b2 = (tmp1 - z) * gain;
             break;
         }
     }
 
-    this->x_1 = 0.0;
-    this->x_2 = 0.0;
-    this->y_1 = 0.0;
-    this->y_2 = 0.0;
+    this->x2 = 0.0;
+    this->x1 = 0.0;
+    this->y2 = 0.0;
+    this->y1 = 0.0;
 
     this->a1 = -a1 / a0;
     this->a2 = -a2 / a0;

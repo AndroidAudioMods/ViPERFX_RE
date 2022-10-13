@@ -4,7 +4,7 @@
 #include <cmath>
 
 PolesFilter::PolesFilter() {
-    this->samplingRate = DEFAULT_SAMPLERATE;
+    this->samplingRate = VIPER_DEFAULT_SAMPLING_RATE;
     this->lower_freq = 160;
     this->upper_freq = 8000;
     UpdateCoeff();

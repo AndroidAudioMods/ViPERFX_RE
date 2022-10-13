@@ -16,7 +16,7 @@ static float ANALOGX_HARMONICS[10] = {
 };
 
 AnalogX::AnalogX() {
-    this->samplingRate = DEFAULT_SAMPLERATE;
+    this->samplingRate = VIPER_DEFAULT_SAMPLING_RATE;
     this->processingModel = 0;
     this->enable = false;
     Reset();
@@ -28,7 +28,7 @@ void AnalogX::Process(float *samples, uint32_t size) {
             float sample = samples[i];
             int channel = i % 2;
 
-            float tmp = this->highpass[channel].ProcessSample(sample);
+            double tmp = this->highpass[channel].ProcessSample(sample);
             tmp = this->harmonic[channel].Process(tmp);
 
             tmp = this->lowpass[channel].ProcessSample(sample + tmp * this->gain);

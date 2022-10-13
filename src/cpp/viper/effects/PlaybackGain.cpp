@@ -3,7 +3,7 @@
 
 PlaybackGain::PlaybackGain() {
     this->enable = false;
-    this->samplingRate = DEFAULT_SAMPLERATE;
+    this->samplingRate = VIPER_DEFAULT_SAMPLING_RATE;
     this->unknown1 = 0.4342945;
     this->counterTo100 = 0;
     this->ratio1 = 2.0;

@@ -3,7 +3,7 @@
 #include "../constants.h"
 
 DiffSurround::DiffSurround() {
-    this->samplingRate = DEFAULT_SAMPLERATE;
+    this->samplingRate = VIPER_DEFAULT_SAMPLING_RATE;
     this->delayTime = 0.0f;
     this->enabled = false;
     for (auto &buffer : this->buffers) {

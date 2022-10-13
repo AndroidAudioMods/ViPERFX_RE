@@ -3,7 +3,7 @@
 
 DynamicSystem::DynamicSystem() {
     this->enabled = false;
-    this->samplingRate = DEFAULT_SAMPLERATE;
+    this->samplingRate = VIPER_DEFAULT_SAMPLING_RATE;
     this->bass.SetSamplingRate(this->samplingRate);
     this->bass.Reset();
 }

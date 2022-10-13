@@ -15,7 +15,7 @@ static float SPECTRUM_HARMONICS[10] = {
 };
 
 SpectrumExtend::SpectrumExtend() {
-    this->samplingRate = DEFAULT_SAMPLERATE;
+    this->samplingRate = VIPER_DEFAULT_SAMPLING_RATE;
     this->referenceFreq = 7600;
     this->enabled = false;
     this->exciter = 0.f;

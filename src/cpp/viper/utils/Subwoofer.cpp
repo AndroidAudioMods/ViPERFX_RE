@@ -3,7 +3,7 @@
 #include <cmath>
 
 Subwoofer::Subwoofer() {
-    uint32_t samplingRate = DEFAULT_SAMPLERATE;
+    uint32_t samplingRate = VIPER_DEFAULT_SAMPLING_RATE;
     this->peak[0].RefreshFilter(MultiBiquad::FilterType::PEAK, 0.0, 37.0, samplingRate, 1.0, false);
     this->peak[1].RefreshFilter(MultiBiquad::FilterType::PEAK, 0.0, 37.0, samplingRate, 1.0, false);
     this->peakLow[0].RefreshFilter(MultiBiquad::FilterType::PEAK, 0.0, 75.0, samplingRate, 1.0, false);

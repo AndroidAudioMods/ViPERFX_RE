@@ -5,7 +5,7 @@
 
 IIRFilter::IIRFilter(uint32_t bands) {
     this->enable = false;
-    this->samplingRate = DEFAULT_SAMPLERATE;
+    this->samplingRate = VIPER_DEFAULT_SAMPLING_RATE;
     if (bands == 10 || bands == 15 || bands == 25 || bands == 31) {
         this->bands = bands;
         this->minPhaseIirCoeffs.UpdateCoeffs(this->bands, this->samplingRate);

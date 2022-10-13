@@ -7,16 +7,16 @@
 class SpeakerCorrection {
 public:
     SpeakerCorrection();
-    ~SpeakerCorrection();
 
     void Process(float *samples, uint32_t size);
     void Reset();
-    void SetEnable(bool enabled);
+    void SetEnable(bool enable);
     void SetSamplingRate(uint32_t samplingRate);
 
+private:
     uint32_t samplingRate;
-    bool enabled;
-    MultiBiquad highpass[2];
-    Biquad lowpass[2];
-    Biquad bandpass[2];
+    bool enable;
+    MultiBiquad highPass[2];
+    Biquad lowPass[2];
+    Biquad bandPass[2];
 };

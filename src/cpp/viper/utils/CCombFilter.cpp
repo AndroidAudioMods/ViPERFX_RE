@@ -42,7 +42,7 @@ void CCombFilter::SetBuffer(float *buffer, uint32_t size) {
 
 void CCombFilter::SetDamp(float damp) {
     this->damp = damp;
-    this->damp2 = 1 - damp;
+    this->damp2 = 1.0f - damp;
 }
 
 void CCombFilter::SetFeedback(float feedback) {

@@ -5,12 +5,12 @@ ViPERClarity::ViPERClarity() {
     for (auto &highShelf : this->highShelf) {
         highShelf.SetFrequency(12000.0);
         highShelf.SetGain(1.0);
-        highShelf.SetSamplingRate(DEFAULT_SAMPLERATE);
+        highShelf.SetSamplingRate(VIPER_DEFAULT_SAMPLING_RATE);
     }
 
     this->enable = false;
     this->processMode = ClarityMode::NATURAL;
-    this->samplingRate = DEFAULT_SAMPLERATE;
+    this->samplingRate = VIPER_DEFAULT_SAMPLING_RATE;
     this->clarityGainPercent = 0.0;
     Reset();
 }

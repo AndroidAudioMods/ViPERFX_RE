@@ -6,7 +6,7 @@ PassFilter::PassFilter() {
     this->filters[1] = new IIR_NOrder_BW_LH(3);
     this->filters[2] = new IIR_NOrder_BW_LH(1);
     this->filters[3] = new IIR_NOrder_BW_LH(1);
-    this->samplingRate = DEFAULT_SAMPLERATE;
+    this->samplingRate = VIPER_DEFAULT_SAMPLING_RATE;
     Reset();
 }
 

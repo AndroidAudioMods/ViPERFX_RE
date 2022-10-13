@@ -6,7 +6,6 @@
 class Reverberation {
 public:
     Reverberation();
-    ~Reverberation();
 
     void Process(float *buffer, uint32_t size);
     void Reset();
@@ -14,18 +13,12 @@ public:
     void SetDry(float value);
     void SetEnable(bool enable);
     void SetRoomSize(float value);
-    void SetSamplingRate(uint32_t value);
     void SetWet(float value);
     void SetWidth(float value);
 
-    float roomsize;
-    float width;
-    float damp;
-    float wet;
-    float dry;
+private:
     CRevModel model;
-    uint32_t samplingRate;
-    bool enabled;
+    bool enable;
 };
 
 

@@ -13,7 +13,7 @@ Crossfeed::Crossfeed() {
     this->b1_hi = 0.f;
     this->gain = 0.f;
     memset(&this->lfs, 0, 6 * sizeof(float));
-    this->samplerate = DEFAULT_SAMPLERATE;
+    this->samplerate = VIPER_DEFAULT_SAMPLING_RATE;
     this->preset.cutoff = 700;
     this->preset.feedback = 45;
 }

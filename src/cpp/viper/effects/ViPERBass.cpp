@@ -3,9 +3,9 @@
 
 ViPERBass::ViPERBass() {
     this->enable = false;
-    this->samplingRate = DEFAULT_SAMPLERATE;
+    this->samplingRate = VIPER_DEFAULT_SAMPLING_RATE;
     this->speaker = 60;
-    this->samplingRatePeriod = 1.0 / DEFAULT_SAMPLERATE;
+    this->samplingRatePeriod = 1.0 / VIPER_DEFAULT_SAMPLING_RATE;
     this->antiPop = 0.0;
     this->processMode = ProcessMode::NATURAL_BASS;
     this->bassFactor = 0.0;
