@@ -15,9 +15,9 @@ public:
     void SetSamplingRate(uint32_t samplingRate);
 
 private:
-    MultiBiquad highpass[2];
+    MultiBiquad highPass[2];
     Harmonic harmonic[2];
-    MultiBiquad lowpass[2];
+    MultiBiquad lowPass[2];
     MultiBiquad peak[2];
 
     float gain;

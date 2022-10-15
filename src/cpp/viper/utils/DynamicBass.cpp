@@ -19,7 +19,7 @@ DynamicBass::DynamicBass() {
 
 void DynamicBass::FilterSamples(float *samples, uint32_t size) {
     if (this->lowFreqX <= 120) {
-        for (int i = 0; i < size; i++) {
+        for (uint32_t i = 0; i < size; i++) {
             float left = samples[2 * i];
             float right = samples[2 * i + 1];
             float avg = (float) this->lowPass.ProcessSample(left + right);
@@ -27,7 +27,7 @@ void DynamicBass::FilterSamples(float *samples, uint32_t size) {
             samples[2 * i + 1] = right + avg;
         }
     } else {
-        for (int i = 0; i < size; i++) {
+        for (uint32_t i = 0; i < size; i++) {
             float x1, x2, x3, x4, x5, x6, y1, y2, y3, y4, y5, y6;
 
             this->filterX.DoFilterLeft(samples[2 * i], &x1, &x2, &x3);

@@ -25,14 +25,14 @@ void DiffSurround::Process(float *samples, uint32_t size) {
         bufs[0] = this->buffers[0]->PushZerosGetBuffer(size);
         bufs[1] = this->buffers[1]->PushZerosGetBuffer(size);
 
-        for (int i = 0; i < size * 2; i++) {
+        for (uint32_t i = 0; i < size * 2; i++) {
             bufs[i % 2][i / 2] = samples[i];
         }
 
         outbufs[0] = this->buffers[0]->GetBuffer();
         outbufs[1] = this->buffers[1]->GetBuffer();
 
-        for (int i = 0; i < size * 2; i++) {
+        for (uint32_t i = 0; i < size * 2; i++) {
             samples[i] = outbufs[i % 2][i / 2];
         }
 

@@ -28,7 +28,7 @@ SpectrumExtend::~SpectrumExtend() {
 
 void SpectrumExtend::Process(float *samples, uint32_t size) {
     if (this->enabled) {
-        for (int i = 0; i < size * 2; i++) {
+        for (uint32_t i = 0; i < size * 2; i++) {
             float sample = samples[i];
             int index = i % 2;
             float tmp = this->highpass[index].ProcessSample(sample);

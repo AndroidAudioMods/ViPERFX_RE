@@ -13,7 +13,7 @@ Subwoofer::Subwoofer() {
 }
 
 void Subwoofer::Process(float *samples, uint32_t size) {
-    for (int i = 0; i < size * 2; i++) {
+    for (uint32_t i = 0; i < size * 2; i++) {
         auto sample = (double) samples[i];
         int index = i % 2;
         double tmp = this->peak[index].ProcessSample(sample);

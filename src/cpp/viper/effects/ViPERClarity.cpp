@@ -26,7 +26,7 @@ void ViPERClarity::Process(float *samples, uint32_t size) {
             break;
         }
         case ClarityMode::OZONE: {
-            for (int i = 0; i < size * 2; i++) {
+            for (uint32_t i = 0; i < size * 2; i++) {
                 samples[i] = (float) this->highShelf[i % 2].Process(samples[i]);
             }
             break;

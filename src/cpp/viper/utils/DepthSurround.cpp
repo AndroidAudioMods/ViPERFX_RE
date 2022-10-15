@@ -17,7 +17,7 @@ DepthSurround::DepthSurround() {
 void DepthSurround::Process(float *samples, uint32_t size) {
     if (this->enabled) {
         if (!this->strengthAtLeast500) {
-            for (int i = 0; i < size; i++) {
+            for (uint32_t i = 0; i < size; i++) {
                 float sampleLeft = samples[2 * i];
                 float sampleRight = samples[2 * i + 1];
 
@@ -34,7 +34,7 @@ void DepthSurround::Process(float *samples, uint32_t size) {
                 samples[2 * i + 1] = avg - (diff - avgOut);
             }
         } else {
-            for (int i = 0; i < size; i++) {
+            for (uint32_t i = 0; i < size; i++) {
                 float sampleLeft = samples[2 * i];
                 float sampleRight = samples[2 * i + 1];
 

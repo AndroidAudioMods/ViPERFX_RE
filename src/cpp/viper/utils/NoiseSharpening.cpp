@@ -8,7 +8,7 @@ NoiseSharpening::NoiseSharpening() {
 }
 
 void NoiseSharpening::Process(float *buffer, uint32_t size) {
-    for (int i = 0; i < size; i++) {
+    for (uint32_t i = 0; i < size; i++) {
         float sampleLeft = buffer[i * 2];
         float sampleRight = buffer[i * 2 + 1];
         float prevLeft = this->in[0];

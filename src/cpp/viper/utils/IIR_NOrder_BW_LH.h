@@ -19,7 +19,7 @@ public:
 };
 
 inline float do_filter_lh(IIR_NOrder_BW_LH *filt, float sample) {
-    for (int idx = 0; idx < filt->order; idx++) {
+    for (uint32_t idx = 0; idx < filt->order; idx++) {
         sample = do_filter(&filt->filters[idx], sample);
     }
     return sample;

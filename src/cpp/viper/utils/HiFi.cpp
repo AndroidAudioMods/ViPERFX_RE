@@ -31,7 +31,7 @@ void HiFi::Process(float *samples, uint32_t size) {
             return;
         }
 
-        for (int i = 0; i < size * 2; i++) {
+        for (uint32_t i = 0; i < size * 2; i++) {
             int index = i % 2;
             float out1 = do_filter_lh(this->filters[index].lowpass, samples[i]);
             float out2 = do_filter_lh(this->filters[index].highpass, samples[i]);
@@ -42,7 +42,7 @@ void HiFi::Process(float *samples, uint32_t size) {
         }
         float *bpOut = this->buffers[0]->GetBuffer();
         float *lpOut = this->buffers[1]->GetBuffer();
-        for (int i = 0; i < size * 2; i++) {
+        for (uint32_t i = 0; i < size * 2; i++) {
             float hp = samples[i] * this->gain * 1.2f;
             float bp = bpOut[i] * this->gain;
             samples[i] = hp + bp + lpOut[i];
@@ -53,7 +53,7 @@ void HiFi::Process(float *samples, uint32_t size) {
 }
 
 void HiFi::Reset() {
-    for (int i = 0; i < 2; i++) {
+    for (uint32_t i = 0; i < 2; i++) {
         this->filters[i].lowpass->setLPF(120.0, this->samplingRate);
         this->filters[i].lowpass->Mute();
         this->filters[i].highpass->setHPF(1200.0, this->samplingRate);

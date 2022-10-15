@@ -10,7 +10,7 @@ SpeakerCorrection::SpeakerCorrection() {
 void SpeakerCorrection::Process(float *samples, uint32_t size) {
     if (!this->enable) return;
 
-    for (int i = 0; i < size * 2; i += 2) {
+    for (uint32_t i = 0; i < size * 2; i += 2) {
         double outL = samples[i];
         outL = this->lowPass[0].ProcessSample(outL);
         outL = this->highPass[0].ProcessSample(outL);

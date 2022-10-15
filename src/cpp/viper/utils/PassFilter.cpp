@@ -37,7 +37,7 @@ void PassFilter::Reset() {
 }
 
 void PassFilter::ProcessFrames(float *buffer, uint32_t size) {
-    for (int x = 0; x < size; x++) {
+    for (uint32_t x = 0; x < size; x++) {
         float left = buffer[2 * x];
         float right = buffer[2 * x + 1];
 

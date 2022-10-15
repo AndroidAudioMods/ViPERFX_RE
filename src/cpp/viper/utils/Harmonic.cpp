@@ -1,19 +1,18 @@
 #include <cstring>
-#include <cstdlib>
 #include <cmath>
 #include "Harmonic.h"
 
-static float HARMONIC_DEFAULT[10] = {
-        1.f,
-        0.f,
-        0.f,
-        0.f,
-        0.f,
-        0.f,
-        0.f,
-        0.f,
-        0.f,
-        0.f,
+static float HARMONIC_DEFAULT[] = {
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
 };
 
 Harmonic::Harmonic() {
@@ -21,38 +20,36 @@ Harmonic::Harmonic() {
     Reset();
 }
 
-Harmonic::~Harmonic() {
+double Harmonic::Process(double sample) {
+    double prevLast = this->lastProcessed;
 
-}
+    this->lastProcessed =
+            (this->coeffs[0] + sample *
+            (this->coeffs[1] + sample *
+            (this->coeffs[2] + sample *
+            (this->coeffs[3] + sample *
+            (this->coeffs[4] + sample *
+            (this->coeffs[5] + sample *
+            (this->coeffs[6] + sample *
+            (this->coeffs[7] + sample *
+            (this->coeffs[8] + sample *
+            (this->coeffs[9] + sample *
+            (this->coeffs[10])))))))))));
 
-float Harmonic::Process(float sample) {
-//    float prevLast = this->lastProcessed;
-//    this->lastProcessed = (
-//            sample * this->coeffs[0] +
-//            sample * this->coeffs[1] +
-//            sample * this->coeffs[2] +
-//            sample * this->coeffs[3] +
-//            sample * this->coeffs[4] +
-//            sample * this->coeffs[5] +
-//            sample * this->coeffs[6] +
-//            sample * this->coeffs[7] +
-//            sample * this->coeffs[8] +
-//            sample * this->coeffs[9] +
-//            sample * this->coeffs[10]
-//    );
-//    this->prevOut = (this->lastProcessed + this->prevOut * 0.999f) - prevLast;
-//    if (this->sampleCounter < this->buildup) {
-//        this->sampleCounter++;
-//        return 0.0;
-//    }
-//    return this->prevOut;
-    return sample;
+    this->prevOut = (this->lastProcessed + this->prevOut * 0.999) - prevLast;
+
+    if (this->sampleCounter < this->biggestCoeff) {
+        this->sampleCounter++;
+        return 0.0;
+    }
+
+    return this->prevOut;
 }
 
 void Harmonic::Reset() {
     this->lastProcessed = 0.0;
-    this->prevOut = 0.0;
     this->sampleCounter = 0;
+    this->prevOut = 0.0;
 }
 
 void Harmonic::SetHarmonics(float *coefficients) {
@@ -61,58 +58,51 @@ void Harmonic::SetHarmonics(float *coefficients) {
 }
 
 void Harmonic::UpdateCoeffs(float *coefficients) {
-//    float fVar5;
-//    float fVar6;
-//    float _coeffs[20];
-//    float afStack76[14];
-//
-//    memset(_coeffs, 0, 11 * sizeof(float));
-//    this->buildup = (int) fabsf(coefficients[10]);
-//    memcpy(&_coeffs[1], coefficients, 10 * sizeof(float));
-//
-//    fVar6 = 1.f / (
-//            fabsf(_coeffs[1]) +
-//            fabsf(_coeffs[2]) +
-//            fabsf(_coeffs[3]) +
-//            fabsf(_coeffs[4]) +
-//            fabsf(_coeffs[5]) +
-//            fabsf(_coeffs[6]) +
-//            fabsf(_coeffs[7]) +
-//            fabsf(_coeffs[8]) +
-//            fabsf(_coeffs[9]) +
-//            fabsf(_coeffs[10])
-//    );
-//
-//    for (int i = 0; i < 11; i++) {
-//        _coeffs[i] *= fVar6;
-//    }
-//
-//    for (int i = 0; i < 11; i++) {
-//        afStack76[2 + i] = 0;
-//        _coeffs[10 + i] = 0;
-//    }
-//
-//    _coeffs[11] = _coeffs[10];
-//    fVar6 = _coeffs[11];
-//    for (int i = 2; i < 11; i++) {
-//        for (int idx = 0; idx < i; idx++) {
-//            _coeffs[11] = fVar6;
-//            fVar5 = _coeffs[10 - idx + i];
-//            fVar6 = afStack76[2 - idx + i];
-//            afStack76[2 - idx + i] = _coeffs[11 - idx + i];
-//            _coeffs[11 - idx + i] = 2 * fVar5 - fVar6;
-//            fVar6 = _coeffs[11];
-//        }
-//        fVar6 = _coeffs[11 - i] - afStack76[2];
-//        afStack76[2] = _coeffs[11];
-//    }
-//
-//    for (int i = 1; i < 11; i++) {
-//        afStack76[2 + i] = afStack76[i - 1] - afStack76[13 - i];
-//    }
-//
-//    _coeffs[11] = _coeffs[0] * 0.5f - _coeffs[11];
-//    for (int i = 0; i < 11; i++) {
-//        this->coeffs[i] = _coeffs[11 + i];
-//    }
+    float unkarr1[11];
+    float unkarr2[11];
+
+    memset(unkarr1, 0, 11 * sizeof(float));
+
+    float biggestCoeffVal = 0.0;
+    float absCoeffSum = 0.0;
+    for (uint32_t i = 0; i < 10; i++) {
+        float absCoeffVal = abs(coefficients[i]);
+        absCoeffSum += absCoeffVal;
+        if (absCoeffVal > biggestCoeffVal) {
+            biggestCoeffVal = absCoeffVal;
+        }
+    }
+    this->biggestCoeff = (uint32_t) (biggestCoeffVal * 10000.0);
+
+    memcpy(unkarr1 + 1, coefficients, 10 * sizeof(float));
+
+    float unk1 = 1.0;
+    if (absCoeffSum > 1.0) {
+        unk1 = 1.0f / absCoeffSum;
+    }
+    for (uint32_t i = 1; i < 11; i++) {
+        unkarr1[i] *= unk1;
+    }
+
+    memset(this->coeffs, 0, 11 * sizeof(float));
+    memset(unkarr2, 0, 11 * sizeof(float));
+
+    this->coeffs[10] = unkarr1[10];
+
+    for (uint32_t i = 2; i < 11; i++) {
+        for (uint32_t j = 0; j < i; j++) {
+            float tmp = unkarr2[i - j];
+            unkarr2[i - j] = this->coeffs[i - j];
+            this->coeffs[i - j] = this->coeffs[i - j - 1] * 2.0f - tmp;
+        }
+        float tmp = unkarr1[10 - i + 1] - unkarr2[0];
+        unkarr2[0] = this->coeffs[0];
+        this->coeffs[0] = tmp;
+    }
+
+    for (uint32_t i = 1; i < 11; i++) {
+        this->coeffs[10 - i + 1] = this->coeffs[10 - i] - unkarr2[10 - i + 1];
+    }
+
+    this->coeffs[0] = unkarr1[0] / 2.0f - unkarr2[0];
 }

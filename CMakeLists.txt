@@ -91,3 +91,4 @@ add_library(
         ${FILES})
 
 target_link_libraries(v4afx_r log) # kissfft)
+target_compile_options(v4afx_r PRIVATE -Wall -Wextra -Wno-unused-parameter)

@@ -65,7 +65,7 @@ MultiBiquad::RefreshFilter(FilterType type, float gainAmp, float frequency, uint
     double b2;
 
     switch (type) {
-        case LOW_PASS: { // OK
+        case LOW_PASS: {
             a0 = 1.0 + y;
             a1 = -2.0 * cosOmega;
             a2 = 1.0 - y;

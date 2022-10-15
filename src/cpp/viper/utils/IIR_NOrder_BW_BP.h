@@ -18,14 +18,14 @@ public:
 };
 
 inline float do_filter_bplp(IIR_NOrder_BW_BP *filt, float sample) {
-    for (int idx = 0; idx < filt->order; idx++) {
+    for (uint32_t idx = 0; idx < filt->order; idx++) {
         sample = do_filter(&filt->lowpass[idx], sample);
     }
     return sample;
 }
 
 inline float do_filter_bphp(IIR_NOrder_BW_BP *filt, float sample) {
-    for (int idx = 0; idx < filt->order; idx++) {
+    for (uint32_t idx = 0; idx < filt->order; idx++) {
         sample = do_filter(&filt->highpass[idx], sample);
     }
     return sample;
