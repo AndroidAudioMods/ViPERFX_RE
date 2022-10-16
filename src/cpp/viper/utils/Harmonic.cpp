@@ -2,7 +2,7 @@
 #include <cmath>
 #include "Harmonic.h"
 
-static float HARMONIC_DEFAULT[] = {
+static const float HARMONIC_DEFAULT[] = {
         1.0,
         0.0,
         0.0,
@@ -52,12 +52,12 @@ void Harmonic::Reset() {
     this->prevOut = 0.0;
 }
 
-void Harmonic::SetHarmonics(float *coefficients) {
+void Harmonic::SetHarmonics(const float *coefficients) {
     UpdateCoeffs(coefficients);
     Reset();
 }
 
-void Harmonic::UpdateCoeffs(float *coefficients) {
+void Harmonic::UpdateCoeffs(const float *coefficients) {
     float unkarr1[11];
     float unkarr2[11];
 

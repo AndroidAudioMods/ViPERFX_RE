@@ -2,7 +2,7 @@
 #include <cstring>
 #include "../constants.h"
 
-static float ANALOGX_HARMONICS[] = {
+static const float ANALOGX_HARMONICS[] = {
         0.01,
         0.02,
         0.0001,

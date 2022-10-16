@@ -1,7 +1,7 @@
 #include "SpectrumExtend.h"
 #include "../constants.h"
 
-static float SPECTRUM_HARMONICS[10] = {
+static const float SPECTRUM_HARMONICS[10] = {
         0.02f,
         0.f,
         0.02f,

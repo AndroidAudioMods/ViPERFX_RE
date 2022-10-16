@@ -8,8 +8,8 @@ public:
 
     double Process(double sample);
     void Reset();
-    void SetHarmonics(float *coeffs);
-    void UpdateCoeffs(float *coeffs);
+    void SetHarmonics(const float *coeffs);
+    void UpdateCoeffs(const float *coeffs);
 
 private:
     float coeffs[11];
