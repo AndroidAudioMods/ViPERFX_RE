@@ -41,7 +41,15 @@ float FETCompressor::GetMeter(int param_1) {
         return 0.0;
     }
 
-    // TODO: Implement
+    if (this->unk1) {
+        float tmp = (6.907755 - this->unk28) / 6.907755;
+        if (tmp < 1.0) {
+            if (tmp < 0.0) {
+                tmp = 0.0;
+            }
+            return tmp;
+        }
+    }
 
     return 1.0;
 }
