@@ -54,7 +54,7 @@ ViPER::ViPER() {
     this->playbackGain->Reset();
 
     this->fetCompressor = new FETCompressor();
-    this->fetCompressor->SetParameter(0, 0.0);
+    this->fetCompressor->SetParameter(FETCompressor::ENABLE, 0.0);
     this->fetCompressor->SetSamplingRate(this->samplingRate);
     this->fetCompressor->Reset();
 
@@ -473,7 +473,7 @@ void ViPER::DispatchCommand(int param, int val1, int val2, int val3, int val4, u
             break;
         } // 0x1004A
         case PARAM_FETCOMP_RATIO: {
-            this->fetCompressor->SetParameter(1, (float) val1 / 100.0f);
+            this->fetCompressor->SetParameter(FETCompressor::THRESHOLD, (float) val1 / 100.0f);
             break;
         } // 0x1004B
         case PARAM_FETCOMP_KNEEWIDTH: {
@@ -486,7 +486,7 @@ void ViPER::DispatchCommand(int param, int val1, int val2, int val3, int val4, u
             break;
         } // 0x1004E
         case PARAM_FETCOMP_AUTOGAIN_ENABLED: {
-            this->fetCompressor->SetParameter(5, (float) val1 / 100.0f);
+            this->fetCompressor->SetParameter(FETCompressor::GAIN, (float) val1 / 100.0f);
             break;
         } // 0x1004F
         case PARAM_FETCOMP_ATTACK: {
@@ -508,7 +508,7 @@ void ViPER::DispatchCommand(int param, int val1, int val2, int val3, int val4, u
             break;
         } // 0x10055
         case PARAM_FETCOMP_META_MAXRELEASE: {
-            this->fetCompressor->SetParameter(12, (float) val1 / 100.0f);
+            this->fetCompressor->SetParameter(FETCompressor::MAX_ATTACK, (float) val1 / 100.0f);
             break;
         } // 0x10056
         case PARAM_FETCOMP_META_CREST: {
@@ -518,7 +518,7 @@ void ViPER::DispatchCommand(int param, int val1, int val2, int val3, int val4, u
             break;
         } // 0x10058
         case PARAM_FETCOMP_META_NOCLIP_ENABLED: {
-            this->fetCompressor->SetParameter(15, (float) val1 / 100.0f);
+            this->fetCompressor->SetParameter(FETCompressor::ADAPT, (float) val1 / 100.0f);
             break;
         } // 0x10059
     }

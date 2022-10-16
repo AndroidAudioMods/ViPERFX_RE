@@ -30,7 +30,7 @@ FETCompressor::FETCompressor() {
     this->samplingRate = VIPER_DEFAULT_SAMPLING_RATE;
 
     for (uint32_t i = 0; i < 17; i++) {
-        SetParameter(i, GetParameterDefault(i));
+        SetParameter((FETCompressor::Parameter) i, GetParameterDefault((FETCompressor::Parameter) i));
     }
 
     Reset();
@@ -41,7 +41,7 @@ float FETCompressor::GetMeter(int param_1) {
         return 0.0;
     }
 
-    if (this->unk1) {
+    if (this->enable) {
         float tmp = (6.907755 - this->unk28) / 6.907755;
         if (tmp < 1.0) {
             if (tmp < 0.0) {
@@ -54,13 +54,13 @@ float FETCompressor::GetMeter(int param_1) {
     return 1.0;
 }
 
-float FETCompressor::GetParameter(uint32_t index) {
-    return this->parameters[index];
+float FETCompressor::GetParameter(FETCompressor::Parameter parameter) {
+    return this->parameters[parameter];
 }
 
-float FETCompressor::GetParameterDefault(uint32_t index) {
-    if (index < 17) {
-        return DEFAULT_FETCOMP_PARAMETERS[index];
+float FETCompressor::GetParameterDefault(FETCompressor::Parameter parameter) {
+    if (parameter < 17) {
+        return DEFAULT_FETCOMP_PARAMETERS[parameter];
     }
     return 0.0;
 }
@@ -80,13 +80,13 @@ void FETCompressor::Process(float *samples, uint32_t size) {
         }
 
         double out = ProcessSidechain(in);
-        if (this->unk1) {
+        if (this->enable) {
             samples[i] *= (float) out;
             samples[i + 1] *= (float) out;
         }
 
-        this->unk23 = this->unk23 + (this->unk2 - this->unk23) * this->unk22;
-        this->unk24 = this->unk24 + this->unk22 * (this->unk6 - this->unk24);
+        this->unk23 = this->unk23 + (this->threshold - this->unk23) * this->unk22;
+        this->unk24 = this->unk24 + this->unk22 * (this->gain - this->unk24);
     }
 }
 
@@ -96,10 +96,10 @@ double FETCompressor::ProcessSidechain(double in) {
         in2 = 0.000001;
     }
 
-    float a = this->unk9;
-    float b = this->unk25 + this->unk18 * (in2 - this->unk25);
-    float c = this->unk26 + this->unk18 * (in2 - this->unk26);
-    float d = this->unk8;
+    float a = this->attack2;
+    float b = this->unk25 + this->crest2 * (in2 - this->unk25);
+    float c = this->unk26 + this->crest2 * (in2 - this->unk26);
+    float d = this->attack1;
 
     if (in2 < b) {
         in2 = b;
@@ -110,11 +110,11 @@ double FETCompressor::ProcessSidechain(double in) {
 
     in2 /= c;
 
-    if (this->unk10) {
+    if (this->autoAttack) {
 
     }
 
-    if (this->unk13) {
+    if (this->autoRelease) {
 
     }
 
@@ -122,14 +122,14 @@ double FETCompressor::ProcessSidechain(double in) {
 
     }
 
-    if (!this->unk5) {
+    if (!this->autoKnee) {
 
     } else {
 
     }
 
-    if (this->unk7) {
-        if (!this->unk21) {
+    if (this->autoGain) {
+        if (!this->noClip) {
 
         } else {
 
@@ -143,8 +143,8 @@ double FETCompressor::ProcessSidechain(double in) {
 
 void FETCompressor::Reset() {
     this->unk22 = calculate_exp_something(this->samplingRate, 0.05);
-    this->unk23 = this->unk2;
-    this->unk24 = this->unk6;
+    this->unk23 = this->threshold;
+    this->unk24 = this->gain;
     this->unk25 = 0.000001;
     this->unk26 = 0.000001;
     this->unk27 = 0.0;
@@ -152,104 +152,104 @@ void FETCompressor::Reset() {
     this->unk29 = 0.0;
 }
 
-void FETCompressor::SetParameter(uint32_t index, float value) {
-    this->parameters[index] = value;
+void FETCompressor::SetParameter(FETCompressor::Parameter parameter, float value) {
+    this->parameters[parameter] = value;
 
-    switch (index) {
-        case 0: {
-            this->unk1 = value >= 0.5;
+    switch (parameter) {
+        case ENABLE: {
+            this->enable = value >= 0.5;
             break;
         }
-        case 1: {
-            this->unk2 = log(pow(10.0, (value * -60.0) / 20.0));
+        case THRESHOLD: {
+            this->threshold = log(pow(10.0, (value * -60.0) / 20.0));
             break;
         }
-        case 2: {
-            this->unk3 = -value;
+        case RATIO: {
+            this->ratio = -value;
             break;
         }
-        case 3: {
-            this->unk4 = log(pow(10.0, (value * 60.0) / 20));
+        case KNEE: {
+            this->knee = log(pow(10.0, (value * 60.0) / 20));
             break;
         }
-        case 4: {
-            this->unk5 = value >= 0.5;
+        case AUTO_KNEE: {
+            this->autoKnee = value >= 0.5;
             break;
         }
-        case 5: {
-            this->unk6 = log(pow(10.0, (value * 60.0) / 20.0));
+        case GAIN: {
+            this->gain = log(pow(10.0, (value * 60.0) / 20.0));
             break;
         }
-        case 6: {
-            this->unk7 = value >= 0.5;
+        case AUTO_GAIN: {
+            this->autoGain = value >= 0.5;
             break;
         }
-        case 7: {
+        case ATTACK: {
             double tmp = exp(value * 7.600903 - 9.21034);
-            this->unk8 = tmp;
+            this->attack1 = tmp;
             if (tmp <= 0.0) {
                 tmp = 1.0;
             } else {
                 tmp = calculate_exp_something(this->samplingRate, tmp);
             }
-            this->unk9 = tmp;
+            this->attack2 = tmp;
             break;
         }
-        case 8: {
-            this->unk10 = value >= 0.5;
+        case AUTO_ATTACK: {
+            this->autoAttack = value >= 0.5;
             break;
         }
-        case 9: {
+        case RELEASE: {
             double tmp = exp(value * 5.991465 - 5.298317);
-            this->unk11 = tmp;
+            this->release1 = tmp;
             if (tmp <= 0.0) {
                 tmp = 1.0;
             } else {
                 tmp = calculate_exp_something(this->samplingRate, tmp);
             }
-            this->unk12 = tmp;
+            this->release2 = tmp;
             break;
         }
-        case 10: {
-            this->unk13 = value >= 0.5;
+        case AUTO_RELEASE: {
+            this->autoRelease = value >= 0.5;
             break;
         }
-        case 11: {
-            this->unk14 =  value * 4.0;
+        case KNEE_MULTI: {
+            this->kneeMulti = value * 4.0;
             break;
         }
-        case 12: {
-            this->unk15 = exp(value * 7.600903 - 9.21034);
+        case MAX_ATTACK: {
+            this->maxAttack = exp(value * 7.600903 - 9.21034);
             break;
         }
-        case 13: {
-            this->unk16 = exp(value * 5.991465 - 5.298317);
+        case MAX_RELEASE: {
+            this->maxRelease = exp(value * 5.991465 - 5.298317);
             break;
         }
-        case 14: {
+        case CREST: {
             double tmp = exp(value * 5.991465 - 5.298317);
-            this->unk17 = tmp;
+            this->crest1 = tmp;
             if (tmp <= 0.0) {
                 tmp = 1.0;
             } else {
                 tmp = calculate_exp_something(this->samplingRate, tmp);
             }
-            this->unk18 = tmp;
+            this->crest2 = tmp;
             break;
         }
-        case 15: {
+        case ADAPT: {
             double tmp = exp(value * 1.386294);
-            this->unk19 = tmp;
+            this->adapt1 = tmp;
             if (tmp <= 0.0) {
                 tmp = 1.0;
             } else {
                 tmp = calculate_exp_something(this->samplingRate, tmp);
             }
-            this->unk20 = tmp;
+            this->adapt2 = tmp;
             break;
         }
-        case 16: {
-            this->unk21 = value >= 0.5;
+        case NO_CLIP: {
+            this->noClip = value >= 0.5;
             break;
         }
     }
@@ -259,7 +259,7 @@ void FETCompressor::SetSamplingRate(uint32_t samplingRate) {
     this->samplingRate = samplingRate;
 
     for (uint32_t i = 0; i < 17; i++) {
-        SetParameter(i, GetParameter(i));
+        SetParameter((FETCompressor::Parameter) i, GetParameter((FETCompressor::Parameter) i));
     }
 
     Reset();

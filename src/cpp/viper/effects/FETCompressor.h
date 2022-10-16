@@ -4,49 +4,69 @@
 
 class FETCompressor {
 public:
+    enum Parameter {
+        ENABLE = 0,
+        THRESHOLD,
+        RATIO,
+        KNEE,
+        AUTO_KNEE,
+        GAIN,
+        AUTO_GAIN,
+        ATTACK,
+        AUTO_ATTACK,
+        RELEASE,
+        AUTO_RELEASE,
+        KNEE_MULTI,
+        MAX_ATTACK,
+        MAX_RELEASE,
+        CREST,
+        ADAPT,
+        NO_CLIP
+    };
+
     FETCompressor();
 
     float GetMeter(int param_1);
-    float GetParameter(uint32_t index);
-    float GetParameterDefault(uint32_t index);
+    float GetParameter(FETCompressor::Parameter parameter);
+    float GetParameterDefault(FETCompressor::Parameter parameter);
     void Process(float *samples, uint32_t size);
     double ProcessSidechain(double in);
     void Reset();
-    void SetParameter(uint32_t index, float value);
+    void SetParameter(FETCompressor::Parameter parameter, float value);
     void SetSamplingRate(uint32_t samplingRate);
 
 private:
     uint32_t samplingRate;
     float parameters[17];
     float unk22;
-    bool unk1;
-    bool unk5;
-    bool unk7;
-    bool unk10;
-    bool unk13;
+    bool enable;
+    bool autoKnee;
+    bool autoGain;
+    bool autoAttack;
+    bool autoRelease;
     float unk27;
     float unk28;
     float unk29;
     float unk23;
-    float unk2;
-    float unk4;
+    float threshold;
+    float knee;
     float unk24;
-    float unk6;
-    float unk3;
+    float gain;
+    float ratio;
     float unk25;
     float unk26;
-    float unk8;
-    float unk9;
-    float unk11;
-    float unk12;
-    float unk14;
-    float unk15;
-    float unk16;
-    float unk17;
-    float unk18;
-    float unk19;
-    float unk20;
-    float unk21;
+    float attack1;
+    float attack2;
+    float release1;
+    float release2;
+    float kneeMulti;
+    float maxAttack;
+    float maxRelease;
+    float crest1;
+    float crest2;
+    float adapt1;
+    float adapt2;
+    float noClip;
 };
 
 
