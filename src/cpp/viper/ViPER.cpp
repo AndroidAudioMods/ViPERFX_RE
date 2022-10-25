@@ -156,7 +156,7 @@ void ViPER::processBuffer(float *buffer, uint32_t size) {
     uint32_t tmpBufSize;
 
     if (this->convolver->GetEnabled() || this->vhe->GetEnabled()) {
-        VIPER_LOGD("Convolver or VHE is enable, use wave buffer");
+//        VIPER_LOGD("Convolver or VHE is enable, use wave buffer");
 
         if (!this->waveBuffer->PushSamples(buffer, size)) {
             this->waveBuffer->Reset();
@@ -181,7 +181,7 @@ void ViPER::processBuffer(float *buffer, uint32_t size) {
         tmpBuf = ptr;
         tmpBufSize = ret;
     } else {
-        VIPER_LOGD("Convolver and VHE are disabled, use adaptive buffer");
+//        VIPER_LOGD("Convolver and VHE are disabled, use adaptive buffer");
 
         if (this->adaptiveBuffer->PushFrames(buffer, size)) {
             this->adaptiveBuffer->SetBufferOffset(size);
@@ -251,172 +251,177 @@ void ViPER::DispatchCommand(int param, int val1, int val2, int val3, int val4, u
             this->ResetAllEffects();
             break;
         }
-        case PARAM_CONV_PROCESS_ENABLED: {
+        case PARAM_CONVOLUTION_ENABLE: {
 //            this->convolver->SetEnabled(val1 != 0);
             break;
         } // 0x10002
-        case PARAM_CONV_UPDATEKERNEL: {
-//            this->convolver->SetKernel(arr, arrSize);
+        case PARAM_CONVOLUTION_PREPARE_BUFFER: {
             break;
-        }
-        case PARAM_CONV_CROSSCHANNEL: {
+        } // 0x10004
+        case PARAM_CONVOLUTION_SET_BUFFER: {
+            break;
+        } // 0x10005
+        case PARAM_CONVOLUTION_COMMIT_BUFFER: {
+            break;
+        } // 0x10006
+        case PARAM_CONVOLUTION_CROSS_CHANNEL: {
             this->convolver->SetCrossChannel((float) val1 / 100.0f);
             break;
         } // 0x10007
-        case PARAM_VHE_PROCESS_ENABLED: {
+        case PARAM_HEADPHONE_SURROUND_ENABLE: {
             this->vhe->SetEnable(val1 != 0);
             break;
         } // 0x10008
-        case PARAM_VHE_EFFECT_LEVEL: {
+        case PARAM_HEADPHONE_SURROUND_STRENGTH: {
             this->vhe->SetEffectLevel(val1);
             break;
         } // 0x10009
-        case PARAM_VDDC_PROCESS_ENABLED: {
+        case PARAM_DDC_ENABLE: {
             this->viperDdc->SetEnable(val1 != 0);
             break;
         } // 0x1000A
-        case PARAM_VDDC_COEFFS: {
+        case PARAM_DDC_COEFFICIENTS: {
             // TODO: Finish
             //this->viperDdc->SetCoeffs();
             break;
         } // 0x1000B
-        case PARAM_VSE_PROCESS_ENABLED: {
+        case PARAM_SPECTRUM_EXTENSION_ENABLE: {
             this->spectrumExtend->SetEnable(val1 != 0);
             break;
         } // 0x1000C
-        case PARAM_VSE_REFERENCE_BARK: {
+        case PARAM_SPECTRUM_EXTENSION_BARK: {
             this->spectrumExtend->SetReferenceFrequency(val1);
             break;
         } // 0x1000D
-        case PARAM_VSE_BARK_RECONSTRUCT: {
+        case PARAM_SPECTRUM_EXTENSION_BARK_RECONSTRUCT: {
             this->spectrumExtend->SetExciter((float) val1 / 100.0f);
             break;
         } // 0x1000E
-        case PARAM_FIREQ_PROCESS_ENABLED: {
+        case PARAM_FIR_EQUALIZER_ENABLE: {
             this->iirFilter->SetEnable(val1 != 0);
             break;
         } // 0x1000F
-        case PARAM_FIREQ_BANDLEVEL: {
+        case PARAM_FIR_EQUALIZER_BAND_LEVEL: {
             this->iirFilter->SetBandLevel(val1, (float) val2 / 100.0f);
             break;
         } // 0x10010
-        case PARAM_COLM_PROCESS_ENABLED: {
+        case PARAM_FIELD_SURROUND_ENABLE: {
             this->colorfulMusic->SetEnable(val1 != 0);
             break;
         } // 0x10011
-        case PARAM_COLM_WIDENING: {
+        case PARAM_FIELD_SURROUND_WIDENING: {
             this->colorfulMusic->SetWidenValue((float) val1 / 100.0f);
             break;
         } // 0x10012
-        case PARAM_COLM_MIDIMAGE: {
+        case PARAM_FIELD_SURROUND_MID_IMAGE: {
             this->colorfulMusic->SetMidImageValue((float) val1 / 100.0f);
             break;
         } // 0x10013
-        case PARAM_COLM_DEPTH: {
+        case PARAM_FIELD_SURROUND_DEPTH: {
             this->colorfulMusic->SetDepthValue((short) val1);
             break;
         } // 0x10014
-        case PARAM_DIFFSURR_PROCESS_ENABLED: {
+        case PARAM_DIFFERENTIAL_SURROUND_ENABLE: {
             this->diffSurround->SetEnable(val1 != 0);
             break;
         } // 0x10015
-        case PARAM_DIFFSURR_DELAYTIME: {
+        case PARAM_DIFFERENTIAL_SURROUND_DELAY: {
             this->diffSurround->SetDelayTime((float) val1 / 100.0f);
             break;
         } // 0x10016
-        case PARAM_REVB_PROCESS_ENABLED: {
+        case PARAM_REVERBERATION_ENABLE: {
             this->reverberation->SetEnable(val1 != 0);
             break;
         } // 0x10017
-        case PARAM_REVB_ROOMSIZE: {
+        case PARAM_REVERBERATION_ROOM_SIZE: {
             this->reverberation->SetRoomSize((float) val1 / 100.0f);
             break;
         } // 0x10018
-        case PARAM_REVB_WIDTH: {
+        case PARAM_REVERBERATION_ROOM_WIDTH: {
             this->reverberation->SetWidth((float) val1 / 100.0f);
             break;
         } // 0x10019
-        case PARAM_REVB_DAMP: {
+        case PARAM_REVERBERATION_ROOM_DAMPENING: {
             this->reverberation->SetDamp((float) val1 / 100.0f);
             break;
         } // 0x1001A
-        case PARAM_REVB_WET: {
+        case PARAM_REVERBERATION_ROOM_WET_SIGNAL: {
             this->reverberation->SetWet((float) val1 / 100.0f);
             break;
         } // 0x1001B
-        case PARAM_REVB_DRY: {
+        case PARAM_REVERBERATION_ROOM_DRY_SIGNAL: {
             this->reverberation->SetDry((float) val1 / 100.0f);
             break;
         } // 0x1001C
-        case PARAM_AGC_PROCESS_ENABLED: {
+        case PARAM_AUTOMATIC_GAIN_CONTROL_ENABLE: {
             this->playbackGain->SetEnable(val1 != 0);
             break;
         } // 0x1001D
-        case PARAM_AGC_RATIO: {
+        case PARAM_AUTOMATIC_GAIN_CONTROL_RATIO: {
             this->playbackGain->SetRatio((float) val1 / 100.0f);
             break;
         } // 0x1001E
-        case PARAM_AGC_VOLUME: {
+        case PARAM_AUTOMATIC_GAIN_CONTROL_VOLUME: {
             this->playbackGain->SetVolume((float) val1 / 100.0f);
             break;
         } // 0x1001F
-        case PARAM_AGC_MAXSCALER: {
+        case PARAM_AUTOMATIC_GAIN_CONTROL_MAX_SCALER: {
             this->playbackGain->SetMaxGainFactor((float) val1 / 100.0f);
             break;
         } // 0x10020
-        case PARAM_DYNSYS_PROCESS_ENABLED: {
+        case PARAM_DYNAMIC_SYSTEM_ENABLE: {
             this->dynamicSystem->SetEnable(val1 != 0);
             break;
         } // 0x10021
-        case PARAM_DYNSYS_XCOEFFS: {
+        case PARAM_DYNAMIC_SYSTEM_X_COEFFICIENTS: {
             this->dynamicSystem->SetXCoeffs(val1, val2);
             break;
         } // 0x10022
-        case PARAM_DYNSYS_YCOEFFS: {
+        case PARAM_DYNAMIC_SYSTEM_Y_COEFFICIENTS: {
             this->dynamicSystem->SetYCoeffs(val1, val2);
             break;
         } // 0x10023
-        case PARAM_DYNSYS_SIDEGAIN: {
+        case PARAM_DYNAMIC_SYSTEM_SIDE_GAIN: {
             this->dynamicSystem->SetSideGain((float) val1 / 100.0f, (float) val2 / 100.0f);
             break;
         } // 0x10024
-        case PARAM_DYNSYS_BASSGAIN: {
+        case PARAM_DYNAMIC_SYSTEM_STRENGTH: {
             this->dynamicSystem->SetBassGain((float) val1 / 100.0f);
             break;
         } // 0x10025
-        case PARAM_VIPERBASS_PROCESS_ENABLED: {
+        case PARAM_FIDELITY_BASS_ENABLE: {
             this->viperBass->SetEnable(val1 != 0);
             break;
         } // 0x10026
-        case PARAM_VIPERBASS_MODE: {
+        case PARAM_FIDELITY_BASS_MODE: {
             this->viperBass->SetProcessMode((ViPERBass::ProcessMode) val1);
             break;
         } // 0x10027
-        case PARAM_VIPERBASS_SPEAKER: {
+        case PARAM_FIDELITY_BASS_FREQUENCY: {
             this->viperBass->SetSpeaker(val1);
             break;
         } // 0x10028
-        case PARAM_VIPERBASS_BASSGAIN: {
+        case PARAM_FIDELITY_BASS_GAIN: {
             this->viperBass->SetBassFactor((float) val1 / 100.0f);
             break;
         } // 0x10029
-        case PARAM_VIPERCLARITY_PROCESS_ENABLED: {
+        case PARAM_FIDELITY_CLARITY_ENABLE: {
             this->viperClarity->SetEnable(val1 != 0);
             break;
         } // 0x1002A
-        case PARAM_VIPERCLARITY_MODE: {
+        case PARAM_FIDELITY_CLARITY_MODE: {
             this->viperClarity->SetProcessMode((ViPERClarity::ClarityMode) val1);
             break;
         } // 0x1002B
-        case PARAM_VIPERCLARITY_CLARITY: {
+        case PARAM_FIDELITY_CLARITY_GAIN: {
             this->viperClarity->SetClarity((float) val1 / 100.0f);
             break;
         } // 0x1002C
-        case PARAM_CURE_PROCESS_ENABLED: {
+        case PARAM_CURE_CROSS_FEED_ENABLED: {
             this->cure->SetEnable(val1 != 0);
             break;
         } // 0x1002D
-        case PARAM_CURE_CROSSFEED: {
+        case PARAM_CURE_CROSS_FEED_STRENGTH: {
             switch (val1) {
                 case 0:
                     // Cure_R::SetPreset(pCVar17,0x5f028a);
@@ -430,11 +435,11 @@ void ViPER::DispatchCommand(int param, int val1, int val2, int val3, int val4, u
             }
             break;
         } // 0x1002E
-        case PARAM_TUBE_PROCESS_ENABLED: {
+        case PARAM_TUBE_SIMULATOR_ENABLED: {
             this->tubeSimulator->SetEnable(val1 != 0);
             break;
         } // 0x1002F
-        case PARAM_ANALOGX_PROCESS_ENABLED: {
+        case PARAM_ANALOGX_ENABLE: {
             this->analogX->SetEnable(val1 != 0);
             break;
         } // 0x10030
@@ -442,11 +447,11 @@ void ViPER::DispatchCommand(int param, int val1, int val2, int val3, int val4, u
             this->analogX->SetProcessingModel(val1);
             break;
         } // 0x10031
-        case PARAM_OUTPUT_VOLUME: {
+        case PARAM_GATE_OUTPUT_VOLUME: {
             this->frameScale = (float) val1 / 100.0f;
             break;
         } // 0x10032
-        case PARAM_OUTPUT_PAN: {
+        case PARAM_GATE_CHANNEL_PAN: {
             float tmp = (float) val1 / 100.0f;
             if (tmp < 0.0f) {
                 this->leftPan = 1.0f;
@@ -457,67 +462,67 @@ void ViPER::DispatchCommand(int param, int val1, int val2, int val3, int val4, u
             }
             break;
         } // 0x10033
-        case PARAM_LIMITER_THRESHOLD: {
+        case PARAM_GATE_LIMIT: {
             this->softwareLimiters[0]->SetGate((float) val1 / 100.0f);
             this->softwareLimiters[1]->SetGate((float) val1 / 100.0f);
             break;
         } // 0x10034
-        case PARAM_SPKFX_AGC_PROCESS_ENABLED: {
+        case PARAM_SPEAKER_OPTIMIZATION: {
             this->speakerCorrection->SetEnable(val1 != 0);
             break;
         } // 0x10043
-        case PARAM_FETCOMP_PROCESS_ENABLED: {
+        case PARAM_FET_COMPRESSOR_ENABLE: {
             break;
         } // 0x10049
-        case PARAM_FETCOMP_THRESHOLD: {
+        case PARAM_FET_COMPRESSOR_THRESHOLD: {
             break;
         } // 0x1004A
-        case PARAM_FETCOMP_RATIO: {
+        case PARAM_FET_COMPRESSOR_RATIO: {
             this->fetCompressor->SetParameter(FETCompressor::THRESHOLD, (float) val1 / 100.0f);
             break;
         } // 0x1004B
-        case PARAM_FETCOMP_KNEEWIDTH: {
+        case PARAM_FET_COMPRESSOR_KNEE: {
             break;
         } // 0x1004C
-        case PARAM_FETCOMP_AUTOKNEE_ENABLED: {
+        case PARAM_FET_COMPRESSOR_AUTO_KNEE: {
             break;
         } // 0x1004D
-        case PARAM_FETCOMP_GAIN: {
+        case PARAM_FET_COMPRESSOR_GAIN: {
             break;
         } // 0x1004E
-        case PARAM_FETCOMP_AUTOGAIN_ENABLED: {
+        case PARAM_FET_COMPRESSOR_AUTO_GAIN: {
             this->fetCompressor->SetParameter(FETCompressor::GAIN, (float) val1 / 100.0f);
             break;
         } // 0x1004F
-        case PARAM_FETCOMP_ATTACK: {
+        case PARAM_FET_COMPRESSOR_ATTACK: {
             break;
         } // 0x10050
-        case PARAM_FETCOMP_AUTOATTACK_ENABLED: {
+        case PARAM_FET_COMPRESSOR_AUTO_ATTACK: {
             break;
         } // 0x10051
-        case PARAM_FETCOMP_RELEASE: {
+        case PARAM_FET_COMPRESSOR_RELEASE: {
             break;
         } // 0x10052
-        case PARAM_FETCOMP_AUTORELEASE_ENABLED: {
+        case PARAM_FET_COMPRESSOR_AUTO_RELEASE: {
             break;
         } // 0x10053
-        case PARAM_FETCOMP_META_KNEEMULTI: {
+        case PARAM_FET_COMPRESSOR_KNEE_MULTI: {
             break;
         } // 0x10054
-        case PARAM_FETCOMP_META_MAXATTACK: {
+        case PARAM_FET_COMPRESSOR_MAX_ATTACK: {
             break;
         } // 0x10055
-        case PARAM_FETCOMP_META_MAXRELEASE: {
+        case PARAM_FET_COMPRESSOR_MAX_RELEASE: {
             this->fetCompressor->SetParameter(FETCompressor::MAX_ATTACK, (float) val1 / 100.0f);
             break;
         } // 0x10056
-        case PARAM_FETCOMP_META_CREST: {
+        case PARAM_FET_COMPRESSOR_CREST: {
             break;
         } // 0x10057
-        case PARAM_FETCOMP_META_ADAPT: {
+        case PARAM_FET_COMPRESSOR_ADAPT: {
             break;
         } // 0x10058
-        case PARAM_FETCOMP_META_NOCLIP_ENABLED: {
+        case PARAM_FET_COMPRESSOR_NO_CLIP: {
             this->fetCompressor->SetParameter(FETCompressor::ADAPT, (float) val1 / 100.0f);
             break;
         } // 0x10059

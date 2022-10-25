@@ -9,6 +9,7 @@ DiffSurround::DiffSurround() {
     for (auto &buffer : this->buffers) {
         buffer = new WaveBuffer(1, 0x1000);
     }
+    Reset();
 }
 
 DiffSurround::~DiffSurround() {
@@ -42,11 +43,10 @@ void DiffSurround::Process(float *samples, uint32_t size) {
 }
 
 void DiffSurround::Reset() {
-    for (auto &buffer : this->buffers) {
-        buffer->Reset();
-    }
+    this->buffers[0]->Reset();
+    this->buffers[1]->Reset();
 
-    this->buffers[1]->PushZeros((uint32_t) (this->delayTime / 1000.0f * (float) this->samplingRate));
+    this->buffers[1]->PushZeros((uint32_t) ((double) this->delayTime / 1000.0 * (double) this->samplingRate));
 }
 
 void DiffSurround::SetDelayTime(float delayTime) {
@@ -58,10 +58,10 @@ void DiffSurround::SetDelayTime(float delayTime) {
 
 void DiffSurround::SetEnable(bool enabled) {
     if (this->enabled != enabled) {
-        this->enabled = enabled;
-        if (enabled) {
+        if (!this->enabled) {
             Reset();
         }
+        this->enabled = enabled;
     }
 }
 

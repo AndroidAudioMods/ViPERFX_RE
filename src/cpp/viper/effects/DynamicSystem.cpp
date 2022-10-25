@@ -2,55 +2,51 @@
 #include "../constants.h"
 
 DynamicSystem::DynamicSystem() {
-    this->enabled = false;
     this->samplingRate = VIPER_DEFAULT_SAMPLING_RATE;
-    this->bass.SetSamplingRate(this->samplingRate);
-    this->bass.Reset();
+    this->enable = false;
+    this->dynamicBass.SetSamplingRate(this->samplingRate);
+    this->dynamicBass.Reset();
 }
 
 void DynamicSystem::Process(float *samples, uint32_t size) {
-    if (this->enabled) {
-        this->bass.FilterSamples(samples, size);
-    }
+    if (!this->enable) return;
+
+    this->dynamicBass.FilterSamples(samples, size);
 }
 
 void DynamicSystem::Reset() {
-    this->bass.SetSamplingRate(this->samplingRate);
-    this->bass.Reset();
+    this->dynamicBass.SetSamplingRate(this->samplingRate);
+    this->dynamicBass.Reset();
 }
 
 void DynamicSystem::SetBassGain(float gain) {
-    this->bass.SetBassGain(gain);
+    this->dynamicBass.SetBassGain(gain);
 }
 
 void DynamicSystem::SetEnable(bool enable) {
-    if (this->enabled != enable) {
-        this->enabled = enable;
-        if (enable) {
+    if (this->enable != enable) {
+        if (!this->enable) {
             Reset();
         }
+        this->enable = enable;
     }
-}
-
-void DynamicSystem::SetSideGain(float gainX, float gainY) {
-    this->bass.SetSideGain(gainX, gainY);
-}
-
-void DynamicSystem::SetXCoeffs(uint32_t low, uint32_t high) {
-    this->bass.SetFilterXPassFrequency(low, high);
-}
-
-void DynamicSystem::SetYCoeffs(uint32_t low, uint32_t high) {
-    this->bass.SetFilterYPassFrequency(low, high);
 }
 
 void DynamicSystem::SetSamplingRate(uint32_t samplingRate) {
     if (this->samplingRate != samplingRate) {
         this->samplingRate = samplingRate;
-        this->bass.SetSamplingRate(samplingRate);
+        this->dynamicBass.SetSamplingRate(samplingRate);
     }
 }
 
-DynamicSystem::~DynamicSystem() {
+void DynamicSystem::SetSideGain(float gainX, float gainY) {
+    this->dynamicBass.SetSideGain(gainX, gainY);
+}
 
+void DynamicSystem::SetXCoeffs(uint32_t low, uint32_t high) {
+    this->dynamicBass.SetFilterXPassFrequency(low, high);
+}
+
+void DynamicSystem::SetYCoeffs(uint32_t low, uint32_t high) {
+    this->dynamicBass.SetFilterYPassFrequency(low, high);
 }

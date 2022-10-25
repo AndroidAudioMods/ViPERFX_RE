@@ -17,7 +17,7 @@ public:
     void SetWidenValue(float widenValue);
 
 private:
-    Stereo3DSurround stereo3DSurround;
+    Stereo3DSurround stereo3dSurround;
     DepthSurround depthSurround;
     uint32_t samplingRate;
     bool enabled;

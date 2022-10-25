@@ -12,28 +12,19 @@ public:
     Crossfeed();
 
     void Reset();
-
     void ProcessFrames(float *buffer, uint32_t size);
-
     void FilterSample(float *sample);
-
     uint16_t GetCutoff();
-
     float GetFeedback();
-
     float GetLevelDelay();
-
     struct Preset GetPreset();
-
     void SetCutoff(uint16_t cutoff);
-
     void SetFeedback(float feedback);
-
     void SetPreset(struct Preset preset);
-
     void SetSamplingRate(uint32_t samplingRate);
 
-    uint32_t samplerate;
+private:
+    uint32_t samplingRate;
     float a0_lo, b1_lo;
     float a0_hi, b1_hi, a1_hi;
     float gain;

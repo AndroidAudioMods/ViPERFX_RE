@@ -6,7 +6,6 @@
 class DynamicSystem {
 public:
     DynamicSystem();
-    ~DynamicSystem();
 
     void Process(float *samples, uint32_t size);
     void Reset();
@@ -17,9 +16,10 @@ public:
     void SetXCoeffs(uint32_t low, uint32_t high);
     void SetYCoeffs(uint32_t low, uint32_t high);
 
-    DynamicBass bass;
+private:
+    DynamicBass dynamicBass;
     uint32_t samplingRate;
-    bool enabled;
+    bool enable;
 };
 
 

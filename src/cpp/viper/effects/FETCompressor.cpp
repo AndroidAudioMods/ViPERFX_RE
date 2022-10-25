@@ -66,6 +66,7 @@ float FETCompressor::GetParameterDefault(FETCompressor::Parameter parameter) {
 }
 
 void FETCompressor::Process(float *samples, uint32_t size) {
+    return;
     if (size == 0) return;
 
     for (uint32_t i = 0; i < size * 2; i += 2) {

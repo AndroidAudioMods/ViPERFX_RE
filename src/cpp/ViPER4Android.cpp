@@ -221,13 +221,15 @@ static int32_t handleGetParam(ViperContext *pContext, effect_param_t *pCmdParam,
 static int32_t Viper_ICommand(effect_handle_t self,
                               uint32_t cmdCode, uint32_t cmdSize, void *pCmdData,
                               uint32_t *replySize, void *pReplyData) {
+    VIPER_LOGD("Viper_ICommand(self = %p, cmdCode = %d, cmdSize = %d, pCmdData = %p, replySize = %p, pReplyData = %p)", self, cmdCode, cmdSize, pCmdData, replySize, pReplyData);
+
     auto pContext = reinterpret_cast<ViperContext *>(self);
 
-    if (pContext == nullptr || pContext->viper == nullptr) {
+    if (pContext == nullptr || pContext->viper == nullptr || replySize == nullptr || pReplyData == nullptr) {
+        VIPER_LOGD("Viper_ICommand() called with null self or replySize or pReplyData");
         return -EINVAL;
     }
 
-    VIPER_LOGD("Viper_ICommand() called with cmdCode = %d", cmdCode);
     switch (cmdCode) {
         case EFFECT_CMD_INIT:
             *((int *) pReplyData) = 0;
@@ -248,7 +250,7 @@ static int32_t Viper_ICommand(effect_handle_t self,
             return 0;
         }
         case EFFECT_CMD_DISABLE: {
-            pContext->viper->enabled = false;
+//            pContext->viper->enabled = false;
             *((int *) pReplyData) = 0;
             return 0;
         }
@@ -293,11 +295,15 @@ static void Viper_Init(ViperContext *pContext) {
 
 static int32_t
 Viper_Create(const effect_uuid_t *uuid, int32_t sessionId __unused, int32_t ioId __unused, effect_handle_t *pHandle) {
+    VIPER_LOGD("Viper_Create(uuid = %p, sessionId = %d, ioId = %d, pHandle = %p)", uuid, sessionId, ioId, pHandle);
+
     if (uuid == nullptr || pHandle == nullptr) {
+        VIPER_LOGD("Viper_Create() called with null uuid or pHandle");
         return -EINVAL;
     }
 
     if (memcmp(uuid, &viper_descriptor.uuid, sizeof(effect_uuid_t)) != 0) {
+        VIPER_LOGD("Viper_Create() called with wrong uuid");
         return -EINVAL;
     }
 
@@ -310,9 +316,12 @@ Viper_Create(const effect_uuid_t *uuid, int32_t sessionId __unused, int32_t ioId
 }
 
 static int32_t Viper_Release(effect_handle_t handle) {
+    VIPER_LOGD("Viper_Release(handle = %p)", handle);
+
     auto pContext = reinterpret_cast<ViperContext *>(handle);
 
     if (pContext == nullptr) {
+        VIPER_LOGD("Viper_Release() called with null handle");
         return -EINVAL;
     }
 
@@ -324,11 +333,15 @@ static int32_t Viper_Release(effect_handle_t handle) {
 }
 
 static int32_t Viper_GetDescriptor(const effect_uuid_t *uuid, effect_descriptor_t *pDescriptor) {
+    VIPER_LOGD("Viper_GetDescriptor(uuid = %p, pDescriptor = %p)", uuid, pDescriptor);
+
     if (uuid == nullptr || pDescriptor == nullptr) {
+        VIPER_LOGD("Viper_GetDescriptor() called with null uuid or pDescriptor");
         return -EINVAL;
     }
 
     if (memcmp(uuid, &viper_descriptor.uuid, sizeof(effect_uuid_t)) != 0) {
+        VIPER_LOGD("Viper_GetDescriptor() called with wrong uuid");
         return -EINVAL;
     }
 

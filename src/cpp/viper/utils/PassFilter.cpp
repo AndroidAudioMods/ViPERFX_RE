@@ -17,25 +17,6 @@ PassFilter::~PassFilter() {
     delete this->filters[3];
 }
 
-void PassFilter::Reset() {
-    uint32_t cutoff;
-    if (this->samplingRate < 44100) {
-        cutoff = this->samplingRate - 100;
-    } else {
-        cutoff = 18000;
-    }
-
-    this->filters[0]->setLPF((float) cutoff, this->samplingRate);
-    this->filters[1]->setLPF((float) cutoff, this->samplingRate);
-    this->filters[2]->setLPF(10.f, cutoff);
-    this->filters[3]->setLPF(10.f, cutoff);
-
-    this->filters[0]->Mute();
-    this->filters[1]->Mute();
-    this->filters[2]->Mute();
-    this->filters[3]->Mute();
-}
-
 void PassFilter::ProcessFrames(float *buffer, uint32_t size) {
     for (uint32_t x = 0; x < size; x++) {
         float left = buffer[2 * x];
@@ -51,7 +32,28 @@ void PassFilter::ProcessFrames(float *buffer, uint32_t size) {
     }
 }
 
+void PassFilter::Reset() {
+    float cutoff;
+    if (this->samplingRate < 44100) {
+        cutoff = (float) this->samplingRate - 100.0f;
+    } else {
+        cutoff = 18000.0;
+    }
+
+    this->filters[0]->setLPF(cutoff, this->samplingRate);
+    this->filters[1]->setLPF(cutoff, this->samplingRate);
+    this->filters[2]->setHPF(10.0, this->samplingRate);
+    this->filters[3]->setHPF(10.0, this->samplingRate);
+
+    this->filters[0]->Mute();
+    this->filters[1]->Mute();
+    this->filters[2]->Mute();
+    this->filters[3]->Mute();
+}
+
 void PassFilter::SetSamplingRate(uint32_t samplingRate) {
-    this->samplingRate = samplingRate;
-    Reset();
+    if (this->samplingRate != samplingRate) {
+        this->samplingRate = samplingRate;
+        Reset();
+    }
 }

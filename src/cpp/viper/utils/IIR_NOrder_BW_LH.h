@@ -9,10 +9,9 @@ public:
     ~IIR_NOrder_BW_LH();
 
     void Mute();
-
     void setLPF(float frequency, uint32_t samplingRate);
-
     void setHPF(float frequency, uint32_t samplingRate);
+
 
     IIR_1st *filters;
     uint32_t order;

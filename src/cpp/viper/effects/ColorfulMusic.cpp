@@ -4,18 +4,16 @@
 ColorfulMusic::ColorfulMusic() {
     this->samplingRate = VIPER_DEFAULT_SAMPLING_RATE;
     this->enabled = false;
-    this->stereo3DSurround.SetStereoWiden(0.0f);
+    this->stereo3dSurround.SetStereoWiden(0.0);
     this->depthSurround.SetSamplingRate(this->samplingRate);
     this->depthSurround.SetStrength(0);
 }
 
 void ColorfulMusic::Process(float *samples, uint32_t size) {
-    if (!this->enabled) {
-        return;
-    }
+    if (!this->enabled) return;
 
     this->depthSurround.Process(samples, size);
-    this->stereo3DSurround.Process(samples, size);
+    this->stereo3dSurround.Process(samples, size);
 }
 
 void ColorfulMusic::Reset() {
@@ -28,15 +26,15 @@ void ColorfulMusic::SetDepthValue(short depthValue) {
 
 void ColorfulMusic::SetEnable(bool enable) {
     if (this->enabled != enable) {
-        this->enabled = enable;
-        if (enable) {
+        if (!this->enabled) {
             Reset();
         }
+        this->enabled = enable;
     }
 }
 
 void ColorfulMusic::SetMidImageValue(float midImageValue) {
-    this->stereo3DSurround.SetMiddleImage(midImageValue);
+    this->stereo3dSurround.SetMiddleImage(midImageValue);
 }
 
 void ColorfulMusic::SetSamplingRate(uint32_t samplingRate) {
@@ -47,5 +45,5 @@ void ColorfulMusic::SetSamplingRate(uint32_t samplingRate) {
 }
 
 void ColorfulMusic::SetWidenValue(float widenValue) {
-    this->stereo3DSurround.SetStereoWiden(widenValue);
+    this->stereo3dSurround.SetStereoWiden(widenValue);
 }

@@ -7,7 +7,6 @@
 class Cure {
 public:
     Cure();
-    ~Cure();
 
     uint16_t GetCutoff();
     float GetFeedback();
@@ -21,7 +20,8 @@ public:
     void SetPreset(struct Crossfeed::Preset preset);
     void SetSamplingRate(uint32_t samplingRate);
 
+private:
     Crossfeed crossfeed;
-    PassFilter pass;
+    PassFilter passFilter;
     bool enabled;
 };
