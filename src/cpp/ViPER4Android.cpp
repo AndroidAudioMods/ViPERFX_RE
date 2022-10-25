@@ -225,7 +225,7 @@ static int32_t Viper_ICommand(effect_handle_t self,
 
     auto pContext = reinterpret_cast<ViperContext *>(self);
 
-    if (pContext == nullptr || pContext->viper == nullptr || replySize == nullptr || pReplyData == nullptr) {
+    if (pContext == nullptr || replySize == nullptr || pReplyData == nullptr) {
         VIPER_LOGD("Viper_ICommand() called with null self or replySize or pReplyData");
         return -EINVAL;
     }

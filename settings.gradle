@@ -1,8 +1,0 @@
-pluginManagement {
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
-
-rootProject.name = "V4AFX_Reworked"
