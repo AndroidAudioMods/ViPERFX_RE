@@ -148,7 +148,7 @@ void ViPER::processBuffer(float *buffer, uint32_t size) {
     if (this->updateProcessTime) {
         struct timeval time{};
         gettimeofday(&time, nullptr);
-        this->processTimeMs = time.tv_sec * 1000 + time.tv_usec / 1000;
+        this->processTimeMs = (uint64_t) (time.tv_sec * 1000) + (uint64_t) (time.tv_usec / 1000);
     }
 
     uint32_t ret;

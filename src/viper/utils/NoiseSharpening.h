@@ -17,7 +17,7 @@ public:
 
     IIR_1st filters[2];
     float in[2];
-    int32_t samplingRate;
+    uint32_t samplingRate;
     float gain;
 };
 

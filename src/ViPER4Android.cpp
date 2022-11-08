@@ -184,7 +184,7 @@ static int32_t handleGetParam(ViperContext *pContext, effect_param_t *pCmdParam,
             struct timeval time{};
             gettimeofday(&time, nullptr);
 
-            uint64_t currentMs = (time.tv_sec * 1000) + (time.tv_usec / 1000);
+            uint64_t currentMs = (uint64_t) (time.tv_sec * 1000) + (uint64_t) (time.tv_usec / 1000);
             uint64_t lastProcessTime = pContext->viper->processTimeMs;
 
             uint64_t diff;

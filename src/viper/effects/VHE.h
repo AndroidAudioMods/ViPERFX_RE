@@ -21,7 +21,7 @@ public:
     uint32_t samplingRate;
     bool enabled;
     int effectLevel;
-    int convSize;
+    uint32_t convSize;
 };
 
 
