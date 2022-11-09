@@ -281,8 +281,7 @@ void ViPER::DispatchCommand(int param, int val1, int val2, int val3, int val4, u
             break;
         } // 0x1000A
         case PARAM_DDC_COEFFICIENTS: {
-            // TODO: Finish
-            //this->viperDdc->SetCoeffs();
+            this->viperDdc->SetCoeffs(arrSize, (float *) arr, (float *) (arr + arrSize * 4));
             break;
         } // 0x1000B
         case PARAM_SPECTRUM_EXTENSION_ENABLE: {
@@ -302,7 +301,7 @@ void ViPER::DispatchCommand(int param, int val1, int val2, int val3, int val4, u
             break;
         } // 0x1000F
         case PARAM_FIR_EQUALIZER_BAND_LEVEL: {
-            this->iirFilter->SetBandLevel(val1, (float) val2 / 100.0f);
+            this->iirFilter->SetBandLevel((uint32_t) val1, (float) val2 / 100.0f);
             break;
         } // 0x10010
         case PARAM_FIELD_SURROUND_ENABLE: {
@@ -398,7 +397,7 @@ void ViPER::DispatchCommand(int param, int val1, int val2, int val3, int val4, u
             break;
         } // 0x10027
         case PARAM_FIDELITY_BASS_FREQUENCY: {
-            this->viperBass->SetSpeaker(val1);
+            this->viperBass->SetSpeaker((uint32_t) val1);
             break;
         } // 0x10028
         case PARAM_FIDELITY_BASS_GAIN: {

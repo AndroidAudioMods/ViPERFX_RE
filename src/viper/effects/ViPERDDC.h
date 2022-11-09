@@ -19,16 +19,16 @@ private:
     bool setCoeffsOk;
     uint32_t samplingRate;
     uint32_t arrSize;
-    float **arrPtr44100;
-    float **arrPtr48000;
-    float *arr1;
-    float *arr2;
-    float *arr3;
-    float *arr4;
-    float *arr5;
-    float *arr6;
-    float *arr7;
-    float *arr8;
+    float **coeffsArr44100;
+    float **coeffsArr48000;
+    float *x1L;
+    float *x1R;
+    float *x2L;
+    float *x2R;
+    float *y1L;
+    float *y1R;
+    float *y2L;
+    float *y2R;
 };
 
 
