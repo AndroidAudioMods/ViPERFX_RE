@@ -1,3 +1,4 @@
+#include <cmath>
 #include "PlaybackGain.h"
 #include "../constants.h"
 
@@ -16,12 +17,23 @@ PlaybackGain::PlaybackGain() {
     this->biquad2.SetBandPassParameter(2200.0,this->samplingRate,0.33);
 }
 
-PlaybackGain::~PlaybackGain() {
+float PlaybackGain::AnalyseWave(float *samples, uint32_t size) {
+    if (size == 0) return 0.0;
 
-}
+    double tmpL = 0.0;
+    double tmpR = 0.0;
 
-void PlaybackGain::AnalyseWave() {
+    for (uint32_t i = 0; i < size * 2; i += 2) {
+        double tmpL2 = this->biquad1.ProcessSample(samples[i]);
+        tmpL += tmpL2 * tmpL2;
 
+        double tmpR2 = this->biquad2.ProcessSample(samples[i + 1]);
+        tmpR += tmpR2 * tmpR2;
+    }
+
+    float tmp = tmpL;
+
+    return tmp / (float) size;
 }
 
 void PlaybackGain::Process(float *samples, uint32_t size) {
@@ -37,9 +49,11 @@ void PlaybackGain::Reset() {
 }
 
 void PlaybackGain::SetEnable(bool enable) {
-    this->enable = enable;
-    if (enable) {
-        Reset();
+    if (this->enable != enable) {
+        this->enable = enable;
+        if (enable) {
+            Reset();
+        }
     }
 }
 
@@ -49,12 +63,14 @@ void PlaybackGain::SetMaxGainFactor(float maxGainFactor) {
 
 void PlaybackGain::SetRatio(float ratio) {
     this->ratio1 = ratio + 1.0f;
-    this->ratio2 = 1.0f / (ratio + 1.0f);
+    this->ratio2 = 1.0f / this->ratio1;
 }
 
 void PlaybackGain::SetSamplingRate(uint32_t samplingRate) {
-    this->samplingRate = samplingRate;
-    Reset();
+    if (this->samplingRate != samplingRate) {
+        this->samplingRate = samplingRate;
+        Reset();
+    }
 }
 
 void PlaybackGain::SetVolume(float volume) {

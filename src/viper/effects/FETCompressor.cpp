@@ -92,7 +92,7 @@ void FETCompressor::Process(float *samples, uint32_t size) {
 }
 
 double FETCompressor::ProcessSidechain(double in) {
-    double in2 = pow(in, 2.0);
+    double in2 = in * in;
     if (in2 < 0.000001) {
         in2 = 0.000001;
     }

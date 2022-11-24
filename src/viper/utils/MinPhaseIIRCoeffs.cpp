@@ -131,7 +131,7 @@ float MinPhaseIIRCoeffs::GetIndexFrequency(uint32_t index) {
 }
 
 int MinPhaseIIRCoeffs::SolveRoot(double param_2, double param_3, double param_4, double *param_5) {
-    double x = (param_4 - pow(param_3, 2) / (param_2 * 4.0)) / param_2;
+    double x = (param_4 - (param_3 * param_3) / (param_2 * 4.0)) / param_2;
     double y = param_3 / (param_2 * 2.0);
 
     if (x >= 0.0) {
@@ -197,15 +197,15 @@ int MinPhaseIIRCoeffs::UpdateCoeffs(uint32_t bands, uint32_t samplingRate) {
         double sinY = sin(y);
 
         double a = cosX * cosY;
-        double b = pow(cosX, 2.0) / 2.0;
-        double c = pow(sinY, 2.0);
+        double b = (cosX * cosX) / 2.0;
+        double c = (sinY * sinY);
 
         // ((b - a) + 0.5) - c
         double d = ((b - a) + 0.5) - c;
-        // c + (((b + pow(cosY, 2.0)) - a) - 0.5)
-        double e = c + (((b + pow(cosY, 2.0)) - a) - 0.5);
-        // ((pow(cosX, 2.0) / 8.0 - cosX * cosY / 4.0) + 0.125) - c / 4.0
-        double f = ((pow(cosX, 2.0) * 0.125 - cosX * cosY * 0.25) + 0.125) - c * 0.25;
+        // c + (((b + (cosY * cosY)) - a) - 0.5)
+        double e = c + (((b + (cosY * cosY)) - a) - 0.5);
+        // (((cosX * cosX) / 8.0 - cosX * cosY / 4.0) + 0.125) - c / 4.0
+        double f = (((cosX * cosX) * 0.125 - cosX * cosY * 0.25) + 0.125) - c * 0.25;
 
         if (SolveRoot(d, e, f, &ret1) == 0) {
             this->coeffs[4 * i] = ret1 * 2.0;

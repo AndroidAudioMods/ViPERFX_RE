@@ -37,7 +37,6 @@ set(FILES
         src/viper/effects/DiffSurround.cpp
         src/viper/effects/DynamicSystem.cpp
         src/viper/effects/FETCompressor.cpp
-        src/viper/effects/FIREqualizer.cpp
         src/viper/effects/IIRFilter.cpp
         src/viper/effects/PlaybackGain.cpp
         src/viper/effects/Reverberation.cpp
@@ -70,7 +69,7 @@ set(FILES
         src/viper/utils/MultiBiquad.cpp
         src/viper/utils/NoiseSharpening.cpp
         src/viper/utils/PassFilter.cpp
-        src/viper/utils/PConvSingle_F32.cpp
+        src/viper/utils/PConvSingle.cpp
         src/viper/utils/PolesFilter.cpp
         src/viper/utils/Polyphase.cpp
         src/viper/utils/Stereo3DSurround.cpp
