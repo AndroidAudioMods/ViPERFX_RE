@@ -11,11 +11,11 @@ public:
     void Process(float *samples, uint32_t size);
     void Reset();
     void SetDelayTime(float delayTime);
-    void SetEnable(bool enabled);
+    void SetEnable(bool enable);
     void SetSamplingRate(uint32_t samplingRate);
 
     uint32_t samplingRate;
-    bool enabled;
+    bool enable;
     float delayTime;
     WaveBuffer *buffers[2];
 };

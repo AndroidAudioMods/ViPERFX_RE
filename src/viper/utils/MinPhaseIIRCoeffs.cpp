@@ -2,6 +2,8 @@
 #include "../constants.h"
 #include <cmath>
 
+// Iscle: Verified with latest version at 13/12/2022
+
 static const float MIN_PHASE_IIR_COEFFS_FREQ_10BANDS[] = {
         31.0,
         62.0,
@@ -107,8 +109,8 @@ MinPhaseIIRCoeffs::~MinPhaseIIRCoeffs() {
 
 void MinPhaseIIRCoeffs::Find_F1_F2(double param_2, double param_3, double *param_4, double *param_5) {
     double x = pow(2.0, param_3 / 2.0);
-    *param_5 = param_2 / x;
-    *param_4 = param_2 * x;
+    *param_4 = param_2 / x;
+    *param_5 = param_2 * x;
 }
 
 double *MinPhaseIIRCoeffs::GetCoefficients() {
@@ -132,7 +134,7 @@ float MinPhaseIIRCoeffs::GetIndexFrequency(uint32_t index) {
 
 int MinPhaseIIRCoeffs::SolveRoot(double param_2, double param_3, double param_4, double *param_5) {
     double x = (param_4 - (param_3 * param_3) / (param_2 * 4.0)) / param_2;
-    double y = param_3 / (param_2 * 2.0);
+    double y = param_3 / (param_2 + param_2);
 
     if (x >= 0.0) {
         return -1;
@@ -161,24 +163,24 @@ int MinPhaseIIRCoeffs::UpdateCoeffs(uint32_t bands, uint32_t samplingRate) {
     delete[] this->coeffs;
     this->coeffs = new double[bands * 4](); // TODO: Check this array size, original type: float
 
-    const float *coeffsArray;
+    const float *bandFreqs;
     double tmp;
 
     switch (bands) {
         case 10:
-            coeffsArray = MIN_PHASE_IIR_COEFFS_FREQ_10BANDS;
+            bandFreqs = MIN_PHASE_IIR_COEFFS_FREQ_10BANDS;
             tmp = 3.0 / 3.0;
             break;
         case 15:
-            coeffsArray = MIN_PHASE_IIR_COEFFS_FREQ_15BANDS;
+            bandFreqs = MIN_PHASE_IIR_COEFFS_FREQ_15BANDS;
             tmp = 2.0 / 3.0;
             break;
         case 25:
-            coeffsArray = MIN_PHASE_IIR_COEFFS_FREQ_25BANDS;
+            bandFreqs = MIN_PHASE_IIR_COEFFS_FREQ_25BANDS;
             tmp = 1.0 / 3.0;
             break;
         case 31:
-            coeffsArray = MIN_PHASE_IIR_COEFFS_FREQ_31BANDS;
+            bandFreqs = MIN_PHASE_IIR_COEFFS_FREQ_31BANDS;
             tmp = 1.0 / 3.0;
             break;
     }
@@ -187,9 +189,9 @@ int MinPhaseIIRCoeffs::UpdateCoeffs(uint32_t bands, uint32_t samplingRate) {
         double ret1;
         double ret2;
 
-        Find_F1_F2(coeffsArray[i], tmp, &ret1, &ret2);
+        Find_F1_F2(bandFreqs[i], tmp, &ret2, &ret1);
 
-        double x = (2.0 * M_PI * (double) coeffsArray[i]) / (double) this->samplingRate;
+        double x = (2.0 * M_PI * (double) bandFreqs[i]) / (double) this->samplingRate;
         double y = (2.0 * M_PI * ret2) / (double) this->samplingRate;
 
         double cosX = cos(x);
@@ -197,20 +199,17 @@ int MinPhaseIIRCoeffs::UpdateCoeffs(uint32_t bands, uint32_t samplingRate) {
         double sinY = sin(y);
 
         double a = cosX * cosY;
-        double b = (cosX * cosX) / 2.0;
-        double c = (sinY * sinY);
+        double b = cosX * cosX / 2.0;
+        double c = sinY * sinY;
 
-        // ((b - a) + 0.5) - c
         double d = ((b - a) + 0.5) - c;
-        // c + (((b + (cosY * cosY)) - a) - 0.5)
-        double e = c + (((b + (cosY * cosY)) - a) - 0.5);
-        // (((cosX * cosX) / 8.0 - cosX * cosY / 4.0) + 0.125) - c / 4.0
+        double e = c + (((b + cosY * cosY) - a) - 0.5);
         double f = (((cosX * cosX) * 0.125 - cosX * cosY * 0.25) + 0.125) - c * 0.25;
 
         if (SolveRoot(d, e, f, &ret1) == 0) {
-            this->coeffs[4 * i] = ret1 * 2.0;
-            this->coeffs[4 * i + 1] = ((0.5 - ret1) * 0.5) * 2.0;
-            this->coeffs[4 * i + 2] = ((ret1 + 0.5) * cosX) * 2.0;
+            this->coeffs[i * 4] = ret1 + ret1;
+            this->coeffs[i * 4 + 1] = 0.5 - ret1;
+            this->coeffs[i * 4 + 2] = (ret1 + 0.5) * cosX * 2.0;
         }
     }
 

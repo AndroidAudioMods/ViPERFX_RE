@@ -7,7 +7,7 @@ class PlaybackGain {
 public:
     PlaybackGain();
 
-    float AnalyseWave(float *samples, uint32_t size);
+    double AnalyseWave(float *samples, uint32_t size);
     void Process(float *samples, uint32_t size);
     void Reset();
     void SetEnable(bool enable);

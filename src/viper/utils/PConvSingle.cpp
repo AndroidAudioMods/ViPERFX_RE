@@ -59,13 +59,13 @@ int PConvSingle::LoadKernel(float *buf, int param_2, int segmentSize) {
 
 int PConvSingle::LoadKernel(const float *param_2,float param_3,int param_4,int param_5) {
 //    if (buf != nullptr && param_5 > 0 && segmentSize > 0 && segmentSize % 2 == 0) {
-//        this->enabled = false;
+//        this->enable = false;
 //        ReleaseResources();
 ////        this->data = new PConvData(); //(PConvData *) malloc(0x140);  // TODO: Sizeof
 //        this->segmentSize = segmentSize;
 //        int n = ProcessKernel(1, param_2, param_4, param_5);
 //        if (n != 0) {
-//            this->enabled = true;
+//            this->enable = true;
 //            return n;
 //        }
 //        ReleaseResources();

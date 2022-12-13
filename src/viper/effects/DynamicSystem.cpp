@@ -25,7 +25,7 @@ void DynamicSystem::SetBassGain(float gain) {
 
 void DynamicSystem::SetEnable(bool enable) {
     if (this->enable != enable) {
-        if (!this->enable) {
+        if (enable) {
             Reset();
         }
         this->enable = enable;

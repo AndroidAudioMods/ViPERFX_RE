@@ -3,6 +3,8 @@
 #include <cstdint>
 #include "../utils/MinPhaseIIRCoeffs.h"
 
+// Iscle: Verified with latest version at 13/12/2022
+
 class IIRFilter {
 public:
     IIRFilter(uint32_t bands);

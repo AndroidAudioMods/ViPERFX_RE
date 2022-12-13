@@ -250,7 +250,7 @@ static int32_t Viper_ICommand(effect_handle_t self,
             return 0;
         }
         case EFFECT_CMD_DISABLE: {
-//            pContext->viper->enabled = false;
+//            pContext->viper->enable = false;
             *((int *) pReplyData) = 0;
             return 0;
         }

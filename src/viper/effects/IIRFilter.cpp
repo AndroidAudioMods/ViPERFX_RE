@@ -3,6 +3,8 @@
 #include "IIRFilter.h"
 #include "../constants.h"
 
+// Iscle: Verified with latest version at 13/12/2022
+
 IIRFilter::IIRFilter(uint32_t bands) {
     this->enable = false;
     this->samplingRate = VIPER_DEFAULT_SAMPLING_RATE;
@@ -40,8 +42,8 @@ void IIRFilter::Process(float *samples, uint32_t size) {
                 double coeff3 = coeffs[k * 4 + 2];
 
                 double a = coeff3 * this->buf[bufIdx + ((this->unknown3 + 3) - this->unknown2)];
-                double b = coeff2 * (sample - this->buf[bufIdx + (unknown4 - unknown2)]);
-                double c = coeff1 * this->buf[bufIdx + ((unknown4 - unknown2) + 3)];
+                double b = coeff2 * (sample - this->buf[bufIdx + (this->unknown4 - this->unknown2)]);
+                double c = coeff1 * this->buf[bufIdx + ((this->unknown4 - this->unknown2) + 3)];
 
                 double tmp = (a + b) - c;
 
@@ -67,7 +69,7 @@ void IIRFilter::Reset() {
 
 void IIRFilter::SetBandLevel(uint32_t band, float level) {
     if (band > 30) return;
-    double bandLevel = pow(10.0, level / 20.0);
+    double bandLevel = pow(10.0, (double) level / 20.0);
     this->bandLevelsWithQ[band] = (float) (bandLevel * 0.636);
 }
 
@@ -75,7 +77,7 @@ void IIRFilter::SetEnable(bool enable) {
     if (this->enable != enable) {
         this->enable = enable;
         if (enable) {
-            this->Reset();
+            Reset();
         }
     }
 }
@@ -84,8 +86,8 @@ void IIRFilter::SetSamplingRate(uint32_t samplingRate) {
     if (this->samplingRate != samplingRate) {
         this->samplingRate = samplingRate;
         if (this->bands != 0) {
-            this->minPhaseIirCoeffs.UpdateCoeffs(this->bands, this->samplingRate);
+            this->minPhaseIirCoeffs.UpdateCoeffs(this->bands, samplingRate);
         }
-        this->Reset();
+        Reset();
     }
 }

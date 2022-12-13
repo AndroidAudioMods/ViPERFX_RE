@@ -5,7 +5,7 @@
 DiffSurround::DiffSurround() {
     this->samplingRate = VIPER_DEFAULT_SAMPLING_RATE;
     this->delayTime = 0.0f;
-    this->enabled = false;
+    this->enable = false;
     for (auto &buffer : this->buffers) {
         buffer = new WaveBuffer(1, 0x1000);
     }
@@ -19,27 +19,27 @@ DiffSurround::~DiffSurround() {
 }
 
 void DiffSurround::Process(float *samples, uint32_t size) {
+    if (!this->enable) return;
+
     float *bufs[2];
     float *outbufs[2];
 
-    if (this->enabled) {
-        bufs[0] = this->buffers[0]->PushZerosGetBuffer(size);
-        bufs[1] = this->buffers[1]->PushZerosGetBuffer(size);
+    bufs[0] = this->buffers[0]->PushZerosGetBuffer(size);
+    bufs[1] = this->buffers[1]->PushZerosGetBuffer(size);
 
-        for (uint32_t i = 0; i < size * 2; i++) {
-            bufs[i % 2][i / 2] = samples[i];
-        }
-
-        outbufs[0] = this->buffers[0]->GetBuffer();
-        outbufs[1] = this->buffers[1]->GetBuffer();
-
-        for (uint32_t i = 0; i < size * 2; i++) {
-            samples[i] = outbufs[i % 2][i / 2];
-        }
-
-        this->buffers[0]->PopSamples(size, false);
-        this->buffers[1]->PopSamples(size, false);
+    for (uint32_t i = 0; i < size * 2; i++) {
+        bufs[i % 2][i / 2] = samples[i];
     }
+
+    outbufs[0] = this->buffers[0]->GetBuffer();
+    outbufs[1] = this->buffers[1]->GetBuffer();
+
+    for (uint32_t i = 0; i < size * 2; i++) {
+        samples[i] = outbufs[i % 2][i / 2];
+    }
+
+    this->buffers[0]->PopSamples(size, false);
+    this->buffers[1]->PopSamples(size, false);
 }
 
 void DiffSurround::Reset() {
@@ -56,12 +56,12 @@ void DiffSurround::SetDelayTime(float delayTime) {
     }
 }
 
-void DiffSurround::SetEnable(bool enabled) {
-    if (this->enabled != enabled) {
-        if (!this->enabled) {
+void DiffSurround::SetEnable(bool enable) {
+    if (this->enable != enable) {
+        if (!this->enable) {
             Reset();
         }
-        this->enabled = enabled;
+        this->enable = enable;
     }
 }
 
