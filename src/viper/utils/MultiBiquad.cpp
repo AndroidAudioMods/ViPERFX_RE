@@ -49,11 +49,11 @@ MultiBiquad::RefreshFilter(FilterType type, float gainAmp, float frequency, uint
     if (type == FilterType::LOW_SHELF || type == FilterType::HIGH_SHELF) {
         y = sinOmega / 2.0 * sqrt((1.0 / gain + gain) * (1.0 / (double) qFactor - 1.0) + 2.0);
         z = sqrt(gain) * 2.0 * y;
-    } else if (!param_7) {
-        y = sinOmega / ((double) qFactor * 2.0);
+    } else if (param_7) {
+        y = sinh(((double) qFactor * log(2.0) * omega / 2.0) / sinOmega) * sinOmega;
         z = -1.0; // Unused in this case
     } else {
-        y = sinh(((double) qFactor * log(2.0) * omega / 2.0) / sinOmega) * sinOmega;
+        y = sinOmega / ((double) qFactor + (double) qFactor);
         z = -1.0; // Unused in this case
     }
 
@@ -143,13 +143,13 @@ MultiBiquad::RefreshFilter(FilterType type, float gainAmp, float frequency, uint
         }
     }
 
-    this->x2 = 0.0;
     this->x1 = 0.0;
-    this->y2 = 0.0;
+    this->x2 = 0.0;
     this->y1 = 0.0;
+    this->y2 = 0.0;
 
-    this->a1 = -a1 / a0;
-    this->a2 = -a2 / a0;
+    this->a1 = -(a1 / a0);
+    this->a2 = -(a2 / a0);
     this->b0 = b0 / a0;
     this->b1 = b1 / a0;
     this->b2 = b2 / a0;

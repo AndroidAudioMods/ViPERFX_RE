@@ -4,6 +4,8 @@
 #include "../utils/MultiBiquad.h"
 #include "../utils/Biquad.h"
 
+// Iscle: Verified with the latest version at 13/12/2022
+
 class SpeakerCorrection {
 public:
     SpeakerCorrection();

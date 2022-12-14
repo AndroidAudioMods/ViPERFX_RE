@@ -2,7 +2,7 @@
 #include "../constants.h"
 #include <cmath>
 
-// Iscle: Verified with latest version at 13/12/2022
+// Iscle: Verified with the latest version at 13/12/2022
 
 static const float MIN_PHASE_IIR_COEFFS_FREQ_10BANDS[] = {
         31.0,

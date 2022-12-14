@@ -2,17 +2,18 @@
 
 #include <cstdint>
 
+// Iscle: Verified with the latest version at 13/12/2022
+
 class TubeSimulator {
 public:
     TubeSimulator();
-    ~TubeSimulator();
 
     void Reset();
     void SetEnable(bool enable);
     void TubeProcess(float *buffer, uint32_t size);
 
 private:
-    float acc[2];
+    double acc[2];
     bool enable;
 };
 

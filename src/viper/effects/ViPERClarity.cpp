@@ -1,6 +1,8 @@
 #include "ViPERClarity.h"
 #include "../constants.h"
 
+// Iscle: Verified with the latest version at 13/12/2022
+
 ViPERClarity::ViPERClarity() {
     for (auto &highShelf : this->highShelf) {
         highShelf.SetFrequency(12000.0);
@@ -10,15 +12,13 @@ ViPERClarity::ViPERClarity() {
 
     this->enable = false;
     this->processMode = ClarityMode::NATURAL;
-    this->samplingRate = VIPER_DEFAULT_SAMPLING_RATE;
     this->clarityGainPercent = 0.0;
+    this->samplingRate = VIPER_DEFAULT_SAMPLING_RATE;
     Reset();
 }
 
 void ViPERClarity::Process(float *samples, uint32_t size) {
-    if (!this->enable) {
-        return;
-    }
+    if (!this->enable) return;
 
     switch (this->processMode) {
         case ClarityMode::NATURAL: {
@@ -26,8 +26,9 @@ void ViPERClarity::Process(float *samples, uint32_t size) {
             break;
         }
         case ClarityMode::OZONE: {
-            for (uint32_t i = 0; i < size * 2; i++) {
-                samples[i] = (float) this->highShelf[i % 2].Process(samples[i]);
+            for (uint32_t i = 0; i < size * 2; i += 2) {
+                samples[i] = (float) this->highShelf[0].Process(samples[i]);
+                samples[i + 1] = (float) this->highShelf[1].Process(samples[i + 1]);
             }
             break;
         }
@@ -41,7 +42,7 @@ void ViPERClarity::Process(float *samples, uint32_t size) {
 void ViPERClarity::Reset() {
     this->noiseSharpening.SetSamplingRate(this->samplingRate);
     this->noiseSharpening.Reset();
-    this->SetClarityToFilter();
+    SetClarityToFilter();
     for (auto &highShelf : this->highShelf) {
         highShelf.SetFrequency(8250.0);
         highShelf.SetSamplingRate(this->samplingRate);
@@ -52,10 +53,10 @@ void ViPERClarity::Reset() {
 
 void ViPERClarity::SetClarity(float gainPercent) {
     this->clarityGainPercent = gainPercent;
-    if (this->processMode != ClarityMode::OZONE) {
-        this->SetClarityToFilter();
-    } else {
+    if (this->processMode == ClarityMode::OZONE) {
         Reset();
+    } else {
+        SetClarityToFilter();
     }
 }
 
@@ -68,7 +69,7 @@ void ViPERClarity::SetClarityToFilter() {
 
 void ViPERClarity::SetEnable(bool enable) {
     if (this->enable != enable) {
-        if (!this->enable) {
+        if (enable) {
             Reset();
         }
         this->enable = enable;

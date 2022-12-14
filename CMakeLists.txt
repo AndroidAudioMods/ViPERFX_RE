@@ -4,21 +4,18 @@ set(CMAKE_CXX_COMPILER_VERSION 20)
 # NDK Settings
 #set(ANDROID_ABI arm64-v8a)
 set(ANDROID_ABI armeabi-v7a)
-#set(ANDROID_ARM_NEON true)
+set(ANDROID_ARM_NEON true)
 set(ANDROID_PLATFORM android-21)
-SET(CMAKE_CXX_FLAGS "-O0")
-SET(CMAKE_C_FLAGS "-O0")
 
-project("ViPER4Android Reworked")
-add_compile_definitions(VERSION_MAJOR=1)
-add_compile_definitions(VERSION_MINOR=0)
-add_compile_definitions(VERSION_CODENAME="Reworked")
+project("ViPER4Android")
+add_compile_definitions(VERSION_CODE=1)
+add_compile_definitions(VERSION_NAME="1.0.0")
 
-# KISS FFT
-set(KISSFFT_PKGCONFIG OFF)
-set(KISSFFT_STATIC ON)
-set(KISSFFT_TEST OFF)
-set(KISSFFT_TOOLS OFF)
+## KISS FFT
+#set(KISSFFT_PKGCONFIG OFF)
+#set(KISSFFT_STATIC ON)
+#set(KISSFFT_TEST OFF)
+#set(KISSFFT_TOOLS OFF)
 #add_subdirectory(src/cpp/viper/kissfft)
 
 # ViPERFX

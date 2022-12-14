@@ -1,6 +1,7 @@
 #include "Biquad.h"
 #include <cmath>
 
+// Iscle: Verified with the latest version at 13/12/2022
 // Some variable names RE'd with help from https://github.com/wooters/miniDSP/blob/master/biquad.c
 
 Biquad::Biquad() {
@@ -41,14 +42,14 @@ void Biquad::SetBandPassParameter(float frequency, uint32_t samplingRate, float 
     double sinOmega = sin(omega);
     double cosOmega = cos(omega);
 
-    double alpha = sinOmega / (2.0 * (double) qFactor);
+    double alpha = sinOmega / ((double) qFactor + (double) qFactor);
 
-    double a0 = 1.0 + alpha;
-    double a1 = -2.0 * cosOmega;
+    double a0 = alpha + 1.0;
+    double a1 = cosOmega * -2.0;
     double a2 = 1.0 - alpha;
     double b0 = sinOmega / 2.0; // Reference biquad implementation would use alpha here
     double b1 = 0.0;
-    double b2 = -sinOmega / 2.0; // Reference biquad implementation would use -alpha here
+    double b2 = -(sinOmega / 2.0); // Reference biquad implementation would use -alpha here
 
     SetCoeffs(a0, a1, a2, b0, b1, b2);
 }
@@ -59,37 +60,30 @@ void Biquad::SetCoeffs(double a0, double a1, double a2, double b0, double b1, do
     this->y2 = 0.0;
     this->y1 = 0.0;
 
-    this->a1 = -a1 / a0;
-    this->a2 = -a2 / a0;
+    this->a1 = -(a1 / a0);
+    this->a2 = -(a2 / a0);
     this->b0 = b0 / a0;
     this->b1 = b1 / a0;
     this->b2 = b2 / a0;
 }
 
-// TODO: Check
 void
 Biquad::SetHighPassParameter(float frequency, uint32_t samplingRate, double dbGain, float qFactor, double param_6) {
     double omega = (2.0 * M_PI * (double) frequency) / (double) samplingRate;
-    double sinX = sin(omega);
-    double cosX = cos(omega);
+    double sinOmega = sin(omega);
+    double cosOmega = cos(omega);
 
     double A = pow(10.0, dbGain / 40.0);
-    double sqrtY = sqrt(A);
+    double sqrtA = sqrt(A);
 
-    double z = sinX / 2.0 * sqrt((1.0 / A + A) * (1.0 / (double) qFactor - 1.0) + 2.0);
-    double a = (A - 1.0) * cosX;
-    double b = (A + 1.0) + a;
-    double c = (A + 1.0) * cosX;
-    double d = (A + 1.0) - a;
-    double e = pow(10.0, param_6 / 20.0);
-    double f = (A - 1.0) - c;
+    double z = sinOmega / 2.0 * sqrt((1.0 / A + A) * (1.0 / (double) qFactor - 1.0) + 2.0);
 
-    double a0 = d + (sqrtY * 2.0) * z;
-    double a1 = f * 2.0;
-    double a2 = d - (sqrtY * 2.0) * z;
-    double b0 = (b + (sqrtY * 2.0) * z) * A * e;
-    double b1 = A * -2.0 * ((A - 1.0) + c) * e;
-    double b2 = (b - (sqrtY * 2.0) * z) * A * e;
+    double a0 = (A + 1.0) - (A - 1.0) * cosOmega + (sqrtA * 2.0) * z;
+    double a1 = ((A - 1.0) - (A + 1.0) * cosOmega) * 2.0;
+    double a2 = (A + 1.0) - (A - 1.0) * cosOmega - (sqrtA * 2.0) * z;
+    double b0 = ((A + 1.0) + (A - 1.0) * cosOmega + (sqrtA * 2.0) * z) * A * omega;
+    double b1 = A * -2.0 * ((A - 1.0) + (A + 1.0) * cosOmega) * omega;
+    double b2 = ((A + 1.0) + (A - 1.0) * cosOmega - (sqrtA * 2.0) * z) * A * omega;
 
     SetCoeffs(a0, a1, a2, b0, b1, b2);
 }
@@ -99,10 +93,10 @@ void Biquad::SetLowPassParameter(float frequency, uint32_t samplingRate, float q
     double sinOmega = sin(omega);
     double cosOmega = cos(omega);
 
-    double alpha = sinOmega / (2.0 * (double) qFactor);
+    double alpha = sinOmega / ((double) qFactor + (double) qFactor);
 
-    double a0 = 1.0 + alpha;
-    double a1 = -2.0 * cosOmega;
+    double a0 = alpha + 1.0;
+    double a1 = cosOmega * -2.0;
     double a2 = 1.0 - alpha;
     double b0 = (1.0 - cosOmega) / 2.0;
     double b1 = 1.0 - cosOmega;

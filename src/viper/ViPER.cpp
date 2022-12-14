@@ -5,7 +5,7 @@
 
 ViPER::ViPER() {
     VIPER_LOGI("Welcome to ViPER FX");
-    VIPER_LOGI("Current version is %s %s", VERSION_STRING, VERSION_CODENAME);
+    VIPER_LOGI("Current version is %s (%d)", VERSION_NAME, VERSION_CODE);
 
     this->samplingRate = VIPER_DEFAULT_SAMPLING_RATE;
 

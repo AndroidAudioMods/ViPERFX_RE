@@ -5,6 +5,8 @@
 #include "../utils/HiFi.h"
 #include "../utils/HighShelf.h"
 
+// Iscle: Verified with the latest version at 13/12/2022
+
 class ViPERClarity {
 public:
     enum ClarityMode {

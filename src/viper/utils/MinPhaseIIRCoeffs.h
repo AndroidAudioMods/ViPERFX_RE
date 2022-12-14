@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-// Iscle: Verified with latest version at 13/12/2022
+// Iscle: Verified with the latest version at 13/12/2022
 
 class MinPhaseIIRCoeffs {
 public:

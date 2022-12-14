@@ -3,7 +3,7 @@
 #include "IIRFilter.h"
 #include "../constants.h"
 
-// Iscle: Verified with latest version at 13/12/2022
+// Iscle: Verified with the latest version at 13/12/2022
 
 IIRFilter::IIRFilter(uint32_t bands) {
     this->enable = false;
@@ -75,10 +75,10 @@ void IIRFilter::SetBandLevel(uint32_t band, float level) {
 
 void IIRFilter::SetEnable(bool enable) {
     if (this->enable != enable) {
-        this->enable = enable;
         if (enable) {
             Reset();
         }
+        this->enable = enable;
     }
 }
 

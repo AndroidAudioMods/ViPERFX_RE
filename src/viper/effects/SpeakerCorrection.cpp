@@ -1,6 +1,8 @@
 #include "SpeakerCorrection.h"
 #include "../constants.h"
 
+// Iscle: Verified with the latest version at 13/12/2022
+
 SpeakerCorrection::SpeakerCorrection() {
     this->samplingRate = VIPER_DEFAULT_SAMPLING_RATE;
     this->enable = false;
@@ -43,7 +45,7 @@ void SpeakerCorrection::Reset() {
 
 void SpeakerCorrection::SetEnable(bool enable) {
     if (this->enable != enable) {
-        if (!this->enable) {
+        if (enable) {
             Reset();
         }
         this->enable = enable;

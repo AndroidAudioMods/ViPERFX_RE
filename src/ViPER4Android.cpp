@@ -159,13 +159,6 @@ static int32_t handleGetParam(ViperContext *pContext, effect_param_t *pCmdParam,
     memcpy(pReplyParam, pCmdParam, sizeof(effect_param_t) + pCmdParam->psize);
 
     switch (*(uint32_t *) pCmdParam->data) {
-        case PARAM_GET_DRIVER_VERSION: {
-            pReplyParam->status = 0;
-            pReplyParam->vsize = sizeof(uint32_t);
-            *(uint32_t *) (pReplyParam->data + vOffset) = 0x2050005; // As original, change as needed
-            *pReplySize = sizeof(effect_param_t) + pReplyParam->psize + vOffset + pReplyParam->vsize;
-            return 0;
-        }
         case PARAM_GET_ENABLED: {
             pReplyParam->status = 0;
             pReplyParam->vsize = sizeof(int32_t);
@@ -211,6 +204,20 @@ static int32_t handleGetParam(ViperContext *pContext, effect_param_t *pCmdParam,
             pReplyParam->status = 0;
             pReplyParam->vsize = sizeof(uint32_t);
             *(uint32_t *) (pReplyParam->data + vOffset) = pContext->viper->convolver->GetKernelID();
+            *pReplySize = sizeof(effect_param_t) + pReplyParam->psize + vOffset + pReplyParam->vsize;
+            return 0;
+        }
+        case PARAM_GET_DRIVER_VERSION_CODE: {
+            pReplyParam->status = 0;
+            pReplyParam->vsize = sizeof(uint32_t);
+            *(int32_t *) (pReplyParam->data + vOffset) = VERSION_CODE;
+            *pReplySize = sizeof(effect_param_t) + pReplyParam->psize + vOffset + pReplyParam->vsize;
+            return 0;
+        }
+        case PARAM_GET_DRIVER_VERSION_NAME: {
+            pReplyParam->status = 0;
+            pReplyParam->vsize = strlen(VERSION_NAME);
+            memcpy(pReplyParam->data + vOffset, VERSION_NAME, pReplyParam->vsize);
             *pReplySize = sizeof(effect_param_t) + pReplyParam->psize + vOffset + pReplyParam->vsize;
             return 0;
         }
@@ -272,9 +279,7 @@ static int32_t Viper_ICommand(effect_handle_t self,
 static int32_t Viper_IGetDescriptor(effect_handle_t self, effect_descriptor_t *pDescriptor) {
     auto pContext = reinterpret_cast<ViperContext *>(self);
 
-    if (pContext == nullptr || pDescriptor == nullptr) {
-        return -EINVAL;
-    }
+    if (pContext == nullptr || pDescriptor == nullptr) return -EINVAL;
 
     *pDescriptor = viper_descriptor;
 

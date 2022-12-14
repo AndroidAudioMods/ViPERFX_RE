@@ -1,23 +1,25 @@
 #include "ViPERBass.h"
 #include "../constants.h"
 
+// Iscle: Verified with the latest version at 13/12/2022
+
 ViPERBass::ViPERBass() {
-    this->enable = false;
-    this->samplingRate = VIPER_DEFAULT_SAMPLING_RATE;
     this->speaker = 60;
-    this->samplingRatePeriod = 1.0 / VIPER_DEFAULT_SAMPLING_RATE;
-    this->antiPop = 0.0;
+    this->enable = false;
     this->processMode = ProcessMode::NATURAL_BASS;
+    this->antiPop = 0.0;
     this->bassFactor = 0.0;
+    this->samplingRate = VIPER_DEFAULT_SAMPLING_RATE;
+    this->samplingRatePeriod = 1.0 / VIPER_DEFAULT_SAMPLING_RATE;
     this->polyphase = new Polyphase(2);
     this->biquad = new Biquad();
     this->subwoofer = new Subwoofer();
-    this->waveBuffer = new WaveBuffer(1, 0x1000);
+    this->waveBuffer = new WaveBuffer(1, 4096);
 
     this->biquad->Reset();
     this->biquad->SetLowPassParameter((float) this->speaker, this->samplingRate, 0.53);
     this->subwoofer->SetBassGain(this->samplingRate, 0.0);
-    this->Reset();
+    Reset();
 }
 
 ViPERBass::~ViPERBass() {
@@ -28,23 +30,17 @@ ViPERBass::~ViPERBass() {
 }
 
 void ViPERBass::Process(float *samples, uint32_t size) {
-    if (!this->enable) {
-        return;
-    }
+    if (!this->enable) return;
+    if (size == 0) return;
 
-    if (size == 0) {
-        return;
-    }
-
+    // Iscle: TODO: Maybe we could attenuate the effect instead of the entire sample
     if (this->antiPop < 1.0) {
         for (uint32_t i = 0; i < size * 2; i += 2) {
             samples[i] *= this->antiPop;
             samples[i + 1] *= this->antiPop;
             
             float x = this->antiPop + this->samplingRatePeriod;
-            if (x > 1.0) {
-                x = 1.0;
-            }
+            if (x > 1.0) x = 1.0;
             this->antiPop = x;
         }
     }
@@ -108,9 +104,7 @@ void ViPERBass::SetBassFactor(float bassFactor) {
 
 void ViPERBass::SetEnable(bool enable) {
     if (this->enable != enable) {
-        if (!this->enable) {
-            Reset();
-        }
+        if (enable) Reset();
         this->enable = enable;
     }
 }
@@ -118,7 +112,7 @@ void ViPERBass::SetEnable(bool enable) {
 void ViPERBass::SetProcessMode(ProcessMode processMode) {
     if (this->processMode != processMode) {
         this->processMode = processMode;
-        this->Reset();
+        Reset();
     }
 }
 

@@ -6,6 +6,8 @@
 #include "../utils/WaveBuffer.h"
 #include "../utils/Polyphase.h"
 
+// Iscle: Verified with the latest version at 13/12/2022
+
 class ViPERBass {
 public:
     enum ProcessMode {
