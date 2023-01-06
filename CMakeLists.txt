@@ -5,11 +5,11 @@ set(CMAKE_CXX_COMPILER_VERSION 20)
 #set(ANDROID_ABI arm64-v8a)
 set(ANDROID_ABI armeabi-v7a)
 set(ANDROID_ARM_NEON true)
-set(ANDROID_PLATFORM android-21)
+set(ANDROID_PLATFORM android-24)
 
 project("ViPER4Android")
-add_compile_definitions(VERSION_CODE=1)
-add_compile_definitions(VERSION_NAME="1.0.0")
+add_compile_definitions(VERSION_CODE=20221231)
+add_compile_definitions(VERSION_NAME="0.1.0")
 
 ## KISS FFT
 #set(KISSFFT_PKGCONFIG OFF)
@@ -78,7 +78,7 @@ message(${CMAKE_BUILD_TYPE})
 
 add_library(
         # Sets the name of the library.
-        v4afx_r
+        v4a_re
 
         # Sets the library as a shared library.
         SHARED
@@ -86,5 +86,5 @@ add_library(
         # Provides a relative path to your source file(s).
         ${FILES})
 
-target_link_libraries(v4afx_r log) # kissfft)
-target_compile_options(v4afx_r PRIVATE -Wall -Wextra -Wno-unused-parameter)
+target_link_libraries(v4a_re log) # kissfft)
+#target_compile_options(v4afx_r PRIVATE -O2 -DNDEBUG -Wall -Wsign-conversion -Wno-unused-result -Wno-unneeded-internal-declaration -fstrict-aliasing -fvisibility=hidden -Wextra -Wno-unused-parameter)

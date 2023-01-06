@@ -1,5 +1,6 @@
 #include <cstring>
 #include <ctime>
+#include <cstdlib>
 #include "viper/ViPER.h"
 #include "essential.h"
 #include "log.h"
@@ -9,10 +10,7 @@
 
 static effect_descriptor_t viper_descriptor = {
         .type = EFFECT_UUID_INITIALIZER,
-        // 41d3c987-e6cf-11e3-a88a-11aba5d5c51b
-        // Original: {0x41d3c987, 0xe6cf, 0x11e3, 0xa88a, {0x11, 0xab, 0xa5, 0xd5, 0xc5, 0x1b}}
-        // New: {0x90380da3, 0x8536, 0x4744, 0xa6a3, {0x57, 0x31, 0x97, 0x0e, 0x64, 0x0f}}
-        .uuid = {0x41d3c987, 0xe6cf, 0x11e3, 0xa88a, {0x11, 0xab, 0xa5, 0xd5, 0xc5, 0x1b}},
+        .uuid = {0x90380da3, 0x8536, 0x4744, 0xa6a3, {0x57, 0x31, 0x97, 0x0e, 0x64, 0x0f}},
         .apiVersion = EFFECT_CONTROL_API_VERSION,
         .flags = EFFECT_FLAG_OUTPUT_DIRECT | EFFECT_FLAG_INPUT_DIRECT | EFFECT_FLAG_INSERT_LAST | EFFECT_FLAG_TYPE_INSERT,
         .cpuLoad = 8, // In 0.1 MIPS units as estimated on an ARM9E core (ARMv5TE) with 0 WS
@@ -29,6 +27,34 @@ struct ViperContext {
     ViPER *viper;
 };
 
+static void pcm16ToFloat(float *dst, const int16_t *src, size_t frameCount) {
+    for (size_t i = 0; i < frameCount * 2; i++) {
+        dst[i] = (float) src[i] / (float) (1 << 15);
+    }
+}
+
+static void pcm32ToFloat(float *dst, const int32_t *src, size_t frameCount) {
+    for (size_t i = 0; i < frameCount * 2; i++) {
+        dst[i] = (float) src[i] / (float) (1 << 31);
+    }
+}
+
+static void floatToFloat(float *dst, const float *src, size_t frameCount) {
+    memcpy(dst, src, frameCount * 2 * sizeof(float));
+}
+
+static void floatToPcm16(int16_t *dst, const float *src, size_t frameCount) {
+    for (size_t i = 0; i < frameCount * 2; i++) {
+        dst[i] = (int16_t) round(src[i] * (float) (1 << 15));
+    }
+}
+
+static void floatToPcm32(int32_t *dst, const float *src, size_t frameCount) {
+    for (size_t i = 0; i < frameCount * 2; i++) {
+        dst[i] = (int32_t) round(src[i] * (float) (1 << 31));
+    }
+}
+
 static int32_t Viper_IProcess(effect_handle_t self, audio_buffer_t *inBuffer, audio_buffer_t *outBuffer) {
     auto pContext = reinterpret_cast<ViperContext *>(self);
 
@@ -40,27 +66,57 @@ static int32_t Viper_IProcess(effect_handle_t self, audio_buffer_t *inBuffer, au
         return -EINVAL;
     }
 
-    float *inBufferPtr = inBuffer->f32;
-    float *outBufferPtr = outBuffer->f32;
+    float *buffer;
+    size_t frameCount = outBuffer->frameCount;
 
-    if (inBufferPtr != outBufferPtr) {
-        memcpy(outBufferPtr, inBufferPtr, outBuffer->frameCount * 2 * sizeof(float));
+    switch (pContext->config.inputCfg.format) {
+        case AUDIO_FORMAT_PCM_16_BIT:
+            buffer = new float[outBuffer->frameCount * 2];
+            pcm16ToFloat(buffer, inBuffer->s16, frameCount);
+            break;
+        case AUDIO_FORMAT_PCM_32_BIT:
+            buffer = new float[outBuffer->frameCount * 2];
+            pcm32ToFloat(buffer, inBuffer->s32, frameCount);
+            break;
+        case AUDIO_FORMAT_PCM_FLOAT:
+            buffer = outBuffer->f32;
+            floatToFloat(buffer, inBuffer->f32, frameCount);
+            break;
+        default:
+            return -EINVAL;
     }
 
-    pContext->viper->processBuffer(outBufferPtr, outBuffer->frameCount);
+    pContext->viper->processBuffer(buffer, frameCount);
+
+    switch (pContext->config.outputCfg.format) {
+        case AUDIO_FORMAT_PCM_16_BIT:
+            floatToPcm16(outBuffer->s16, buffer, frameCount);
+            delete[] buffer;
+            break;
+        case AUDIO_FORMAT_PCM_32_BIT:
+            floatToPcm32(outBuffer->s32, buffer, frameCount);
+            delete[] buffer;
+            break;
+        case AUDIO_FORMAT_PCM_FLOAT:
+            floatToFloat(outBuffer->f32, buffer, frameCount);
+            break;
+        default:
+            return -EINVAL;
+    }
+
     return 0;
 }
 
 static int handleSetConfig(ViperContext *pContext, effect_config_t *newConfig) {
-    VIPER_LOGI("Begin handleSetConfig ...");
+    VIPER_LOGD("Begin handleSetConfig ...");
     VIPER_LOGI("Checking input and output configuration ...");
 
-    VIPER_LOGD("Input sampling rate: %d", newConfig->inputCfg.samplingRate);
-    VIPER_LOGD("Input channels: %d", newConfig->inputCfg.channels);
-    VIPER_LOGD("Input format: %d", newConfig->inputCfg.format);
-    VIPER_LOGD("Output sampling rate: %d", newConfig->outputCfg.samplingRate);
-    VIPER_LOGD("Output channels: %d", newConfig->outputCfg.channels);
-    VIPER_LOGD("Output format: %d", newConfig->outputCfg.format);
+    VIPER_LOGI("Input sampling rate: %d", newConfig->inputCfg.samplingRate);
+    VIPER_LOGI("Input channels: %d", newConfig->inputCfg.channels);
+    VIPER_LOGI("Input format: %d", newConfig->inputCfg.format);
+    VIPER_LOGI("Output sampling rate: %d", newConfig->outputCfg.samplingRate);
+    VIPER_LOGI("Output channels: %d", newConfig->outputCfg.channels);
+    VIPER_LOGI("Output format: %d", newConfig->outputCfg.format);
 
     pContext->isConfigValid = false;
 
@@ -86,17 +142,19 @@ static int handleSetConfig(ViperContext *pContext, effect_config_t *newConfig) {
         return -EINVAL;
     }
 
-    // AUDIO_FORMAT_PCM_16_BIT
-    if (newConfig->inputCfg.format != AUDIO_FORMAT_PCM_FLOAT) {
+    if (newConfig->inputCfg.format != AUDIO_FORMAT_PCM_16_BIT &&
+        newConfig->inputCfg.format != AUDIO_FORMAT_PCM_32_BIT &&
+        newConfig->inputCfg.format != AUDIO_FORMAT_PCM_FLOAT) {
         VIPER_LOGE("ViPER4Android disabled, reason [in.FMT = %d]", newConfig->inputCfg.format);
-        VIPER_LOGE("We only accept f32 format");
+        VIPER_LOGE("We only accept AUDIO_FORMAT_PCM_16_BIT, AUDIO_FORMAT_PCM_32_BIT and AUDIO_FORMAT_PCM_FLOAT input format!");
         return -EINVAL;
     }
 
-    // AUDIO_FORMAT_PCM_16_BIT
-    if (newConfig->outputCfg.format != AUDIO_FORMAT_PCM_FLOAT) {
+    if (newConfig->outputCfg.format != AUDIO_FORMAT_PCM_16_BIT &&
+        newConfig->outputCfg.format != AUDIO_FORMAT_PCM_32_BIT &&
+        newConfig->outputCfg.format != AUDIO_FORMAT_PCM_FLOAT) {
         VIPER_LOGE("ViPER4Android disabled, reason [out.FMT = %d]", newConfig->outputCfg.format);
-        VIPER_LOGE("We only accept f32 format");
+        VIPER_LOGE("We only accept AUDIO_FORMAT_PCM_16_BIT, AUDIO_FORMAT_PCM_32_BIT and AUDIO_FORMAT_PCM_FLOAT output format!");
         return -EINVAL;
     }
 
@@ -107,7 +165,7 @@ static int handleSetConfig(ViperContext *pContext, effect_config_t *newConfig) {
     pContext->viper->ResetAllEffects();
     pContext->isConfigValid = true;
 
-    VIPER_LOGI("Audio handleSetConfig finished");
+    VIPER_LOGD("Audio handleSetConfig finished");
 
     return 0;
 }
