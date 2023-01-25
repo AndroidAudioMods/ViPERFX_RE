@@ -35,7 +35,6 @@ public:
 //private:
     bool updateProcessTime;
     uint64_t processTimeMs;
-    bool enabled;
     uint32_t samplingRate;
 
     // Effects

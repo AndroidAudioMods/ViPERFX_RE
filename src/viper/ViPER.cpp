@@ -106,7 +106,6 @@ ViPER::ViPER() {
     this->rightPan = 1.0;
     this->updateProcessTime = false;
     this->processTimeMs = 0;
-    this->enabled = false;
 }
 
 ViPER::~ViPER() {
@@ -136,10 +135,6 @@ ViPER::~ViPER() {
 
 // TODO: Return int
 void ViPER::processBuffer(float *buffer, uint32_t size) {
-    if (!this->enabled) {
-        VIPER_LOGD("ViPER is disabled, skip processing");
-        return;
-    }
     if (size == 0) {
         VIPER_LOGD("Buffer size is 0, skip processing");
         return;
