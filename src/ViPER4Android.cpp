@@ -39,19 +39,37 @@ static void pcm32ToFloat(float *dst, const int32_t *src, size_t frameCount) {
     }
 }
 
-static void floatToFloat(float *dst, const float *src, size_t frameCount) {
-    memcpy(dst, src, frameCount * 2 * sizeof(float));
-}
-
-static void floatToPcm16(int16_t *dst, const float *src, size_t frameCount) {
-    for (size_t i = 0; i < frameCount * 2; i++) {
-        dst[i] = (int16_t) round(src[i] * (float) (1 << 15));
+static void floatToFloat(float *dst, const float *src, size_t frameCount, bool accumulate) {
+    if (accumulate) {
+        for (size_t i = 0; i < frameCount * 2; i++) {
+            dst[i] += src[i];
+        }
+    } else {
+        memcpy(dst, src, frameCount * 2 * sizeof(float));
     }
 }
 
-static void floatToPcm32(int32_t *dst, const float *src, size_t frameCount) {
-    for (size_t i = 0; i < frameCount * 2; i++) {
-        dst[i] = (int32_t) round(src[i] * (float) (1 << 31));
+static void floatToPcm16(int16_t *dst, const float *src, size_t frameCount, bool accumulate) {
+    if (accumulate) {
+        for (size_t i = 0; i < frameCount * 2; i++) {
+            dst[i] += (int16_t) round(src[i] * (float) (1 << 15));
+        }
+    } else {
+        for (size_t i = 0; i < frameCount * 2; i++) {
+            dst[i] = (int16_t) round(src[i] * (float) (1 << 15));
+        }
+    }
+}
+
+static void floatToPcm32(int32_t *dst, const float *src, size_t frameCount, bool accumulate) {
+    if (accumulate) {
+        for (size_t i = 0; i < frameCount * 2; i++) {
+            dst[i] += (int32_t) round(src[i] * (float) (1 << 31));
+        }
+    } else {
+        for (size_t i = 0; i < frameCount * 2; i++) {
+            dst[i] = (int32_t) round(src[i] * (float) (1 << 31));
+        }
     }
 }
 
@@ -66,41 +84,42 @@ static int32_t Viper_IProcess(effect_handle_t self, audio_buffer_t *inBuffer, au
         return -EINVAL;
     }
 
-    float *buffer;
+    float *buffer = new float[outBuffer->frameCount * 2];
     size_t frameCount = outBuffer->frameCount;
 
     switch (pContext->config.inputCfg.format) {
         case AUDIO_FORMAT_PCM_16_BIT:
-            buffer = new float[outBuffer->frameCount * 2];
             pcm16ToFloat(buffer, inBuffer->s16, frameCount);
             break;
         case AUDIO_FORMAT_PCM_32_BIT:
-            buffer = new float[outBuffer->frameCount * 2];
             pcm32ToFloat(buffer, inBuffer->s32, frameCount);
             break;
         case AUDIO_FORMAT_PCM_FLOAT:
-            buffer = outBuffer->f32;
-            floatToFloat(buffer, inBuffer->f32, frameCount);
+            floatToFloat(buffer, inBuffer->f32, frameCount, false);
             break;
         default:
+            delete[] buffer;
             return -EINVAL;
     }
 
     pContext->viper->processBuffer(buffer, frameCount);
 
+    const bool accumulate = pContext->config.outputCfg.accessMode == EFFECT_BUFFER_ACCESS_ACCUMULATE;
     switch (pContext->config.outputCfg.format) {
         case AUDIO_FORMAT_PCM_16_BIT:
-            floatToPcm16(outBuffer->s16, buffer, frameCount);
+            floatToPcm16(outBuffer->s16, buffer, frameCount, accumulate);
             delete[] buffer;
             break;
         case AUDIO_FORMAT_PCM_32_BIT:
-            floatToPcm32(outBuffer->s32, buffer, frameCount);
+            floatToPcm32(outBuffer->s32, buffer, frameCount, accumulate);
             delete[] buffer;
             break;
         case AUDIO_FORMAT_PCM_FLOAT:
-            floatToFloat(outBuffer->f32, buffer, frameCount);
+            floatToFloat(outBuffer->f32, buffer, frameCount, accumulate);
+            delete[] buffer;
             break;
         default:
+            delete[] buffer;
             return -EINVAL;
     }
 
@@ -114,9 +133,11 @@ static int handleSetConfig(ViperContext *pContext, effect_config_t *newConfig) {
     VIPER_LOGI("Input sampling rate: %d", newConfig->inputCfg.samplingRate);
     VIPER_LOGI("Input channels: %d", newConfig->inputCfg.channels);
     VIPER_LOGI("Input format: %d", newConfig->inputCfg.format);
+    VIPER_LOGI("Input access mode: %d", newConfig->inputCfg.accessMode);
     VIPER_LOGI("Output sampling rate: %d", newConfig->outputCfg.samplingRate);
     VIPER_LOGI("Output channels: %d", newConfig->outputCfg.channels);
     VIPER_LOGI("Output format: %d", newConfig->outputCfg.format);
+    VIPER_LOGI("Output access mode: %d", newConfig->outputCfg.accessMode);
 
     pContext->isConfigValid = false;
 
