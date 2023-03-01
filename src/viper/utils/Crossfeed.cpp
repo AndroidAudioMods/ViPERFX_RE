@@ -55,8 +55,8 @@ struct Crossfeed::Preset Crossfeed::GetPreset() {
 }
 
 void Crossfeed::ProcessFrames(float *buffer, uint32_t size) {
-    for (uint32_t i = 0; i < size; i += 2) {
-        FilterSample(&buffer[i]);
+    for (uint32_t i = 0; i < size * 2; i += 2) {
+        FilterSample(buffer + i);
     }
 }
 

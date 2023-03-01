@@ -9,11 +9,13 @@ SoftwareLimiter::SoftwareLimiter() {
     this->gate = 0.999999;
     this->unknown3 = 1.0;
     this->unknown1 = 1.0;
-    this->ResetLimiter();
+
+    Reset();
 }
 
 float SoftwareLimiter::Process(float sample) {
     bool bVar1;
+    float *pfVar2;
     uint uVar3;
     uint uVar4;
     int iVar5;
@@ -22,16 +24,26 @@ float SoftwareLimiter::Process(float sample) {
     uint uVar8;
     float fVar9;
     float fVar10;
+    float gate;
+    float abs_sample;
 
-    float abs_sample = std::abs(sample);
-    if (abs_sample < this->gate) {
+    gate = this->gate;
+    abs_sample = std::abs(sample);
+    if (abs_sample < gate) {
         if (this->ready) goto LAB_0006d86c;
         uVar8 = this->unknown4;
-    } else {
+    }
+    else {
         if (!this->ready) {
-            memset(this->arr512, 0, sizeof(this->arr512));
-            this->ready = true;
+            iVar5 = 0x200;
+            pfVar2 = this->arr512;
+            do {
+                iVar5 = iVar5 + -1;
+                *pfVar2 = 0.0;
+                pfVar2 = pfVar2 + 1;
+            } while (iVar5 != 0);
         }
+        this->ready = true;
 LAB_0006d86c:
         uVar3 = 8;
         puVar7 = &this->unknown4;
@@ -47,11 +59,16 @@ LAB_0006d86c:
             }
             uVar3 = uVar3 - 1;
         } while (uVar3 != 0);
-        if (this->gate < abs_sample) {
+        gate = this->gate;
+        if (gate < abs_sample) {
+            bVar1 = this->ready;
+            fVar10 = this->unknown1;
             uVar4 = uVar8 + 1 & 0xff;
             this->arr256[uVar8] = sample;
             this->unknown4 = uVar4;
-            fVar10 = this->gate / abs_sample;
+            if (bVar1) {
+                fVar10 = gate / abs_sample;
+            }
             abs_sample = this->arr256[uVar4];
             goto LAB_0006d8fc;
         }
@@ -77,17 +94,20 @@ LAB_0006d8fc:
         this->unknown2 = fVar9;
     }
     fVar9 = abs_sample * fVar9;
-    if (this->gate <= std::abs(fVar9)) {
-        fVar9 = this->gate / std::abs(abs_sample);
+    fVar10 = std::abs(fVar9);
+    if (gate <= fVar10) {
+        fVar9 = gate / std::abs(abs_sample);
+    }
+    if (gate <= fVar10) {
         this->unknown2 = fVar9;
         fVar9 = abs_sample * fVar9;
     }
     return fVar9;
 }
 
-void SoftwareLimiter::ResetLimiter() {
-    memset(this->arr256, 0, 256);
-    memset(this->arr512, 0, 512);
+void SoftwareLimiter::Reset() {
+    memset(this->arr256, 0, sizeof(this->arr256));
+    memset(this->arr512, 0, sizeof(this->arr512));
     this->ready = false;
     this->unknown4 = 0;
     this->unknown2 = 1.0;

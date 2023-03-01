@@ -123,20 +123,20 @@ void CRevModel::ProcessReplace(float *bufL, float *bufR, uint32_t size) {
     for (uint32_t idx = 0; idx < size; idx++) {
         float outL = 0.0;
         float outR = 0.0;
-        float input = (bufL[idx] + bufR[idx]) * gain;
+        float input = (bufL[idx] + bufR[idx]) * this->gain;
 
         for (uint32_t i = 0; i < 8; i++) {
-            outL += combL[i].Process(input);
-            outR += combR[i].Process(input);
+            outL += this->combL[i].Process(input);
+            outR += this->combR[i].Process(input);
         }
 
         for (uint32_t i = 0; i < 4; i++) {
-            outL = allpassL[i].Process(outL);
-            outR = allpassR[i].Process(outR);
+            outL = this->allpassL[i].Process(outL);
+            outR = this->allpassR[i].Process(outR);
         }
 
-        bufL[idx] = outL * unknown1 + outR * unknown2 + bufL[idx] * dry;
-        bufR[idx] = outR * unknown1 + outL * unknown2 + bufR[idx] * dry;
+        bufL[idx] = outL * this->unknown1 + outR * this->unknown2 + bufL[idx] * this->dry;
+        bufR[idx] = outR * this->unknown1 + outL * this->unknown2 + bufR[idx] * this->dry;
     }
 }
 

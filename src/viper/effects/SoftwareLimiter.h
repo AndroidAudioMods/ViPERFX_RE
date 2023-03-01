@@ -7,7 +7,7 @@ public:
     SoftwareLimiter();
 
     float Process(float sample);
-    void ResetLimiter();
+    void Reset();
     void SetGate(float gate);
 
 private:

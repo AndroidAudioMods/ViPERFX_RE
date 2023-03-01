@@ -18,8 +18,6 @@ PlaybackGain::PlaybackGain() {
 }
 
 double PlaybackGain::AnalyseWave(float *samples, uint32_t size) {
-    if (size == 0) return 0.0;
-
     double tmpL = 0.0;
     double tmpR = 0.0;
 

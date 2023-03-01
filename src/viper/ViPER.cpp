@@ -98,7 +98,7 @@ ViPER::ViPER() {
 
     for (auto &softwareLimiter: this->softwareLimiters) {
         softwareLimiter = new SoftwareLimiter();
-        softwareLimiter->ResetLimiter();
+        softwareLimiter->Reset();
     }
 
     this->frameScale = 1.0;
@@ -417,15 +417,33 @@ void ViPER::DispatchCommand(int param, int val1, int val2, int val3, int val4, u
         } // 0x1002D
         case PARAM_CURE_CROSS_FEED_STRENGTH: {
             switch (val1) {
-                case 0:
+                case 0: {
                     // Cure_R::SetPreset(pCVar17,0x5f028a);
+                    struct Crossfeed::Preset preset = {
+                            .cutoff = 650,
+                            .feedback = 95,
+                    };
+                    this->cure->SetPreset(preset);
                     break;
-                case 1:
+                }
+                case 1: {
                     // Cure_R::SetPreset(pCVar17,0x3c02bc);
+                    struct Crossfeed::Preset preset = {
+                            .cutoff = 700,
+                            .feedback = 60,
+                    };
+                    this->cure->SetPreset(preset);
                     break;
-                case 2:
+                }
+                case 2: {
                     // Cure_R::SetPreset(pCVar17,0x2d02bc);
+                    struct Crossfeed::Preset preset = {
+                            .cutoff = 700,
+                            .feedback = 45,
+                    };
+                    this->cure->SetPreset(preset);
                     break;
+                }
             }
             break;
         } // 0x1002E
@@ -598,7 +616,7 @@ void ViPER::ResetAllEffects() {
     }
     for (auto &softwareLimiter: softwareLimiters) {
         if (softwareLimiter != nullptr) {
-            softwareLimiter->ResetLimiter();
+            softwareLimiter->Reset();
         }
     }
 }

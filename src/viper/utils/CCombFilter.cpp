@@ -27,10 +27,7 @@ float CCombFilter::Process(float sample) {
     float output = this->buffer[this->bufferIndex];
     this->filterStore = output * this->damp2 + this->filterStore * this->damp;
     this->buffer[this->bufferIndex] = sample + this->filterStore * this->feedback;
-    this->bufferIndex++;
-    if (this->bufferIndex >= this->bufferSize) {
-        this->bufferIndex = 0;
-    }
+    this->bufferIndex = (this->bufferIndex + 1) % this->bufferSize;
     return output;
 }
 
