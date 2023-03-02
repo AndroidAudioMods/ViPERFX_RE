@@ -11,12 +11,8 @@ project("ViPER4Android")
 add_compile_definitions(VERSION_CODE=20221231)
 add_compile_definitions(VERSION_NAME="0.1.0")
 
-## KISS FFT
-#set(KISSFFT_PKGCONFIG OFF)
-#set(KISSFFT_STATIC ON)
-#set(KISSFFT_TEST OFF)
-#set(KISSFFT_TOOLS OFF)
-#add_subdirectory(src/cpp/viper/kissfft)
+# FFTS
+add_subdirectory(src/viper/ffts)
 
 # ViPERFX
 include_directories(src/include)

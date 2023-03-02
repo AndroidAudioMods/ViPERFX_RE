@@ -1,6 +1,9 @@
 #pragma once
 
 class PConvSingle {
+    struct PConvData {
+
+    };
 public:
     PConvSingle();
 
@@ -34,7 +37,8 @@ public:
 
     void UnloadKernel();
 
-    bool enabled;
-    int segments, segmentSize;
-//    PConvData *data;  // TODO: Type
+    bool instanceUsable;
+    int segmentCount;
+    int segmentSize;
+    PConvData *data;
 };

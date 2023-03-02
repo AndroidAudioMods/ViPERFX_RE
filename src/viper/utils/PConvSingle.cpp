@@ -3,8 +3,8 @@
 #include "PConvSingle.h"
 
 PConvSingle::PConvSingle() {
-    this->enabled = false;
-    this->segments = 0;
+    this->instanceUsable = false;
+    this->segmentCount = 0;
     this->segmentSize = 0;
 //    this->data = nullptr;
 }
@@ -30,7 +30,7 @@ int PConvSingle::GetFFTSize() {
 }
 
 int PConvSingle::GetSegmentCount() {
-    return this->segments;
+    return this->segmentCount;
 }
 
 int PConvSingle::GetSegmentSize() {
@@ -38,18 +38,18 @@ int PConvSingle::GetSegmentSize() {
 }
 
 bool PConvSingle::InstanceUsable() {
-    return this->enabled;
+    return this->instanceUsable;
 }
 
 int PConvSingle::LoadKernel(float *buf, int param_2, int segmentSize) {
     if (buf != nullptr && param_2 > 0 && segmentSize > 0 && segmentSize % 2 == 0) {
-        this->enabled = false;
+        this->instanceUsable = false;
         ReleaseResources();
-//        this->data = new PConvData(); //(PConvData *) malloc(0x140);  // TODO: Sizeof
+        this->data = new PConvData(); //(PConvData *) malloc(0x140);  // TODO: Sizeof
         this->segmentSize = segmentSize;
         int n = ProcessKernel(buf, param_2, 1);
         if (n != 0) {
-            this->enabled = true;
+            this->instanceUsable = true;
             return n;
         }
         ReleaseResources();
@@ -84,18 +84,20 @@ int PConvSingle::ProcessKernel(int param_2, float *param_3, int param_4, int par
 }
 
 void PConvSingle::ReleaseResources() {
-    // TODO
-    this->enabled = false;
-    this->segments = 0;
+    if (this->data != nullptr) {
+        // TODO
+    }
+    this->instanceUsable = false;
+    this->segmentCount = 0;
     this->segmentSize = 0;
 }
 
 void PConvSingle::Reset() {
-    if (!this->enabled) return;
+    if (!this->instanceUsable) return;
     // TODO
 }
 
 void PConvSingle::UnloadKernel() {
-    this->enabled = false;
+    this->instanceUsable = false;
     ReleaseResources();
 }
