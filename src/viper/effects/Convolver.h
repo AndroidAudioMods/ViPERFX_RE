@@ -35,7 +35,7 @@ private:
     uint32_t unknown2;
     uint32_t unknown3;
     uint32_t unknown4;
-    uint32_t unknown5;
+    uint32_t currentKernelBufferCrc;
     int isQuadChannel;
     float crossChannel;
     bool isValidCrossChannel;
