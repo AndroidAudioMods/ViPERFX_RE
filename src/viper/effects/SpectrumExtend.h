@@ -16,6 +16,7 @@ public:
     void SetReferenceFrequency(uint32_t freq);
     void SetSamplingRate(uint32_t samplingRate);
 
+private:
     MultiBiquad highpass[2];
     MultiBiquad lowpass[2];
     Harmonic harmonics[2];

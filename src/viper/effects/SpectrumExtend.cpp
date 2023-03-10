@@ -3,22 +3,22 @@
 
 static const float SPECTRUM_HARMONICS[10] = {
         0.02f,
-        0.f,
+        0.0f,
         0.02f,
-        0.f,
+        0.0f,
         0.02f,
-        0.f,
+        0.0f,
         0.02f,
-        0.f,
+        0.0f,
         0.02f,
-        0.f,
+        0.0f,
 };
 
 SpectrumExtend::SpectrumExtend() {
     this->samplingRate = VIPER_DEFAULT_SAMPLING_RATE;
     this->referenceFreq = 7600;
     this->enabled = false;
-    this->exciter = 0.f;
+    this->exciter = 0.0;
     Reset();
 }
 
@@ -27,15 +27,20 @@ SpectrumExtend::~SpectrumExtend() {
 }
 
 void SpectrumExtend::Process(float *samples, uint32_t size) {
-    if (this->enabled) {
-        for (uint32_t i = 0; i < size * 2; i++) {
-            float sample = samples[i];
-            int index = i % 2;
-            float tmp = this->highpass[index].ProcessSample(sample);
-            tmp = this->harmonics[index].Process(tmp);
-            tmp = this->lowpass[index].ProcessSample(tmp * this->exciter);
-            samples[i] = samples[i] + tmp;
-        }
+    if (!this->enabled) return;
+
+    for (uint32_t i = 0; i < size * 2; i += 2) {
+        double tmp;
+
+        tmp = this->highpass[0].ProcessSample(samples[i]);
+        tmp = this->harmonics[0].Process(tmp);
+        tmp = this->lowpass[0].ProcessSample(tmp * this->exciter);
+        samples[i] = samples[i] + (float) tmp;
+
+        tmp = this->highpass[1].ProcessSample(samples[i + 1]);
+        tmp = this->harmonics[1].Process(tmp);
+        tmp = this->lowpass[1].ProcessSample(tmp * this->exciter);
+        samples[i + 1] = samples[i + 1] + (float) tmp;
     }
 }
 
@@ -45,10 +50,10 @@ void SpectrumExtend::Reset() {
     this->highpass[1].RefreshFilter(MultiBiquad::FilterType::HIGH_PASS, 0.0, (float) this->referenceFreq, this->samplingRate,
                                     0.717, false);
 
-    this->lowpass[0].RefreshFilter(MultiBiquad::FilterType::LOW_PASS, 0.0, (float) this->referenceFreq / 2.f - 2000.f,
-                                   this->referenceFreq, 0.717, false);
-    this->lowpass[1].RefreshFilter(MultiBiquad::FilterType::LOW_PASS, 0.0, (float) this->referenceFreq / 2.f - 2000.f,
-                                   this->referenceFreq, 0.717, false);
+    this->lowpass[0].RefreshFilter(MultiBiquad::FilterType::LOW_PASS, 0.0, (float) this->samplingRate / 2.0f - 2000.0f,
+                                   this->samplingRate, 0.717, false);
+    this->lowpass[1].RefreshFilter(MultiBiquad::FilterType::LOW_PASS, 0.0, (float) this->samplingRate / 2.0f - 2000.0f,
+                                   this->samplingRate, 0.717, false);
 
     this->harmonics[0].Reset();
     this->harmonics[1].Reset();
@@ -58,7 +63,12 @@ void SpectrumExtend::Reset() {
 }
 
 void SpectrumExtend::SetEnable(bool enable) {
-    this->enabled = enable;
+    if (this->enabled != enable) {
+        if (enable) {
+            Reset();
+        }
+        this->enabled = enable;
+    }
 }
 
 void SpectrumExtend::SetExciter(float value) {
@@ -74,9 +84,11 @@ void SpectrumExtend::SetReferenceFrequency(uint32_t freq) {
 }
 
 void SpectrumExtend::SetSamplingRate(uint32_t samplingRate) {
-    this->samplingRate = samplingRate;
-    if (this->samplingRate / 2 - 100 < this->referenceFreq) {
-        this->referenceFreq = this->samplingRate / 2 - 100;
+    if (this->samplingRate != samplingRate) {
+        this->samplingRate = samplingRate;
+        if (samplingRate / 2 - 100 < this->referenceFreq) {
+            this->referenceFreq = samplingRate / 2 - 100;
+        }
+        Reset();
     }
-    Reset();
 }
