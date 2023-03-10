@@ -13,13 +13,18 @@ Subwoofer::Subwoofer() {
 }
 
 void Subwoofer::Process(float *samples, uint32_t size) {
-    for (uint32_t i = 0; i < size * 2; i++) {
-        auto sample = (double) samples[i];
-        int index = i % 2;
-        double tmp = this->peak[index].ProcessSample(sample);
-        tmp = this->peakLow[index].ProcessSample(tmp);
-        tmp = this->lowpass[index].ProcessSample(tmp - sample);
-        samples[i] = (float) ((sample / 2.0) + (tmp * 0.6));
+    for (uint32_t i = 0; i < size * 2; i += 2) {
+        double tmp;
+
+        tmp = this->peak[0].ProcessSample(samples[i]);
+        tmp = this->peakLow[0].ProcessSample(tmp);
+        tmp = this->lowpass[0].ProcessSample(tmp - samples[i]);
+        samples[i] = (samples[i] * 0.5f) + ((float) tmp * 0.6f);
+
+        tmp = this->peak[1].ProcessSample(samples[i + 1]);
+        tmp = this->peakLow[1].ProcessSample(tmp);
+        tmp = this->lowpass[1].ProcessSample(tmp - samples[i + 1]);
+        samples[i + 1] = (samples[i + 1] * 0.5f) + ((float) tmp * 0.6f);
     }
 }
 
