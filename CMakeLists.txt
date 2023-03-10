@@ -2,14 +2,14 @@ cmake_minimum_required(VERSION 3.16.3)
 set(CMAKE_CXX_COMPILER_VERSION 20)
 
 # NDK Settings
-#set(ANDROID_ABI arm64-v8a)
-set(ANDROID_ABI armeabi-v7a)
-set(ANDROID_ARM_NEON true)
-set(ANDROID_PLATFORM android-24)
+#add_compile_definitions(ANDROID_ABI=arm64-v8a)
+#add_compile_definitions(ANDROID_ABI=armeabi-v7a)
+#add_compile_definitions(ANDROID_ARM_NEON=true)
+#add_compile_definitions(ANDROID_PLATFORM=android-24)
 
 project("ViPER4Android")
-add_compile_definitions(VERSION_CODE=20221231)
-add_compile_definitions(VERSION_NAME="0.1.0")
+add_compile_definitions(VERSION_CODE=20230311)
+add_compile_definitions(VERSION_NAME="0.3.0")
 
 # FFTS
 add_subdirectory(src/viper/ffts)
