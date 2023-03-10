@@ -46,16 +46,14 @@ void FIR::FilterSamplesInterleaved(float *samples, uint32_t size, uint32_t chann
     }
 
     if (this->coeffsSize > 1) {
-        // TODO: Replace this with memcpy
         float *pfVar1 = this->block;
-        float *pfVar6 = pfVar1 + blockLength;
+        float *pfVar6 = pfVar1 + this->blockLength;
         float *pfVar2 = this->offsetBlock + this->coeffsSize;
         do {
-            pfVar6 = pfVar6 + -1;
+            pfVar6 = pfVar6 - 1;
             pfVar2[-2] = *pfVar6;
-            pfVar2 = pfVar2 + -1;
-        } while (pfVar6 != pfVar1 + blockLength + (1 - this->coeffsSize));
-        //memcpy(this->offsetBlock + this->coeffsSize - 2 - (this->coeffsSize - 1), this->block + this->blockLength - 1 - (this->coeffsSize - 1), (this->coeffsSize - 1) * sizeof(float));
+            pfVar2 = pfVar2 - 1;
+        } while (pfVar6 != pfVar1 + this->blockLength + 1 - this->coeffsSize);
     }
 }
 
