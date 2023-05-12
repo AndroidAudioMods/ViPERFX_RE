@@ -1,16 +1,12 @@
 #include "IIR_NOrder_BW_LH.h"
 
 IIR_NOrder_BW_LH::IIR_NOrder_BW_LH(uint32_t order) {
-    this->filters = new IIR_1st[order];
+    this->filters = std::vector<IIR_1st>(order);
     this->order = order;
 
     for (uint32_t x = 0; x < order; x++) {
         this->filters[x].Mute();
     }
-}
-
-IIR_NOrder_BW_LH::~IIR_NOrder_BW_LH() {
-    delete[] this->filters;
 }
 
 void IIR_NOrder_BW_LH::Mute() {

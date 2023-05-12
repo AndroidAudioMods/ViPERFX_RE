@@ -1,19 +1,18 @@
 #pragma once
 
 #include "IIR_1st.h"
+#include <vector>
 
 class IIR_NOrder_BW_BP {
 public:
     explicit IIR_NOrder_BW_BP(uint32_t order);
 
-    ~IIR_NOrder_BW_BP();
-
     void Mute();
 
     void setBPF(float highCut, float lowCut, uint32_t samplingRate);
 
-    IIR_1st *lowpass;
-    IIR_1st *highpass;
+    std::vector<IIR_1st> lowpass;
+    std::vector<IIR_1st> highpass;
     uint32_t order;
 };
 

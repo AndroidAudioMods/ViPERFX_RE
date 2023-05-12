@@ -1,20 +1,14 @@
 #include "PassFilter.h"
 #include "../constants.h"
 
-PassFilter::PassFilter() {
-    this->filters[0] = new IIR_NOrder_BW_LH(3);
-    this->filters[1] = new IIR_NOrder_BW_LH(3);
-    this->filters[2] = new IIR_NOrder_BW_LH(1);
-    this->filters[3] = new IIR_NOrder_BW_LH(1);
+PassFilter::PassFilter() : filters({
+    IIR_NOrder_BW_LH(3),
+    IIR_NOrder_BW_LH(3),
+    IIR_NOrder_BW_LH(1),
+    IIR_NOrder_BW_LH(1)
+}) {
     this->samplingRate = VIPER_DEFAULT_SAMPLING_RATE;
     Reset();
-}
-
-PassFilter::~PassFilter() {
-    delete this->filters[0];
-    delete this->filters[1];
-    delete this->filters[2];
-    delete this->filters[3];
 }
 
 void PassFilter::ProcessFrames(float *buffer, uint32_t size) {
@@ -40,15 +34,15 @@ void PassFilter::Reset() {
         cutoff = 18000.0;
     }
 
-    this->filters[0]->setLPF(cutoff, this->samplingRate);
-    this->filters[1]->setLPF(cutoff, this->samplingRate);
-    this->filters[2]->setHPF(10.0, this->samplingRate);
-    this->filters[3]->setHPF(10.0, this->samplingRate);
+    this->filters[0].setLPF(cutoff, this->samplingRate);
+    this->filters[1].setLPF(cutoff, this->samplingRate);
+    this->filters[2].setHPF(10.0, this->samplingRate);
+    this->filters[3].setHPF(10.0, this->samplingRate);
 
-    this->filters[0]->Mute();
-    this->filters[1]->Mute();
-    this->filters[2]->Mute();
-    this->filters[3]->Mute();
+    this->filters[0].Mute();
+    this->filters[1].Mute();
+    this->filters[2].Mute();
+    this->filters[3].Mute();
 }
 
 void PassFilter::SetSamplingRate(uint32_t samplingRate) {

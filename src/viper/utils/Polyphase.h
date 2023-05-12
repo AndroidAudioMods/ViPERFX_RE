@@ -7,7 +7,6 @@
 class Polyphase {
 public:
     Polyphase(int param_1);
-    ~Polyphase();
 
     uint32_t GetLatency();
     uint32_t Process(float *samples, uint32_t size);
@@ -17,9 +16,9 @@ public:
 private:
     FIR fir1;
     FIR fir2;
-    WaveBuffer *waveBuffer1;
-    WaveBuffer *waveBuffer2;
-    float *buffer;
+    WaveBuffer waveBuffer1;
+    WaveBuffer waveBuffer2;
+    float buffer[0x7e0];
     uint32_t samplingRate;
 };
 

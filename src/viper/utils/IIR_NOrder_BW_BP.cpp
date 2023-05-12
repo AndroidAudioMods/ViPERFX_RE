@@ -1,19 +1,14 @@
 #include "IIR_NOrder_BW_BP.h"
 
 IIR_NOrder_BW_BP::IIR_NOrder_BW_BP(uint32_t order) {
-    this->lowpass = new IIR_1st[order];
-    this->highpass = new IIR_1st[order];
+    this->lowpass = std::vector<IIR_1st>(order);
+    this->highpass = std::vector<IIR_1st>(order);
     this->order = order;
 
     for (uint32_t x = 0; x < order; x++) {
         this->lowpass[x].Mute();
         this->highpass[x].Mute();
     }
-}
-
-IIR_NOrder_BW_BP::~IIR_NOrder_BW_BP() {
-    delete[] this->lowpass;
-    delete[] this->highpass;
 }
 
 void IIR_NOrder_BW_BP::Mute() {

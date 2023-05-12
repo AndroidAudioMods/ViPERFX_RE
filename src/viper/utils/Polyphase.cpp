@@ -133,11 +133,8 @@ static const float POLYPHASE_COEFFICIENTS_OTHER[] = {
         -0.032919
 };
 
-Polyphase::Polyphase(int param_1) {
+Polyphase::Polyphase(int param_1) : waveBuffer1(2, 0x1000), waveBuffer2(2, 0x1000) {
     this->samplingRate = VIPER_DEFAULT_SAMPLING_RATE;
-    this->waveBuffer1 = new WaveBuffer(2, 0x1000);
-    this->waveBuffer2 = new WaveBuffer(2, 0x1000);
-    this->buffer = new float[0x7e0];
 
     if (param_1 == 2) {
         this->fir1.LoadCoefficients(POLYPHASE_COEFFICIENTS_2, 63, 1008);
@@ -148,31 +145,25 @@ Polyphase::Polyphase(int param_1) {
     }
 }
 
-Polyphase::~Polyphase() {
-    delete this->waveBuffer1;
-    delete this->waveBuffer2;
-    delete[] this->buffer;
-}
-
 uint32_t Polyphase::GetLatency() {
     return 63;
 }
 
 uint32_t Polyphase::Process(float *samples, uint32_t size) {
-    if (this->waveBuffer1->PushSamples(samples, size)) {
-        while (this->waveBuffer1->GetBufferOffset() >= 1008) {
-            if (this->waveBuffer1->PopSamples(this->buffer, 1008, false) == 1008) {
+    if (this->waveBuffer1.PushSamples(samples, size)) {
+        while (this->waveBuffer1.GetBufferOffset() >= 1008) {
+            if (this->waveBuffer1.PopSamples(this->buffer, 1008, false) == 1008) {
                 this->fir1.FilterSamplesInterleaved(this->buffer, 1008, 2);
                 this->fir2.FilterSamplesInterleaved(this->buffer + 1, 1008, 2);
-                this->waveBuffer2->PushSamples(this->buffer, 1008);
+                this->waveBuffer2.PushSamples(this->buffer, 1008);
             }
         }
 
-        if (this->waveBuffer2->GetBufferOffset() < size) {
+        if (this->waveBuffer2.GetBufferOffset() < size) {
             return 0;
         }
 
-        this->waveBuffer2->PopSamples(samples, size, true);
+        this->waveBuffer2.PopSamples(samples, size, true);
     }
 
     return size;
@@ -181,8 +172,8 @@ uint32_t Polyphase::Process(float *samples, uint32_t size) {
 void Polyphase::Reset() {
     this->fir1.Reset();
     this->fir2.Reset();
-    this->waveBuffer1->Reset();
-    this->waveBuffer2->Reset();
+    this->waveBuffer1.Reset();
+    this->waveBuffer2.Reset();
 }
 
 void Polyphase::SetSamplingRate(uint32_t samplingRate) {

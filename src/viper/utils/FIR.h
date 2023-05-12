@@ -1,11 +1,11 @@
 #pragma once
 
 #include <cstdint>
+#include <vector>
 
 class FIR {
 public:
     FIR();
-    ~FIR();
 
     void FilterSamples(float *samples, uint32_t size);
     void FilterSamplesInterleaved(float *samples, uint32_t size, uint32_t channels);
@@ -14,9 +14,9 @@ public:
     void Reset();
 
 private:
-    float *offsetBlock;
-    float *coeffs;
-    float *block;
+    std::vector<float> offsetBlock;
+    std::vector<float> coeffs;
+    std::vector<float> block;
     uint32_t coeffsSize;
     uint32_t blockLength;
     bool hasCoefficients;

@@ -1,13 +1,11 @@
 #pragma once
 
-
 #include <cstdint>
+#include <vector>
 
 class WaveBuffer {
 public:
     WaveBuffer(uint32_t channels, uint32_t length);
-
-    ~WaveBuffer();
 
     void Reset();
     uint32_t GetBufferOffset();
@@ -21,8 +19,7 @@ public:
     void SetBufferOffset(uint32_t offset);
 
 private:
-    float *buffer;
-    uint32_t size;
+    std::vector<float> buffer;
     uint32_t index;
     uint32_t channels;
 };

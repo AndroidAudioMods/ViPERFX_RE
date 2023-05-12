@@ -2,18 +2,9 @@
 #include "FIR.h"
 
 FIR::FIR() {
-    this->offsetBlock = nullptr;
-    this->coeffs = nullptr;
-    this->block = nullptr;
     this->coeffsSize = 0;
     this->blockLength = 0;
     this->hasCoefficients = false;
-}
-
-FIR::~FIR() {
-    delete[] this->offsetBlock;
-    delete[] this->coeffs;
-    delete[] this->block;
 }
 
 void FIR::FilterSamples(float *samples, uint32_t size) {
@@ -28,10 +19,10 @@ void FIR::FilterSamplesInterleaved(float *samples, uint32_t size, uint32_t chann
     }
 
     if (this->blockLength > size) {
-        memset(this->block + size, 0, (this->blockLength - size) * sizeof(float));
+        memset(this->block.data() + size, 0, (this->blockLength - size) * sizeof(float));
     }
 
-    memcpy(this->offsetBlock + this->coeffsSize - 1, this->block, this->blockLength * sizeof(float));
+    memcpy(this->offsetBlock.data() + this->coeffsSize - 1, this->block.data(), this->blockLength * sizeof(float));
 
     for (uint32_t i = 0; i < this->blockLength; i++) {
         float sample = 0.0f;
@@ -46,9 +37,9 @@ void FIR::FilterSamplesInterleaved(float *samples, uint32_t size, uint32_t chann
     }
 
     if (this->coeffsSize > 1) {
-        float *pfVar1 = this->block;
+        float *pfVar1 = this->block.data();
         float *pfVar6 = pfVar1 + this->blockLength;
-        float *pfVar2 = this->offsetBlock + this->coeffsSize;
+        float *pfVar2 = this->offsetBlock.data() + this->coeffsSize;
         do {
             pfVar6 = pfVar6 - 1;
             pfVar2[-2] = *pfVar6;
@@ -64,18 +55,14 @@ uint32_t FIR::GetBlockLength() {
 int FIR::LoadCoefficients(const float *coeffs, uint32_t coeffsSize, uint32_t blockLength) {
     if (coeffs == nullptr || coeffsSize == 0 || blockLength == 0) return 0;
 
-    delete[] this->offsetBlock;
-    delete[] this->coeffs;
-    delete[] this->block;
-
-    this->offsetBlock = new float[coeffsSize + blockLength + 1];
-    this->coeffs = new float[coeffsSize];
-    this->block = new float[blockLength];
+    this->offsetBlock = std::vector<float>(coeffsSize + blockLength + 1);
+    this->coeffs = std::vector<float>(coeffsSize);
+    this->block = std::vector<float>(blockLength);
 
     this->coeffsSize = coeffsSize;
     this->blockLength = blockLength;
 
-    memcpy(this->coeffs, coeffs, coeffsSize * sizeof(float));
+    memcpy(this->coeffs.data(), coeffs, coeffsSize * sizeof(float));
 
     Reset();
     this->hasCoefficients = true;
@@ -84,7 +71,7 @@ int FIR::LoadCoefficients(const float *coeffs, uint32_t coeffsSize, uint32_t blo
 }
 
 void FIR::Reset() {
-    if (this->offsetBlock != nullptr && this->coeffsSize + this->blockLength > 0) {
-        memset(this->offsetBlock, 0, (this->coeffsSize + this->blockLength + 1) * sizeof(float));
+    if (this->coeffsSize + this->blockLength > 0) {
+        memset(this->offsetBlock.data(), 0, (this->coeffsSize + this->blockLength + 1) * sizeof(float));
     }
 }
