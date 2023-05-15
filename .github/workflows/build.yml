@@ -1,0 +1,60 @@
+name: build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+
+      - name: Install NDK
+        run: echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;21.1.6352462"
+
+      - name: Build with CMake for arm
+        run: |
+          export ANDROID_NDK_HOME=${ANDROID_HOME}/ndk/21.1.6352462
+          cmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake -DANDROID_ABI=armeabi-v7a .
+          cmake --build . -- -j$(nproc)
+        env:
+          BUILD_TYPE: 'arm'
+
+      - name: Rename and move output for arm
+        run: |
+          mv build/libv4a_re.so build/libv4a_re_arm.so
+
+      - name: Clean build
+        run: |
+          cmake --build . --target clean
+
+      - name: Build with CMake for arm64
+        run: |
+          export ANDROID_NDK_HOME=${ANDROID_HOME}/ndk/21.1.6352462
+          cmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake -DANDROID_ABI=arm64-v8a .
+          cmake --build . -- -j$(nproc)
+        env:
+          BUILD_TYPE: 'arm64'
+
+      - name: Rename and move output for arm64
+        run: |
+          mv build/libv4a_re.so build/libv4a_re_arm64.so
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: compiled-binaries
+          path: |
+            build/libv4a_re_arm.so
+            build/libv4a_re_arm64.so
