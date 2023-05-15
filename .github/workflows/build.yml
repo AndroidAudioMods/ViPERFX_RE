@@ -29,7 +29,7 @@ jobs:
 
       - name: Rename and move output for arm
         run: |
-          mv build/libv4a_re.so build/libv4a_re_arm.so
+          mv libv4a_re.so libv4a_re_arm.so
 
       - name: Clean build
         run: |
@@ -45,12 +45,12 @@ jobs:
 
       - name: Rename and move output for arm64
         run: |
-          mv build/libv4a_re.so build/libv4a_re_arm64.so
+          mv libv4a_re.so libv4a_re_arm64.so
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
           name: compiled-binaries
           path: |
-            build/libv4a_re_arm.so
-            build/libv4a_re_arm64.so
+            libv4a_re_arm.so
+            libv4a_re_arm64.so
