@@ -2,6 +2,10 @@
 #include <cmath>
 #include "SoftwareLimiter.h"
 
+#ifndef uint
+#define uint unsigned int
+#endif
+
 SoftwareLimiter::SoftwareLimiter() {
     this->ready = false;
     this->unknown4 = 0;

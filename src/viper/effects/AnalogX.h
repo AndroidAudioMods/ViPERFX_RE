@@ -3,6 +3,7 @@
 #include <cstdint>
 #include "../utils/Harmonic.h"
 #include "../utils/MultiBiquad.h"
+#include <array>
 
 class AnalogX {
 public:
@@ -15,10 +16,10 @@ public:
     void SetSamplingRate(uint32_t samplingRate);
 
 private:
-    MultiBiquad highPass[2];
-    Harmonic harmonic[2];
-    MultiBiquad lowPass[2];
-    MultiBiquad peak[2];
+    std::array<MultiBiquad, 2> highPass;
+    std::array<Harmonic, 2> harmonic;
+    std::array<MultiBiquad, 2> lowPass;
+    std::array<MultiBiquad, 2> peak;
 
     float gain;
     uint32_t freqRange;

@@ -22,10 +22,6 @@ SpectrumExtend::SpectrumExtend() {
     Reset();
 }
 
-SpectrumExtend::~SpectrumExtend() {
-    // empty?
-}
-
 void SpectrumExtend::Process(float *samples, uint32_t size) {
     if (!this->enabled) return;
 

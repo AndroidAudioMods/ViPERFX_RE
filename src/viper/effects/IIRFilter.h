@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include "../utils/MinPhaseIIRCoeffs.h"
+#include <array>
 
 // Iscle: Verified with the latest version at 13/12/2022
 
@@ -24,7 +25,7 @@ private:
     uint32_t unknown2;
     uint32_t unknown3;
     uint32_t unknown4;
-    float bandLevelsWithQ[31];
+    std::array<float, 31> bandLevelsWithQ;
 };
 
 

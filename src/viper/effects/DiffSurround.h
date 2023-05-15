@@ -2,11 +2,11 @@
 
 #include <cstdint>
 #include "../utils/WaveBuffer.h"
+#include <array>
 
 class DiffSurround {
 public:
     DiffSurround();
-    ~DiffSurround();
 
     void Process(float *samples, uint32_t size);
     void Reset();
@@ -17,7 +17,7 @@ public:
     uint32_t samplingRate;
     bool enable;
     float delayTime;
-    WaveBuffer *buffers[2];
+    std::array<WaveBuffer, 2> buffers;
 };
 
 

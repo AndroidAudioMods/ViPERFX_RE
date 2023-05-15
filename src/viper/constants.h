@@ -8,5 +8,6 @@
 
 #include "../log.h" // TODO: Remove this dependency
 
-#define VIPER_DEFAULT_SAMPLING_RATE 44100
+#define VIPER_NAME "ViPER4Android"
 #define VIPER_AUTHORS "viper.WYF, Martmists, Iscle"
+#define VIPER_DEFAULT_SAMPLING_RATE 44100

@@ -3,6 +3,7 @@
 #include <cstdint>
 #include "../utils/MultiBiquad.h"
 #include "../utils/Biquad.h"
+#include <array>
 
 // Iscle: Verified with the latest version at 13/12/2022
 
@@ -18,7 +19,7 @@ public:
 private:
     uint32_t samplingRate;
     bool enable;
-    MultiBiquad highPass[2];
-    Biquad lowPass[2];
-    Biquad bandPass[2];
+    std::array<MultiBiquad, 2> highPass;
+    std::array<Biquad, 2> lowPass;
+    std::array<Biquad, 2> bandPass;
 };

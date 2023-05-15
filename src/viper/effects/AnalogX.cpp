@@ -19,6 +19,8 @@ AnalogX::AnalogX() {
     this->samplingRate = VIPER_DEFAULT_SAMPLING_RATE;
     this->processingModel = 0;
     this->enable = false;
+    this->gain = 0.0;
+    this->freqRange = 0;
     Reset();
 }
 

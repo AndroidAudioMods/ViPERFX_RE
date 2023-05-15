@@ -1,6 +1,6 @@
 #include "ViPER.h"
-#include <ctime>
 #include <cstring>
+#include <chrono>
 #include "constants.h"
 
 ViPER::ViPER() {
@@ -141,9 +141,9 @@ void ViPER::processBuffer(float *buffer, uint32_t size) {
     }
 
     if (this->updateProcessTime) {
-        struct timeval time{};
-        gettimeofday(&time, nullptr);
-        this->processTimeMs = (uint64_t) (time.tv_sec * 1000) + (uint64_t) (time.tv_usec / 1000);
+        auto now = std::chrono::system_clock::now();
+        auto now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(now);
+        this->processTimeMs = now_ms.time_since_epoch().count();
     }
 
     uint32_t ret;

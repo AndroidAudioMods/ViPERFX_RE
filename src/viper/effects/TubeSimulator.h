@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <array>
 
 // Iscle: Verified with the latest version at 13/12/2022
 
@@ -13,7 +14,7 @@ public:
     void TubeProcess(float *buffer, uint32_t size);
 
 private:
-    double acc[2];
+    std::array<double, 2> acc;
     bool enable;
 };
 

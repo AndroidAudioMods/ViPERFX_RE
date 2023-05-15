@@ -21,6 +21,7 @@ set(FILES
         # Main
         src/viper/ViPER.cpp
         src/ViPER4Android.cpp
+        src/ViperContext.cpp
 
         # Effects
         src/viper/effects/AnalogX.cpp
