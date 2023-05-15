@@ -37,7 +37,7 @@ jobs:
 
       - name: Build with CMake
         run: |
-          cmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake -DANDROID_ABI=${{ matrix.abi }} -DANDROID_PLATFORM=android-${{ env.MIN_SDK_VERSION }} .
+          cmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake -DANDROID_ABI=${{ matrix.abi }} -DANDROID_PLATFORM=android-${{ env.MIN_SDK_VERSION }} -DANDROID_ARM_NEON=TRUE .
           cmake --build . -- -j$(nproc)
 
       - name: Rename and move output
