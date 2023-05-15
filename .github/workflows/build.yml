@@ -2,20 +2,36 @@ name: build
 
 on: [push, pull_request]
 
+env:
+  NDK_VERSION: 25.2.9519653
+
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
 
+      - name: Cache NDK
+        id: ndk-cache
+        uses: actions/cache@v3
+        with:
+          path: ndk
+          key: ndk-${{ env.NDK_VERSION }}
+          restore-keys: |
+            ndk-${{ env.NDK_VERSION }}
+
       - name: Install NDK
-        run: echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;21.1.6352462"
+        if: steps.ndk-cache.outputs.cache-hit != 'true'
+        run: |
+          echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;${{ env.NDK_VERSION }}"
+          mv $ANDROID_HOME/ndk/${{ env.NDK_VERSION }} ndk
+
+      - name: Set NDK environment variable
+        run: echo "ANDROID_NDK_HOME=$(pwd)/ndk" >> $GITHUB_ENV
 
       - name: Build with CMake for arm
         run: |
-          export ANDROID_NDK_HOME=${ANDROID_HOME}/ndk/21.1.6352462
           cmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake -DANDROID_ABI=armeabi-v7a .
           cmake --build . -- -j$(nproc)
         env:
@@ -31,7 +47,6 @@ jobs:
 
       - name: Build with CMake for arm64
         run: |
-          export ANDROID_NDK_HOME=${ANDROID_HOME}/ndk/21.1.6352462
           cmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake -DANDROID_ABI=arm64-v8a .
           cmake --build . -- -j$(nproc)
         env:
