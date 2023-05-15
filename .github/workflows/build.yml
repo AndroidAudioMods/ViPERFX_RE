@@ -19,7 +19,7 @@ jobs:
 
       - name: Cache NDK
         id: ndk-cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ndk
           key: ndk-${{ env.NDK_VERSION }}
