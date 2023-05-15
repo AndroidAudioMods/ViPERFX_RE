@@ -27,10 +27,10 @@ public:
     ViPER();
     ~ViPER();
 
-    void processBuffer(float *buffer, uint32_t size);
+    void process(std::vector<float>& buffer, uint32_t size);
     // TODO: Parameter types/names
     void DispatchCommand(int param, int val1, int val2, int val3, int val4, uint32_t arrSize, signed char *arr);
-    void ResetAllEffects();
+    void resetAllEffects();
 
 //private:
     bool updateProcessTime;

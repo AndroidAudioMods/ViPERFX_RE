@@ -133,13 +133,7 @@ ViPER::~ViPER() {
     }
 }
 
-// TODO: Return int
-void ViPER::processBuffer(float *buffer, uint32_t size) {
-    if (size == 0) {
-        VIPER_LOGD("Buffer size is 0, skip processing");
-        return;
-    }
-
+void ViPER::process(std::vector<float>& buffer, uint32_t size) {
     if (this->updateProcessTime) {
         auto now = std::chrono::system_clock::now();
         auto now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(now);
@@ -153,7 +147,7 @@ void ViPER::processBuffer(float *buffer, uint32_t size) {
     if (this->convolver->GetEnabled() || this->vhe->GetEnabled()) {
 //        VIPER_LOGD("Convolver or VHE is enable, use wave buffer");
 
-        if (!this->waveBuffer->PushSamples(buffer, size)) {
+        if (!this->waveBuffer->PushSamples(buffer.data(), size)) {
             this->waveBuffer->Reset();
             return;
         }
@@ -178,7 +172,7 @@ void ViPER::processBuffer(float *buffer, uint32_t size) {
     } else {
 //        VIPER_LOGD("Convolver and VHE are disabled, use adaptive buffer");
 
-        if (this->adaptiveBuffer->PushFrames(buffer, size)) {
+        if (this->adaptiveBuffer->PushFrames(buffer.data(), size)) {
             this->adaptiveBuffer->SetBufferOffset(size);
 
             tmpBuf = this->adaptiveBuffer->GetBuffer();
@@ -220,7 +214,7 @@ void ViPER::processBuffer(float *buffer, uint32_t size) {
             tmpBuf[i + 1] = this->softwareLimiters[1]->Process(tmpBuf[i + 1]);
         }
 
-        if (!this->adaptiveBuffer->PopFrames(buffer, tmpBufSize)) {
+        if (!this->adaptiveBuffer->PopFrames(buffer.data(), tmpBufSize)) {
             this->adaptiveBuffer->FlushBuffer();
             return;
         }
@@ -230,8 +224,8 @@ void ViPER::processBuffer(float *buffer, uint32_t size) {
         }
     }
 
-    memmove(buffer + (size - tmpBufSize) * 2, buffer, tmpBufSize * sizeof(float));
-    memset(buffer, 0, (size - tmpBufSize) * sizeof(float));
+    memmove(buffer.data() + (size - tmpBufSize) * 2, buffer.data(), tmpBufSize * sizeof(float));
+    memset(buffer.data(), 0, (size - tmpBufSize) * sizeof(float));
 }
 
 void ViPER::DispatchCommand(int param, int val1, int val2, int val3, int val4, uint32_t arrSize,
@@ -243,7 +237,7 @@ void ViPER::DispatchCommand(int param, int val1, int val2, int val3, int val4, u
             break;
         }
         case PARAM_SET_RESET_STATUS: {
-            this->ResetAllEffects();
+            this->resetAllEffects();
             break;
         }
         case PARAM_CONVOLUTION_ENABLE: {
@@ -541,7 +535,7 @@ void ViPER::DispatchCommand(int param, int val1, int val2, int val3, int val4, u
     }
 }
 
-void ViPER::ResetAllEffects() {
+void ViPER::resetAllEffects() {
     if (this->adaptiveBuffer != nullptr) {
         this->adaptiveBuffer->FlushBuffer();
     }

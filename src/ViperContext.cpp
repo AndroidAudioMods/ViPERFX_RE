@@ -7,14 +7,14 @@
 
 ViperContext::ViperContext() :
         config({}),
-        isConfigValid(false),
+        disableReason(DisableReason::NONE),
         buffer(std::vector<float>()),
         bufferFrameCount(0),
         enabled(false) {
     VIPER_LOGI("ViperContext created");
 }
 
-int ViperContext::handleSetConfig(effect_config_t *newConfig) {
+void ViperContext::handleSetConfig(effect_config_t *newConfig) {
     VIPER_LOGI("Checking input and output configuration ...");
 
     VIPER_LOGI("Input buffer frame count: %ld", newConfig->inputCfg.buffer.frameCount);
@@ -28,39 +28,39 @@ int ViperContext::handleSetConfig(effect_config_t *newConfig) {
     VIPER_LOGI("Output format: %d", newConfig->outputCfg.format);
     VIPER_LOGI("Output access mode: %d", newConfig->outputCfg.accessMode);
 
-    isConfigValid = false;
+    setDisableReason(DisableReason::UNKNOWN);
 
     if (newConfig->inputCfg.buffer.frameCount != newConfig->outputCfg.buffer.frameCount) {
         VIPER_LOGE("ViPER4Android disabled, reason [in.FC = %ld, out.FC = %ld]",
                    newConfig->inputCfg.buffer.frameCount, newConfig->outputCfg.buffer.frameCount);
-//        disableReason = "Invalid frame count";
-        return 0;
+        setDisableReason(DisableReason::INVALID_FRAME_COUNT);
+        return;
     }
 
     if (newConfig->inputCfg.samplingRate != newConfig->outputCfg.samplingRate) {
         VIPER_LOGE("ViPER4Android disabled, reason [in.SR = %d, out.SR = %d]",
                    newConfig->inputCfg.samplingRate, newConfig->outputCfg.samplingRate);
-//        disableReason = "Invalid sampling rate";
-        return 0;
+        setDisableReason(DisableReason::INVALID_SAMPLING_RATE);
+        return;
     }
 
     if (newConfig->inputCfg.samplingRate > 48000) {
         VIPER_LOGE("ViPER4Android disabled, reason [SR out of range]");
-//        disableReason = "Sampling rate out of range";
-        return 0;
+        setDisableReason(DisableReason::INVALID_SAMPLING_RATE, "Sampling rate out of range: " + std::to_string(newConfig->inputCfg.samplingRate));
+        return;
     }
 
     if (newConfig->inputCfg.channels != newConfig->outputCfg.channels) {
         VIPER_LOGE("ViPER4Android disabled, reason [in.CH = %d, out.CH = %d]",
                    newConfig->inputCfg.channels, newConfig->outputCfg.channels);
-//        disableReason = "Invalid channel count";
-        return 0;
+        setDisableReason(DisableReason::INVALID_CHANNEL_COUNT);
+        return;
     }
 
     if (newConfig->inputCfg.channels != AUDIO_CHANNEL_OUT_STEREO) {
         VIPER_LOGE("ViPER4Android disabled, reason [CH != 2]");
-//        disableReason = "Channel count != 2";
-        return 0;
+        setDisableReason(DisableReason::INVALID_CHANNEL_COUNT, "Invalid channel count: " + std::to_string(newConfig->inputCfg.channels));
+        return;
     }
 
     if (newConfig->inputCfg.format != AUDIO_FORMAT_PCM_16_BIT &&
@@ -68,8 +68,8 @@ int ViperContext::handleSetConfig(effect_config_t *newConfig) {
         newConfig->inputCfg.format != AUDIO_FORMAT_PCM_FLOAT) {
         VIPER_LOGE("ViPER4Android disabled, reason [in.FMT = %d]", newConfig->inputCfg.format);
         VIPER_LOGE("We only accept AUDIO_FORMAT_PCM_16_BIT, AUDIO_FORMAT_PCM_32_BIT and AUDIO_FORMAT_PCM_FLOAT input format!");
-//        disableReason = "Invalid input format";
-        return 0;
+        setDisableReason(DisableReason::INVALID_FORMAT, "Invalid input format: " + std::to_string(newConfig->inputCfg.format));
+        return;
     }
 
     if (newConfig->outputCfg.format != AUDIO_FORMAT_PCM_16_BIT &&
@@ -77,24 +77,23 @@ int ViperContext::handleSetConfig(effect_config_t *newConfig) {
         newConfig->outputCfg.format != AUDIO_FORMAT_PCM_FLOAT) {
         VIPER_LOGE("ViPER4Android disabled, reason [out.FMT = %d]", newConfig->outputCfg.format);
         VIPER_LOGE("We only accept AUDIO_FORMAT_PCM_16_BIT, AUDIO_FORMAT_PCM_32_BIT and AUDIO_FORMAT_PCM_FLOAT output format!");
-//        disableReason = "Invalid output format";
-        return 0;
+        setDisableReason(DisableReason::INVALID_FORMAT, "Invalid output format: " + std::to_string(newConfig->outputCfg.format));
+        return;
     }
 
     VIPER_LOGI("Input and output configuration checked.");
 
     // Config
     config = *newConfig;
-    isConfigValid = true;
-//    disableReason = "";
+    setDisableReason(DisableReason::NONE);
+
     // Processing buffer
     buffer.resize(newConfig->inputCfg.buffer.frameCount * 2);
     bufferFrameCount = newConfig->inputCfg.buffer.frameCount;
+
     // ViPER
     viper.samplingRate = newConfig->inputCfg.samplingRate;
-    viper.ResetAllEffects();
-
-    return 0;
+    viper.resetAllEffects();
 }
 
 int32_t ViperContext::handleSetParam(effect_param_t *pCmdParam, void *pReplyData) {
@@ -148,7 +147,7 @@ int32_t ViperContext::handleGetParam(effect_param_t *pCmdParam, effect_param_t *
     // the parameter size to the next 32 bit alignment.
     uint32_t vOffset = ((pCmdParam->psize + sizeof(int32_t) - 1) / sizeof(int32_t)) * sizeof(int32_t);
 
-    VIPER_LOGD("viperInterfaceCommand() EFFECT_CMD_GET_PARAM called with data = %d, psize = %d, vsize = %d", *(uint32_t *) pCmdParam->data, pCmdParam->psize, pCmdParam->vsize);
+    VIPER_LOGD("handleGetParam() EFFECT_CMD_GET_PARAM called with data = %d, psize = %d, vsize = %d", *(uint32_t *) pCmdParam->data, pCmdParam->psize, pCmdParam->vsize);
 
     memcpy(pReplyParam, pCmdParam, sizeof(effect_param_t) + pCmdParam->psize);
 
@@ -163,7 +162,7 @@ int32_t ViperContext::handleGetParam(effect_param_t *pCmdParam, effect_param_t *
         case PARAM_GET_CONFIGURE: {
             pReplyParam->status = 0;
             pReplyParam->vsize = sizeof(int32_t);
-            *(int32_t *) (pReplyParam->data + vOffset) = isConfigValid;
+            *(int32_t *) (pReplyParam->data + vOffset) = disableReason == DisableReason::NONE;
             *pReplySize = sizeof(effect_param_t) + pReplyParam->psize + vOffset + pReplyParam->vsize;
             return 0;
         }
@@ -174,16 +173,16 @@ int32_t ViperContext::handleGetParam(effect_param_t *pCmdParam, effect_param_t *
             uint64_t currentMs = now_ms.time_since_epoch().count();
             uint64_t lastProcessTime = viper.processTimeMs;
 
-            uint64_t diff;
-            if (currentMs > lastProcessTime) {
-                diff = currentMs - lastProcessTime;
+            bool isProcessing;
+            if (currentMs >= lastProcessTime) {
+                isProcessing = currentMs - lastProcessTime < 5000;
             } else {
-                diff = lastProcessTime - currentMs;
+                isProcessing = false;
             }
 
             pReplyParam->status = 0;
             pReplyParam->vsize = sizeof(int32_t);
-            *(int32_t *) (pReplyParam->data + vOffset) = diff > 5000 ? 0 : 1;
+            *(int32_t *) (pReplyParam->data + vOffset) = isProcessing;
             *pReplySize = sizeof(effect_param_t) + pReplyParam->psize + vOffset + pReplyParam->vsize;
             return 0;
         }
@@ -221,79 +220,79 @@ int32_t ViperContext::handleGetParam(effect_param_t *pCmdParam, effect_param_t *
     }
 }
 
-#define SET_INT32(ptr, value) (*(int32_t *) (ptr) = (value))
-#define GET_REPLY_SIZE(ptr) (ptr == nullptr ? 0 : *ptr)
+#define SET(type, ptr, value) (*(type *) (ptr) = (value))
 
-int32_t ViperContext::handleCommand(uint32_t cmdCode, uint32_t cmdSize, void *pCmdData, uint32_t *replySize, void *pReplyData) {
+int32_t ViperContext::handleCommand(uint32_t cmdCode, uint32_t cmdSize, void *pCmdData, uint32_t *pReplySize, void *pReplyData) {
+    uint32_t replySize = pReplySize == nullptr ? 0 : *pReplySize;
     switch (cmdCode) {
         case EFFECT_CMD_INIT: {
-            if (GET_REPLY_SIZE(replySize) != sizeof(int32_t) || pReplyData == nullptr) {
-                VIPER_LOGE("EFFECT_CMD_INIT called with invalid replySize = %d, pReplyData = %p, expected replySize = %lu", GET_REPLY_SIZE(replySize), pReplyData, sizeof(int32_t));
+            if (replySize != sizeof(int32_t) || pReplyData == nullptr) {
+                VIPER_LOGE("EFFECT_CMD_INIT called with invalid replySize = %d, pReplyData = %p, expected replySize = %lu", replySize, pReplyData, sizeof(int32_t));
                 return -EINVAL;
             }
-            SET_INT32(pReplyData, 0);
+            SET(int32_t, pReplyData, 0);
             return 0;
         }
         case EFFECT_CMD_SET_CONFIG: {
-            if (cmdSize < sizeof(effect_config_t) || pCmdData == nullptr || GET_REPLY_SIZE(replySize) != sizeof(int32_t) || pReplyData == nullptr) {
-                VIPER_LOGE("EFFECT_CMD_SET_CONFIG called with invalid cmdSize = %d, pCmdData = %p, replySize = %d, pReplyData = %p, expected cmdSize = %lu, replySize = %lu", cmdSize, pCmdData, GET_REPLY_SIZE(replySize), pReplyData, sizeof(effect_config_t), sizeof(int32_t));
+            if (cmdSize < sizeof(effect_config_t) || pCmdData == nullptr || replySize != sizeof(int32_t) || pReplyData == nullptr) {
+                VIPER_LOGE("EFFECT_CMD_SET_CONFIG called with invalid cmdSize = %d, pCmdData = %p, replySize = %d, pReplyData = %p, expected cmdSize = %lu, replySize = %lu", cmdSize, pCmdData, replySize, pReplyData, sizeof(effect_config_t), sizeof(int32_t));
                 return -EINVAL;
             }
-            SET_INT32(pReplyData, handleSetConfig((effect_config_t *) pCmdData));
+            handleSetConfig((effect_config_t *) pCmdData);
+            SET(int32_t, pReplyData, 0);
             return 0;
         }
         case EFFECT_CMD_RESET: {
-            if (GET_REPLY_SIZE(replySize) != sizeof(int32_t) || pReplyData == nullptr) {
-                VIPER_LOGE("EFFECT_CMD_RESET called with invalid replySize = %d, pReplyData = %p, expected replySize = %lu", GET_REPLY_SIZE(replySize), pReplyData, sizeof(int32_t));
+            if (replySize != sizeof(int32_t) || pReplyData == nullptr) {
+                VIPER_LOGE("EFFECT_CMD_RESET called with invalid replySize = %d, pReplyData = %p, expected replySize = %lu", replySize, pReplyData, sizeof(int32_t));
                 return -EINVAL;
             }
-            viper.ResetAllEffects();
-            SET_INT32(pReplyData, 0);
+            viper.resetAllEffects();
+            SET(int32_t, pReplyData, 0);
             return 0;
         }
         case EFFECT_CMD_ENABLE: {
-            if (GET_REPLY_SIZE(replySize) != sizeof(int32_t) || pReplyData == nullptr) {
-                VIPER_LOGE("EFFECT_CMD_ENABLE called with invalid replySize = %d, pReplyData = %p, expected replySize = %lu", GET_REPLY_SIZE(replySize), pReplyData, sizeof(int32_t));
+            if (replySize != sizeof(int32_t) || pReplyData == nullptr) {
+                VIPER_LOGE("EFFECT_CMD_ENABLE called with invalid replySize = %d, pReplyData = %p, expected replySize = %lu", replySize, pReplyData, sizeof(int32_t));
                 return -EINVAL;
             }
-            viper.ResetAllEffects();
             enabled = true;
-            SET_INT32(pReplyData, 0);
+            SET(int32_t, pReplyData, 0);
             return 0;
         }
         case EFFECT_CMD_DISABLE: {
-            if (GET_REPLY_SIZE(replySize) != sizeof(int32_t) || pReplyData == nullptr) {
-                VIPER_LOGE("EFFECT_CMD_DISABLE called with invalid replySize = %d, pReplyData = %p, expected replySize = %lu", GET_REPLY_SIZE(replySize), pReplyData, sizeof(int32_t));
+            if (replySize != sizeof(int32_t) || pReplyData == nullptr) {
+                VIPER_LOGE("EFFECT_CMD_DISABLE called with invalid replySize = %d, pReplyData = %p, expected replySize = %lu", replySize, pReplyData, sizeof(int32_t));
                 return -EINVAL;
             }
             enabled = false;
-            SET_INT32(pReplyData, 0);
+            SET(int32_t, pReplyData, 0);
             return 0;
         }
         case EFFECT_CMD_SET_PARAM: {
-            if (cmdSize < sizeof(effect_param_t) || pCmdData == nullptr || GET_REPLY_SIZE(replySize) != sizeof(int32_t) || pReplyData == nullptr) {
-                VIPER_LOGE("EFFECT_CMD_SET_PARAM called with invalid cmdSize = %d, pCmdData = %p, replySize = %d, pReplyData = %p, expected cmdSize = %lu, replySize = %lu", cmdSize, pCmdData, GET_REPLY_SIZE(replySize), pReplyData, sizeof(effect_param_t), sizeof(int32_t));
+            if (cmdSize < sizeof(effect_param_t) || pCmdData == nullptr || replySize != sizeof(int32_t) || pReplyData == nullptr) {
+                VIPER_LOGE("EFFECT_CMD_SET_PARAM called with invalid cmdSize = %d, pCmdData = %p, replySize = %d, pReplyData = %p, expected cmdSize = %lu, replySize = %lu", cmdSize, pCmdData, replySize, pReplyData, sizeof(effect_param_t), sizeof(int32_t));
                 return -EINVAL;
             }
             return handleSetParam((effect_param_t *) pCmdData, pReplyData);
         }
         case EFFECT_CMD_GET_PARAM: {
-            if (cmdSize < sizeof(effect_param_t) || pCmdData == nullptr || GET_REPLY_SIZE(replySize) < sizeof(effect_param_t) || pReplyData == nullptr) {
-                VIPER_LOGE("EFFECT_CMD_GET_PARAM called with invalid cmdSize = %d, pCmdData = %p, replySize = %d, pReplyData = %p, expected cmdSize = %lu, replySize = %lu", cmdSize, pCmdData, GET_REPLY_SIZE(replySize), pReplyData, sizeof(effect_param_t), sizeof(effect_param_t));
+            if (cmdSize < sizeof(effect_param_t) || pCmdData == nullptr || replySize < sizeof(effect_param_t) || pReplyData == nullptr) {
+                VIPER_LOGE("EFFECT_CMD_GET_PARAM called with invalid cmdSize = %d, pCmdData = %p, replySize = %d, pReplyData = %p, expected cmdSize = %lu, replySize = %lu", cmdSize, pCmdData, replySize, pReplyData, sizeof(effect_param_t), sizeof(effect_param_t));
                 return -EINVAL;
             }
-            return handleGetParam((effect_param_t *) pCmdData, (effect_param_t *) pReplyData, replySize);
+            return handleGetParam((effect_param_t *) pCmdData, (effect_param_t *) pReplyData, pReplySize);
         }
         case EFFECT_CMD_GET_CONFIG: {
-            if (GET_REPLY_SIZE(replySize) != sizeof(effect_config_t) || pReplyData == nullptr) {
-                VIPER_LOGE("EFFECT_CMD_GET_CONFIG called with invalid replySize = %d, pReplyData = %p, expected replySize = %lu", GET_REPLY_SIZE(replySize), pReplyData, sizeof(effect_config_t));
+            if (replySize != sizeof(effect_config_t) || pReplyData == nullptr) {
+                VIPER_LOGE("EFFECT_CMD_GET_CONFIG called with invalid replySize = %d, pReplyData = %p, expected replySize = %lu", replySize, pReplyData, sizeof(effect_config_t));
                 return -EINVAL;
             }
             *(effect_config_t *) pReplyData = config;
             return 0;
         }
         default: {
-            VIPER_LOGE("viperInterfaceCommand called with unknown command: %d", cmdCode);
+            VIPER_LOGE("handleCommand called with unknown command: %d", cmdCode);
             return -EINVAL;
         }
     }
@@ -324,11 +323,11 @@ static void floatToFloat(float *dst, const float *src, size_t frameCount, bool a
 static void floatToPcm16(int16_t *dst, const float *src, size_t frameCount, bool accumulate) {
     if (accumulate) {
         for (size_t i = 0; i < frameCount * 2; i++) {
-            dst[i] += static_cast<int16_t>(std::round(src[i] * static_cast<float>(1 << 15)));
+            dst[i] += static_cast<int16_t>(std::roundf(src[i] * static_cast<float>(1 << 15)));
         }
     } else {
         for (size_t i = 0; i < frameCount * 2; i++) {
-            dst[i] = static_cast<int16_t>(std::round(src[i] * static_cast<float>(1 << 15)));
+            dst[i] = static_cast<int16_t>(std::roundf(src[i] * static_cast<float>(1 << 15)));
         }
     }
 }
@@ -336,11 +335,11 @@ static void floatToPcm16(int16_t *dst, const float *src, size_t frameCount, bool
 static void floatToPcm32(int32_t *dst, const float *src, size_t frameCount, bool accumulate) {
     if (accumulate) {
         for (size_t i = 0; i < frameCount * 2; i++) {
-            dst[i] += static_cast<int32_t>(std::round(src[i] * static_cast<float>(1 << 31)));
+            dst[i] += static_cast<int32_t>(std::roundf(src[i] * static_cast<float>(1 << 31)));
         }
     } else {
         for (size_t i = 0; i < frameCount * 2; i++) {
-            dst[i] = static_cast<int32_t>(std::round(src[i] * static_cast<float>(1 << 31)));
+            dst[i] = static_cast<int32_t>(std::roundf(src[i] * static_cast<float>(1 << 31)));
         }
     }
 }
@@ -351,7 +350,7 @@ static audio_buffer_t *getBuffer(buffer_config_s *config, audio_buffer_t *buffer
 }
 
 int32_t ViperContext::process(audio_buffer_t *inBuffer, audio_buffer_t *outBuffer) {
-    if (!isConfigValid) {
+    if (disableReason != DisableReason::NONE) {
         return -EINVAL;
     }
 
@@ -388,7 +387,7 @@ int32_t ViperContext::process(audio_buffer_t *inBuffer, audio_buffer_t *outBuffe
             return -EINVAL;
     }
 
-    viper.processBuffer(buffer.data(), frameCount);
+    viper.process(buffer, frameCount);
 
     const bool accumulate = config.outputCfg.accessMode == EFFECT_BUFFER_ACCESS_ACCUMULATE;
     switch (config.outputCfg.format) {
@@ -406,4 +405,13 @@ int32_t ViperContext::process(audio_buffer_t *inBuffer, audio_buffer_t *outBuffe
     }
 
     return 0;
+}
+
+void ViperContext::setDisableReason(DisableReason reason) {
+    setDisableReason(reason, "");
+}
+
+void ViperContext::setDisableReason(DisableReason reason, std::string message) {
+    this->disableReason = reason;
+    this->disableReasonMessage = std::move(message);
 }
