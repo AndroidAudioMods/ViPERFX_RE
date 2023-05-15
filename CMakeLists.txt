@@ -71,8 +71,6 @@ set(FILES
         src/viper/utils/TimeConstDelay.cpp
         src/viper/utils/WaveBuffer.cpp)
 
-message(${CMAKE_BUILD_TYPE})
-
 add_library(
         # Sets the name of the library.
         v4a_re
