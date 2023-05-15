@@ -4,17 +4,22 @@ on: [push, pull_request]
 
 env:
   NDK_VERSION: 25.2.9519653
+  MIN_SDK_VERSION: 21
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        abi: ['armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64']
 
     steps:
       - uses: actions/checkout@v3
 
       - name: Cache NDK
         id: ndk-cache
-        uses: actions/cache@v3
+        uses: actions/cache@v2
         with:
           path: ndk
           key: ndk-${{ env.NDK_VERSION }}
@@ -30,36 +35,22 @@ jobs:
       - name: Set NDK environment variable
         run: echo "ANDROID_NDK_HOME=$(pwd)/ndk" >> $GITHUB_ENV
 
-      - name: Build with CMake for arm
+      - name: Build with CMake
         run: |
-          cmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake -DANDROID_ABI=armeabi-v7a .
+          cmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake -DANDROID_ABI=${{ matrix.abi }} -DANDROID_PLATFORM=android-${{ env.MIN_SDK_VERSION }} .
           cmake --build . -- -j$(nproc)
-        env:
-          BUILD_TYPE: 'arm'
 
-      - name: Rename and move output for arm
+      - name: Rename and move output
         run: |
-          mv libv4a_re.so libv4a_re_arm.so
+          mv libv4a_re.so libv4a_re_${{ matrix.abi }}.so
 
       - name: Clean build
         run: |
           cmake --build . --target clean
-
-      - name: Build with CMake for arm64
-        run: |
-          cmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake -DANDROID_ABI=arm64-v8a .
-          cmake --build . -- -j$(nproc)
-        env:
-          BUILD_TYPE: 'arm64'
-
-      - name: Rename and move output for arm64
-        run: |
-          mv libv4a_re.so libv4a_re_arm64.so
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: compiled-binaries
           path: |
-            libv4a_re_arm.so
-            libv4a_re_arm64.so
+            libv4a_re_*.so
