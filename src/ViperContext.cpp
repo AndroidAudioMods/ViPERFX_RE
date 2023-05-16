@@ -66,7 +66,7 @@ void ViperContext::handleSetConfig(effect_config_t *newConfig) {
     copyBufferConfig(&config.outputCfg, &newConfig->outputCfg);
 
     if (config.inputCfg.buffer.frameCount != config.outputCfg.buffer.frameCount) {
-        VIPER_LOGE("ViPER4Android disabled, reason [in.FC = %ld, out.FC = %ld]",
+        VIPER_LOGE("ViPER4Android disabled, reason [in.FC = %zu, out.FC = %zu]",
                    config.inputCfg.buffer.frameCount, config.outputCfg.buffer.frameCount);
         setDisableReason(DisableReason::INVALID_FRAME_COUNT, "Input and output frame count mismatch");
         return;
