@@ -16,9 +16,35 @@ ViperContext::ViperContext() :
     VIPER_LOGI("ViperContext created");
 }
 
-void ViperContext::handleSetConfig(effect_config_t *newConfig) {
-    // TODO: Check the mask and set the config accordingly
+void ViperContext::copyBufferConfig(buffer_config_t *dest, buffer_config_t *src) {
+    if (src->mask & EFFECT_CONFIG_BUFFER) {
+        dest->buffer = src->buffer;
+    }
 
+    if (src->mask & EFFECT_CONFIG_SMP_RATE) {
+        dest->samplingRate = src->samplingRate;
+    }
+
+    if (src->mask & EFFECT_CONFIG_CHANNELS) {
+        dest->channels = src->channels;
+    }
+
+    if (src->mask & EFFECT_CONFIG_FORMAT) {
+        dest->format = src->format;
+    }
+
+    if (src->mask & EFFECT_CONFIG_ACC_MODE) {
+        dest->accessMode = src->accessMode;
+    }
+
+    if (src->mask & EFFECT_CONFIG_PROVIDER) {
+        dest->bufferProvider = src->bufferProvider;
+    }
+
+    dest->mask |= src->mask;
+}
+
+void ViperContext::handleSetConfig(effect_config_t *newConfig) {
     VIPER_LOGI("Checking input and output configuration ...");
 
     VIPER_LOGI("Input mask: 0x%04X", newConfig->inputCfg.mask);
@@ -36,69 +62,69 @@ void ViperContext::handleSetConfig(effect_config_t *newConfig) {
 
     setDisableReason(DisableReason::UNKNOWN);
 
-    if (newConfig->inputCfg.buffer.frameCount != newConfig->outputCfg.buffer.frameCount) {
+    copyBufferConfig(&config.inputCfg, &newConfig->inputCfg);
+    copyBufferConfig(&config.outputCfg, &newConfig->outputCfg);
+
+    if (config.inputCfg.buffer.frameCount != config.outputCfg.buffer.frameCount) {
         VIPER_LOGE("ViPER4Android disabled, reason [in.FC = %ld, out.FC = %ld]",
-                   newConfig->inputCfg.buffer.frameCount, newConfig->outputCfg.buffer.frameCount);
+                   config.inputCfg.buffer.frameCount, config.outputCfg.buffer.frameCount);
         setDisableReason(DisableReason::INVALID_FRAME_COUNT, "Input and output frame count mismatch");
         return;
     }
 
-    if (newConfig->inputCfg.samplingRate != newConfig->outputCfg.samplingRate) {
+    if (config.inputCfg.samplingRate != config.outputCfg.samplingRate) {
         VIPER_LOGE("ViPER4Android disabled, reason [in.SR = %d, out.SR = %d]",
-                   newConfig->inputCfg.samplingRate, newConfig->outputCfg.samplingRate);
+                   config.inputCfg.samplingRate, config.outputCfg.samplingRate);
         setDisableReason(DisableReason::INVALID_SAMPLING_RATE, "Input and output sampling rate mismatch");
         return;
     }
 
-//    if (newConfig->inputCfg.samplingRate > 48000) {
+//    if (config.inputCfg.samplingRate > 48000) {
 //        VIPER_LOGE("ViPER4Android disabled, reason [SR out of range]");
-//        setDisableReason(DisableReason::INVALID_SAMPLING_RATE, "Sampling rate out of range: " + std::to_string(newConfig->inputCfg.samplingRate));
+//        setDisableReason(DisableReason::INVALID_SAMPLING_RATE, "Sampling rate out of range: " + std::to_string(config.inputCfg.samplingRate));
 //        return;
 //    }
 
-    if (newConfig->inputCfg.channels != newConfig->outputCfg.channels) {
+    if (config.inputCfg.channels != config.outputCfg.channels) {
         VIPER_LOGE("ViPER4Android disabled, reason [in.CH = %d, out.CH = %d]",
-                   newConfig->inputCfg.channels, newConfig->outputCfg.channels);
+                   config.inputCfg.channels, config.outputCfg.channels);
         setDisableReason(DisableReason::INVALID_CHANNEL_COUNT, "Input and output channel count mismatch");
         return;
     }
 
-    if (newConfig->inputCfg.channels != AUDIO_CHANNEL_OUT_STEREO) {
+    if (config.inputCfg.channels != AUDIO_CHANNEL_OUT_STEREO) {
         VIPER_LOGE("ViPER4Android disabled, reason [CH != 2]");
-        setDisableReason(DisableReason::INVALID_CHANNEL_COUNT, "Invalid channel count: " + std::to_string(newConfig->inputCfg.channels));
+        setDisableReason(DisableReason::INVALID_CHANNEL_COUNT, "Invalid channel count: " + std::to_string(config.inputCfg.channels));
         return;
     }
 
-    if (newConfig->inputCfg.format != AUDIO_FORMAT_PCM_16_BIT &&
-        newConfig->inputCfg.format != AUDIO_FORMAT_PCM_32_BIT &&
-        newConfig->inputCfg.format != AUDIO_FORMAT_PCM_FLOAT) {
-        VIPER_LOGE("ViPER4Android disabled, reason [in.FMT = %d]", newConfig->inputCfg.format);
+    if (config.inputCfg.format != AUDIO_FORMAT_PCM_16_BIT &&
+        config.inputCfg.format != AUDIO_FORMAT_PCM_32_BIT &&
+        config.inputCfg.format != AUDIO_FORMAT_PCM_FLOAT) {
+        VIPER_LOGE("ViPER4Android disabled, reason [in.FMT = %d]", config.inputCfg.format);
         VIPER_LOGE("We only accept AUDIO_FORMAT_PCM_16_BIT, AUDIO_FORMAT_PCM_32_BIT and AUDIO_FORMAT_PCM_FLOAT input format!");
-        setDisableReason(DisableReason::INVALID_FORMAT, "Invalid input format: " + std::to_string(newConfig->inputCfg.format));
+        setDisableReason(DisableReason::INVALID_FORMAT, "Invalid input format: " + std::to_string(config.inputCfg.format));
         return;
     }
 
-    if (newConfig->outputCfg.format != AUDIO_FORMAT_PCM_16_BIT &&
-        newConfig->outputCfg.format != AUDIO_FORMAT_PCM_32_BIT &&
-        newConfig->outputCfg.format != AUDIO_FORMAT_PCM_FLOAT) {
-        VIPER_LOGE("ViPER4Android disabled, reason [out.FMT = %d]", newConfig->outputCfg.format);
+    if (config.outputCfg.format != AUDIO_FORMAT_PCM_16_BIT &&
+        config.outputCfg.format != AUDIO_FORMAT_PCM_32_BIT &&
+        config.outputCfg.format != AUDIO_FORMAT_PCM_FLOAT) {
+        VIPER_LOGE("ViPER4Android disabled, reason [out.FMT = %d]", config.outputCfg.format);
         VIPER_LOGE("We only accept AUDIO_FORMAT_PCM_16_BIT, AUDIO_FORMAT_PCM_32_BIT and AUDIO_FORMAT_PCM_FLOAT output format!");
-        setDisableReason(DisableReason::INVALID_FORMAT, "Invalid output format: " + std::to_string(newConfig->outputCfg.format));
+        setDisableReason(DisableReason::INVALID_FORMAT, "Invalid output format: " + std::to_string(config.outputCfg.format));
         return;
     }
 
     VIPER_LOGI("Input and output configuration checked.");
-
-    // Config
-    config = *newConfig;
     setDisableReason(DisableReason::NONE);
 
     // Processing buffer
-    buffer.resize(newConfig->inputCfg.buffer.frameCount * 2);
-    bufferFrameCount = newConfig->inputCfg.buffer.frameCount;
+    buffer.resize(config.inputCfg.buffer.frameCount * 2);
+    bufferFrameCount = config.inputCfg.buffer.frameCount;
 
     // ViPER
-    viper.samplingRate = newConfig->inputCfg.samplingRate;
+    viper.samplingRate = config.inputCfg.samplingRate;
     viper.resetAllEffects();
 }
 

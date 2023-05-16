@@ -35,6 +35,7 @@ private:
     bool enabled;
     ViPER viper;
 
+    static void copyBufferConfig(buffer_config_t *dest, buffer_config_t *src);
     void handleSetConfig(effect_config_t *newConfig);
     int32_t handleSetParam(effect_param_t *pCmdParam, void *pReplyData);
     int32_t handleGetParam(effect_param_t *pCmdParam, effect_param_t *pReplyParam, uint32_t *pReplySize);
