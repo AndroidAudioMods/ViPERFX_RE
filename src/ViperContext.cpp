@@ -214,6 +214,20 @@ int32_t ViperContext::handleGetParam(effect_param_t *pCmdParam, effect_param_t *
             *pReplySize = sizeof(effect_param_t) + pReplyParam->psize + vOffset + pReplyParam->vsize;
             return 0;
         }
+        case PARAM_GET_DISABLE_REASON: {
+            pReplyParam->status = 0;
+            pReplyParam->vsize = sizeof(int32_t);
+            *(int32_t *) (pReplyParam->data + vOffset) = static_cast<int32_t>(disableReason);
+            *pReplySize = sizeof(effect_param_t) + pReplyParam->psize + vOffset + pReplyParam->vsize;
+            return 0;
+        }
+        case PARAM_GET_DISABLE_REASON_MESSAGE: {
+            pReplyParam->status = 0;
+            pReplyParam->vsize = disableReasonMessage.size();
+            memcpy(pReplyParam->data + vOffset, disableReasonMessage.c_str(), pReplyParam->vsize);
+            *pReplySize = sizeof(effect_param_t) + pReplyParam->psize + vOffset + pReplyParam->vsize;
+            return 0;
+        }
         default: {
             return -EINVAL;
         }

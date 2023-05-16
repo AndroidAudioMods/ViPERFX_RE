@@ -8,9 +8,9 @@
 
 class ViperContext {
 public:
-    enum class DisableReason {
-        NONE,
-        UNKNOWN,
+    enum class DisableReason : int32_t {
+        UNKNOWN = -1,
+        NONE = 0,
         INVALID_FRAME_COUNT,
         INVALID_SAMPLING_RATE,
         INVALID_CHANNEL_COUNT,
