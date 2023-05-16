@@ -23,7 +23,6 @@ static const effect_descriptor_t viperDescriptor = {
 };
 
 static int32_t viperInterfaceProcess(effect_handle_t self, audio_buffer_t *inBuffer, audio_buffer_t *outBuffer) {
-    VIPER_LOGD("viperInterfaceProcess() called");
     auto viperHandle = reinterpret_cast<ViperHandle *>(self);
     if (viperHandle == nullptr) return -EINVAL;
 
@@ -33,7 +32,6 @@ static int32_t viperInterfaceProcess(effect_handle_t self, audio_buffer_t *inBuf
 static int32_t viperInterfaceCommand(effect_handle_t self,
                                      uint32_t cmdCode, uint32_t cmdSize, void *pCmdData,
                                      uint32_t *replySize, void *pReplyData) {
-    VIPER_LOGD("viperInterfaceCommand() called");
     auto viperHandle = reinterpret_cast<ViperHandle *>(self);
     if (viperHandle == nullptr) return -EINVAL;
 
@@ -41,7 +39,6 @@ static int32_t viperInterfaceCommand(effect_handle_t self,
 }
 
 static int32_t viperInterfaceGetDescriptor(effect_handle_t self, effect_descriptor_t *pDescriptor) {
-    VIPER_LOGD("viperInterfaceGetDescriptor() called");
     if (pDescriptor == nullptr) return -EINVAL;
     *pDescriptor = viperDescriptor;
     return 0;
@@ -56,7 +53,6 @@ static const effect_interface_s viperInterface = {
 static int32_t
 viperLibraryCreate(const effect_uuid_t *uuid, int32_t sessionId __unused, int32_t ioId __unused,
                    effect_handle_t *pHandle) {
-    VIPER_LOGD("viperLibraryCreate() called");
     if (uuid == nullptr || pHandle == nullptr) return -EINVAL;
     if (memcmp(uuid, &viperDescriptor.uuid, sizeof(effect_uuid_t)) != 0) return -ENOENT;
 
@@ -68,7 +64,6 @@ viperLibraryCreate(const effect_uuid_t *uuid, int32_t sessionId __unused, int32_
 }
 
 static int32_t viperLibraryRelease(effect_handle_t handle) {
-    VIPER_LOGD("viperLibraryRelease() called");
     auto viperHandle = reinterpret_cast<ViperHandle *>(handle);
     if (viperHandle == nullptr) return -EINVAL;
 
@@ -77,7 +72,6 @@ static int32_t viperLibraryRelease(effect_handle_t handle) {
 }
 
 static int32_t viperLibraryGetDescriptor(const effect_uuid_t *uuid, effect_descriptor_t *pDescriptor) {
-    VIPER_LOGD("viperLibraryGetDescriptor() called");
     if (uuid == nullptr || pDescriptor == nullptr) return -EINVAL;
     if (memcmp(uuid, &viperDescriptor.uuid, sizeof(effect_uuid_t)) != 0) return -ENOENT;
 

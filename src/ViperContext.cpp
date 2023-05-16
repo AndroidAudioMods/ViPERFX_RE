@@ -15,13 +15,17 @@ ViperContext::ViperContext() :
 }
 
 void ViperContext::handleSetConfig(effect_config_t *newConfig) {
+    // TODO: Check the mask and set the config accordingly
+
     VIPER_LOGI("Checking input and output configuration ...");
 
+    VIPER_LOGI("Input mask: 0x%04X", newConfig->inputCfg.mask);
     VIPER_LOGI("Input buffer frame count: %ld", newConfig->inputCfg.buffer.frameCount);
     VIPER_LOGI("Input sampling rate: %d", newConfig->inputCfg.samplingRate);
     VIPER_LOGI("Input channels: %d", newConfig->inputCfg.channels);
     VIPER_LOGI("Input format: %d", newConfig->inputCfg.format);
     VIPER_LOGI("Input access mode: %d", newConfig->inputCfg.accessMode);
+    VIPER_LOGI("Output mask: 0x%04X", newConfig->outputCfg.mask);
     VIPER_LOGI("Output buffer frame count: %ld", newConfig->outputCfg.buffer.frameCount);
     VIPER_LOGI("Output sampling rate: %d", newConfig->outputCfg.samplingRate);
     VIPER_LOGI("Output channels: %d", newConfig->outputCfg.channels);
@@ -196,7 +200,7 @@ int32_t ViperContext::handleGetParam(effect_param_t *pCmdParam, effect_param_t *
         case PARAM_GET_CONVOLUTION_KERNEL_ID: {
             pReplyParam->status = 0;
             pReplyParam->vsize = sizeof(uint32_t);
-            *(uint32_t *) (pReplyParam->data + vOffset) = viper.convolver->GetKernelID();
+            *(uint32_t *) (pReplyParam->data + vOffset) = viper.convolver.GetKernelID();
             *pReplySize = sizeof(effect_param_t) + pReplyParam->psize + vOffset + pReplyParam->vsize;
             return 0;
         }

@@ -21,11 +21,11 @@
 #include "effects/SoftwareLimiter.h"
 #include "effects/PlaybackGain.h"
 #include "../ViPER4Android.h"
+#include <array>
 
 class ViPER {
 public:
     ViPER();
-    ~ViPER();
 
     void process(std::vector<float>& buffer, uint32_t size);
     // TODO: Parameter types/names
@@ -38,26 +38,26 @@ public:
     uint32_t samplingRate;
 
     // Effects
-    AdaptiveBuffer *adaptiveBuffer;
-    WaveBuffer *waveBuffer;
-    Convolver *convolver;
-    VHE *vhe;
-    ViPERDDC *viperDdc;
-    SpectrumExtend *spectrumExtend;
-    IIRFilter *iirFilter;
-    ColorfulMusic *colorfulMusic;
-    Reverberation *reverberation;
-    PlaybackGain *playbackGain;
-    FETCompressor *fetCompressor;
-    DynamicSystem *dynamicSystem;
-    ViPERBass *viperBass;
-    ViPERClarity *viperClarity;
-    DiffSurround *diffSurround;
-    Cure *cure;
-    TubeSimulator *tubeSimulator;
-    AnalogX *analogX;
-    SpeakerCorrection *speakerCorrection;
-    SoftwareLimiter *softwareLimiters[2];
+    AdaptiveBuffer adaptiveBuffer;
+    WaveBuffer waveBuffer;
+    Convolver convolver;
+    VHE vhe;
+    ViPERDDC viperDdc;
+    SpectrumExtend spectrumExtend;
+    IIRFilter iirFilter;
+    ColorfulMusic colorfulMusic;
+    Reverberation reverberation;
+    PlaybackGain playbackGain;
+    FETCompressor fetCompressor;
+    DynamicSystem dynamicSystem;
+    ViPERBass viperBass;
+    ViPERClarity viperClarity;
+    DiffSurround diffSurround;
+    Cure cure;
+    TubeSimulator tubeSimulator;
+    AnalogX analogX;
+    SpeakerCorrection speakerCorrection;
+    std::array<SoftwareLimiter, 2> softwareLimiters;
 
     float frameScale;
     float leftPan;
