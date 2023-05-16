@@ -5,6 +5,8 @@
 #include "ViperContext.h"
 #include "log.h"
 
+#define SET(type, ptr, value) (*(type *) (ptr) = (value))
+
 ViperContext::ViperContext() :
         config({}),
         disableReason(DisableReason::NONE),
@@ -232,13 +234,31 @@ int32_t ViperContext::handleGetParam(effect_param_t *pCmdParam, effect_param_t *
             *pReplySize = sizeof(effect_param_t) + pReplyParam->psize + vOffset + pReplyParam->vsize;
             return 0;
         }
+        case PARAM_GET_CONFIG: {
+            pReplyParam->status = 0;
+            pReplyParam->vsize = 40;
+            // Input
+            SET(uint64_t, pReplyParam->data + vOffset, config.inputCfg.buffer.frameCount);
+            SET(uint32_t, pReplyParam->data + vOffset + 8, config.inputCfg.samplingRate);
+            SET(uint32_t, pReplyParam->data + vOffset + 12, config.inputCfg.channels);
+            SET(uint8_t, pReplyParam->data + vOffset + 16, config.inputCfg.format);
+            SET(uint8_t, pReplyParam->data + vOffset + 17, config.inputCfg.accessMode);
+            SET(uint16_t, pReplyParam->data + vOffset + 18, config.inputCfg.mask);
+            // Output
+            SET(uint64_t, pReplyParam->data + vOffset + 20, config.outputCfg.buffer.frameCount);
+            SET(uint32_t, pReplyParam->data + vOffset + 28, config.outputCfg.samplingRate);
+            SET(uint32_t, pReplyParam->data + vOffset + 32, config.outputCfg.channels);
+            SET(uint8_t, pReplyParam->data + vOffset + 36, config.outputCfg.format);
+            SET(uint8_t, pReplyParam->data + vOffset + 37, config.outputCfg.accessMode);
+            SET(uint16_t, pReplyParam->data + vOffset + 38, config.outputCfg.mask);
+            *pReplySize = sizeof(effect_param_t) + pReplyParam->psize + vOffset + pReplyParam->vsize;
+            return 0;
+        }
         default: {
             return -EINVAL;
         }
     }
 }
-
-#define SET(type, ptr, value) (*(type *) (ptr) = (value))
 
 int32_t ViperContext::handleCommand(uint32_t cmdCode, uint32_t cmdSize, void *pCmdData, uint32_t *pReplySize, void *pReplyData) {
     uint32_t replySize = pReplySize == nullptr ? 0 : *pReplySize;
