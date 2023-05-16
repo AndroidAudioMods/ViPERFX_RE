@@ -5,6 +5,7 @@
 
 // Basically Bauer-to-Stereophonic Binaural filter
 // See: http://bs2b.sourceforge.net/
+
 Crossfeed::Crossfeed() {
     this->a0_lo = 0.f;
     this->b1_lo = 0.f;

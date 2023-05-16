@@ -99,7 +99,6 @@ static const float MIN_PHASE_IIR_COEFFS_FREQ_31BANDS[] = {
 
 MinPhaseIIRCoeffs::MinPhaseIIRCoeffs() {
     this->coeffs = nullptr;
-    this->samplingRate = VIPER_DEFAULT_SAMPLING_RATE;
     this->bands = 0;
 }
 
@@ -153,12 +152,11 @@ int MinPhaseIIRCoeffs::SolveRoot(double param_2, double param_3, double param_4,
 }
 
 int MinPhaseIIRCoeffs::UpdateCoeffs(uint32_t bands, uint32_t samplingRate) {
-    if ((bands != 10 && bands != 15 && bands != 25 && bands != 31) || samplingRate < 44100) {
+    if (bands != 10 && bands != 15 && bands != 25 && bands != 31) {
         return 0;
     }
 
     this->bands = bands;
-    this->samplingRate = samplingRate;
 
     delete[] this->coeffs;
     this->coeffs = new double[bands * 4](); // TODO: Check this array size, original type: float
@@ -191,8 +189,8 @@ int MinPhaseIIRCoeffs::UpdateCoeffs(uint32_t bands, uint32_t samplingRate) {
 
         Find_F1_F2(bandFreqs[i], tmp, &ret2, &ret1);
 
-        double x = (2.0 * M_PI * (double) bandFreqs[i]) / (double) this->samplingRate;
-        double y = (2.0 * M_PI * ret2) / (double) this->samplingRate;
+        double x = (2.0 * M_PI * (double) bandFreqs[i]) / (double) samplingRate;
+        double y = (2.0 * M_PI * ret2) / (double) samplingRate;
 
         double cosX = cos(x);
         double cosY = cos(y);

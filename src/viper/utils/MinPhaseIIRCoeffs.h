@@ -18,6 +18,5 @@ private:
     int SolveRoot(double param_2, double param_3, double param_4, double *param_5);
 
     double *coeffs;
-    uint32_t samplingRate;
     uint32_t bands;
 };

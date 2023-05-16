@@ -37,27 +37,27 @@ void ViperContext::handleSetConfig(effect_config_t *newConfig) {
     if (newConfig->inputCfg.buffer.frameCount != newConfig->outputCfg.buffer.frameCount) {
         VIPER_LOGE("ViPER4Android disabled, reason [in.FC = %ld, out.FC = %ld]",
                    newConfig->inputCfg.buffer.frameCount, newConfig->outputCfg.buffer.frameCount);
-        setDisableReason(DisableReason::INVALID_FRAME_COUNT);
+        setDisableReason(DisableReason::INVALID_FRAME_COUNT, "Input and output frame count mismatch");
         return;
     }
 
     if (newConfig->inputCfg.samplingRate != newConfig->outputCfg.samplingRate) {
         VIPER_LOGE("ViPER4Android disabled, reason [in.SR = %d, out.SR = %d]",
                    newConfig->inputCfg.samplingRate, newConfig->outputCfg.samplingRate);
-        setDisableReason(DisableReason::INVALID_SAMPLING_RATE);
+        setDisableReason(DisableReason::INVALID_SAMPLING_RATE, "Input and output sampling rate mismatch");
         return;
     }
 
-    if (newConfig->inputCfg.samplingRate > 48000) {
-        VIPER_LOGE("ViPER4Android disabled, reason [SR out of range]");
-        setDisableReason(DisableReason::INVALID_SAMPLING_RATE, "Sampling rate out of range: " + std::to_string(newConfig->inputCfg.samplingRate));
-        return;
-    }
+//    if (newConfig->inputCfg.samplingRate > 48000) {
+//        VIPER_LOGE("ViPER4Android disabled, reason [SR out of range]");
+//        setDisableReason(DisableReason::INVALID_SAMPLING_RATE, "Sampling rate out of range: " + std::to_string(newConfig->inputCfg.samplingRate));
+//        return;
+//    }
 
     if (newConfig->inputCfg.channels != newConfig->outputCfg.channels) {
         VIPER_LOGE("ViPER4Android disabled, reason [in.CH = %d, out.CH = %d]",
                    newConfig->inputCfg.channels, newConfig->outputCfg.channels);
-        setDisableReason(DisableReason::INVALID_CHANNEL_COUNT);
+        setDisableReason(DisableReason::INVALID_CHANNEL_COUNT, "Input and output channel count mismatch");
         return;
     }
 
