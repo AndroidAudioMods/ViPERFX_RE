@@ -378,7 +378,7 @@ static const T& clamp(const T& v, const T& lo, const T& hi) {
 static void floatToFloat(float *dst, const float *src, size_t frameCount, bool accumulate) {
     if (accumulate) {
         for (size_t i = 0; i < frameCount * 2; i++) {
-            dst[i] += clamp(src[i], -1.0f, 1.0f);
+            dst[i] = clamp(dst[i] + src[i], -1.0f, 1.0f);
         }
     } else {
         memcpy(dst, src, frameCount * 2 * sizeof(float));
@@ -391,8 +391,7 @@ void floatToPcm(T *dst, const float *src, size_t frameCount, bool accumulate) {
     constexpr T min_val = std::numeric_limits<T>::min();
 
     for (size_t i = 0; i < frameCount * 2; i++) {
-        float f = clamp(src[i], -1.0f, 1.0f);
-        T pcm = static_cast<T>(f * static_cast<float>(max_val));
+        T pcm = static_cast<T>(src[i] * static_cast<float>(max_val));
         if (accumulate) {
             U temp = static_cast<U>(dst[i]) + pcm;
             dst[i] = static_cast<T>(clamp(temp, static_cast<U>(min_val), static_cast<U>(max_val)));
