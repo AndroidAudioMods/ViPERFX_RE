@@ -362,55 +362,51 @@ int32_t ViperContext::handleCommand(uint32_t cmdCode, uint32_t cmdSize, void *pC
     }
 }
 
-static void pcm16ToFloat(float *dst, const int16_t *src, size_t frameCount) {
+template <typename T>
+void pcmToFloat(float* dst, const T* src, size_t frameCount) {
+    constexpr float max_val = static_cast<float>(std::numeric_limits<T>::max());
     for (size_t i = 0; i < frameCount * 2; i++) {
-        dst[i] = static_cast<float>(src[i]) / static_cast<float>(1 << 15);
+        dst[i] = static_cast<float>(src[i]) / max_val;
     }
 }
 
-static void pcm32ToFloat(float *dst, const int32_t *src, size_t frameCount) {
-    for (size_t i = 0; i < frameCount * 2; i++) {
-        dst[i] = static_cast<float>(src[i]) / static_cast<float>(1 << 31);
-    }
+template <typename T>
+static const T& clamp(const T& v, const T& lo, const T& hi) {
+    return std::min(std::max(v, lo), hi);
 }
 
 static void floatToFloat(float *dst, const float *src, size_t frameCount, bool accumulate) {
     if (accumulate) {
         for (size_t i = 0; i < frameCount * 2; i++) {
-            dst[i] += src[i];
+            dst[i] += clamp(src[i], -1.0f, 1.0f);
         }
     } else {
         memcpy(dst, src, frameCount * 2 * sizeof(float));
     }
 }
 
-static void floatToPcm16(int16_t *dst, const float *src, size_t frameCount, bool accumulate) {
-    if (accumulate) {
-        for (size_t i = 0; i < frameCount * 2; i++) {
-            dst[i] += static_cast<int16_t>(std::roundf(src[i] * static_cast<float>(1 << 15)));
-        }
-    } else {
-        for (size_t i = 0; i < frameCount * 2; i++) {
-            dst[i] = static_cast<int16_t>(std::roundf(src[i] * static_cast<float>(1 << 15)));
-        }
-    }
-}
+template <typename T, typename U>
+void floatToPcm(T *dst, const float *src, size_t frameCount, bool accumulate) {
+    constexpr T max_val = std::numeric_limits<T>::max();
+    constexpr T min_val = std::numeric_limits<T>::min();
 
-static void floatToPcm32(int32_t *dst, const float *src, size_t frameCount, bool accumulate) {
-    if (accumulate) {
-        for (size_t i = 0; i < frameCount * 2; i++) {
-            dst[i] += static_cast<int32_t>(std::roundf(src[i] * static_cast<float>(1 << 31)));
-        }
-    } else {
-        for (size_t i = 0; i < frameCount * 2; i++) {
-            dst[i] = static_cast<int32_t>(std::roundf(src[i] * static_cast<float>(1 << 31)));
+    for (size_t i = 0; i < frameCount * 2; i++) {
+        float f = clamp(src[i], -1.0f, 1.0f);
+        T pcm = static_cast<T>(f * static_cast<float>(max_val));
+        if (accumulate) {
+            U temp = static_cast<U>(dst[i]) + pcm;
+            dst[i] = static_cast<T>(clamp(temp, static_cast<U>(min_val), static_cast<U>(max_val)));
+        } else {
+            dst[i] = pcm;
         }
     }
 }
 
 static audio_buffer_t *getBuffer(buffer_config_s *config, audio_buffer_t *buffer) {
     if (buffer != nullptr) return buffer;
-    return &config->buffer;
+    if (config->mask & EFFECT_CONFIG_BUFFER) return &config->buffer;
+    // EFFECT_CONFIG_PROVIDER not implemented, it's not used by any known effect
+    return nullptr;
 }
 
 int32_t ViperContext::process(audio_buffer_t *inBuffer, audio_buffer_t *outBuffer) {
@@ -433,16 +429,17 @@ int32_t ViperContext::process(audio_buffer_t *inBuffer, audio_buffer_t *outBuffe
 
     size_t frameCount = inBuffer->frameCount;
     if (frameCount > bufferFrameCount) {
+        // This should never happen, but just in case
         buffer.resize(frameCount * 2);
         bufferFrameCount = frameCount;
     }
 
     switch (config.inputCfg.format) {
         case AUDIO_FORMAT_PCM_16_BIT:
-            pcm16ToFloat(buffer.data(), inBuffer->s16, frameCount);
+            pcmToFloat<int16_t>(buffer.data(), inBuffer->s16, frameCount);
             break;
         case AUDIO_FORMAT_PCM_32_BIT:
-            pcm32ToFloat(buffer.data(), inBuffer->s32, frameCount);
+            pcmToFloat<int32_t>(buffer.data(), inBuffer->s32, frameCount);
             break;
         case AUDIO_FORMAT_PCM_FLOAT:
             floatToFloat(buffer.data(), inBuffer->f32, frameCount, false);
@@ -456,10 +453,10 @@ int32_t ViperContext::process(audio_buffer_t *inBuffer, audio_buffer_t *outBuffe
     const bool accumulate = config.outputCfg.accessMode == EFFECT_BUFFER_ACCESS_ACCUMULATE;
     switch (config.outputCfg.format) {
         case AUDIO_FORMAT_PCM_16_BIT:
-            floatToPcm16(outBuffer->s16, buffer.data(), frameCount, accumulate);
+            floatToPcm<int16_t, int32_t>(outBuffer->s16, buffer.data(), frameCount, accumulate);
             break;
         case AUDIO_FORMAT_PCM_32_BIT:
-            floatToPcm32(outBuffer->s32, buffer.data(), frameCount, accumulate);
+            floatToPcm<int32_t, int64_t>(outBuffer->s32, buffer.data(), frameCount, accumulate);
             break;
         case AUDIO_FORMAT_PCM_FLOAT:
             floatToFloat(outBuffer->f32, buffer.data(), frameCount, accumulate);
