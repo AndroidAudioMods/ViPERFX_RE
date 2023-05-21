@@ -4,6 +4,7 @@
 #include <chrono>
 #include "ViperContext.h"
 #include "log.h"
+#include "viper/constants.h"
 
 #define SET(type, ptr, value) (*(type *) (ptr) = (value))
 
@@ -277,6 +278,13 @@ int32_t ViperContext::handleGetParam(effect_param_t *pCmdParam, effect_param_t *
             SET(uint8_t, pReplyParam->data + vOffset + 36, config.outputCfg.format);
             SET(uint8_t, pReplyParam->data + vOffset + 37, config.outputCfg.accessMode);
             SET(uint16_t, pReplyParam->data + vOffset + 38, config.outputCfg.mask);
+            *pReplySize = sizeof(effect_param_t) + pReplyParam->psize + vOffset + pReplyParam->vsize;
+            return 0;
+        }
+        case PARAM_GET_ARCHITECTURE: {
+            pReplyParam->status = 0;
+            pReplyParam->vsize = sizeof(VIPER_ARCHITECTURE) - 1; // Exclude null terminator
+            memcpy(pReplyParam->data + vOffset, VIPER_ARCHITECTURE, pReplyParam->vsize);
             *pReplySize = sizeof(effect_param_t) + pReplyParam->psize + vOffset + pReplyParam->vsize;
             return 0;
         }

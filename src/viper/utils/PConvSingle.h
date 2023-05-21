@@ -25,13 +25,13 @@ public:
 
     void ConvSegment(float *buffer, bool interleaved, int channel);
 
-    int LoadKernel(float *buf, int param_2, int segmentSize);
+    int LoadKernel(const float *kernel, int kernelSize, int segmentSize);
 
-    int LoadKernel(const float *param_2,float param_3,int param_4,int param_5);
+    int LoadKernel(const float *kernel, float param_3, int kernelSize, int segmentSize);
 
-    int ProcessKernel(float *param_1, int param_2, int param_3);
+    int ProcessKernel(const float *kernel, int kernelSize, int param_4);
 
-    int ProcessKernel(int param_2, float *param_3, int param_4, int param_5);
+    int ProcessKernel(const float *kernel, float param_3, int kernelSize, int param_5);
 
     void ReleaseResources();
 

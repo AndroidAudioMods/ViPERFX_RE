@@ -22,7 +22,11 @@ void PConvSingle::ConvolveInterleaved(float *buffer, int channel) {
 }
 
 void PConvSingle::ConvSegment(float *buffer, bool interleaved, int channel) {
-    // TODO
+    if (!interleaved) {
+
+    } else {
+        // TODO
+    }
 }
 
 int PConvSingle::GetFFTSize() {
@@ -41,13 +45,13 @@ bool PConvSingle::InstanceUsable() {
     return this->instanceUsable;
 }
 
-int PConvSingle::LoadKernel(float *buf, int param_2, int segmentSize) {
-    if (buf != nullptr && param_2 > 0 && segmentSize > 0 && segmentSize % 2 == 0) {
+int PConvSingle::LoadKernel(const float *kernel, int kernelSize, int segmentSize) {
+    if (kernel != nullptr && kernelSize >= 2 && segmentSize >= 2 && (segmentSize & (segmentSize - 1)) == 0) {
         this->instanceUsable = false;
         ReleaseResources();
         this->data = new PConvData(); //(PConvData *) malloc(0x140);  // TODO: Sizeof
         this->segmentSize = segmentSize;
-        int n = ProcessKernel(buf, param_2, 1);
+        int n = ProcessKernel(kernel, kernelSize, 1);
         if (n != 0) {
             this->instanceUsable = true;
             return n;
@@ -57,28 +61,28 @@ int PConvSingle::LoadKernel(float *buf, int param_2, int segmentSize) {
     return 0;
 }
 
-int PConvSingle::LoadKernel(const float *param_2,float param_3,int param_4,int param_5) {
-//    if (buf != nullptr && param_5 > 0 && segmentSize > 0 && segmentSize % 2 == 0) {
-//        this->enable = false;
-//        ReleaseResources();
-////        this->data = new PConvData(); //(PConvData *) malloc(0x140);  // TODO: Sizeof
-//        this->segmentSize = segmentSize;
-//        int n = ProcessKernel(1, param_2, param_4, param_5);
-//        if (n != 0) {
-//            this->enable = true;
-//            return n;
-//        }
-//        ReleaseResources();
-//    }
+int PConvSingle::LoadKernel(const float *kernel, float param_3, int kernelSize, int segmentSize) {
+    if (kernel != nullptr && kernelSize >= 2 && segmentSize >= 2 && (segmentSize & (segmentSize - 1)) == 0) {
+        this->instanceUsable = false;
+        ReleaseResources();
+        this->data = new PConvData(); //(PConvData *) malloc(0x140);  // TODO: Sizeof
+        this->segmentSize = segmentSize;
+        int n = ProcessKernel(kernel, param_3, kernelSize, 1);
+        if (n != 0) {
+            this->instanceUsable = true;
+            return n;
+        }
+        ReleaseResources();
+    }
     return 0;
 }
 
-int PConvSingle::ProcessKernel(float *param_1, int param_2, int param_3) {
+int PConvSingle::ProcessKernel(const float *kernel, int kernelSize, int param_4) {
     // TODO
     return 0;
 }
 
-int PConvSingle::ProcessKernel(int param_2, float *param_3, int param_4, int param_5) {
+int PConvSingle::ProcessKernel(const float *kernel, float param_3, int kernelSize, int param_5) {
     // TODO
     return 0;
 }

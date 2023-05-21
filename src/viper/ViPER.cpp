@@ -228,7 +228,7 @@ void ViPER::DispatchCommand(int param, int val1, int val2, int val3, int val4, u
             break;
         } // 0x1000A
         case PARAM_DDC_COEFFICIENTS: {
-            this->viperDdc.SetCoeffs(arrSize, (float *) arr, (float *) (arr + arrSize * 4));
+            this->viperDdc.SetCoeffs(arrSize, (float *) arr, (float *) (arr + arrSize * sizeof(float)));
             break;
         } // 0x1000B
         case PARAM_SPECTRUM_EXTENSION_ENABLE: {
