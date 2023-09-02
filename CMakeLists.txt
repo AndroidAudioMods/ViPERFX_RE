@@ -82,4 +82,5 @@ add_library(
         ${FILES})
 
 target_link_libraries(v4a_re log) # kissfft)
+target_compile_options(v4a_re PRIVATE -flto -O3 -DNDEBUG)
 #target_compile_options(v4afx_r PRIVATE -O2 -DNDEBUG -Wall -Wsign-conversion -Wno-unused-result -Wno-unneeded-internal-declaration -fstrict-aliasing -fvisibility=hidden -Wextra -Wno-unused-parameter)
