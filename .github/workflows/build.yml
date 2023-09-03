@@ -44,9 +44,28 @@ jobs:
         run: |
           mv libv4a_re.so libv4a_re_${{ matrix.abi }}.so
 
-      - name: Upload artifacts
+      # Move compiled libraries into the Magisk module folder
+      - name: Move to Magisk Module
+        run: |
+          mkdir -p module/common/files/${{ matrix.abi }}
+          mv libv4a_re_${{ matrix.abi }}.so module/common/files/${{ matrix.abi }}/
+
+      # Zip the Magisk module folder
+      - name: Zip Magisk Module
+        run: |
+          cd module
+          zip -r ../magisk_module.zip ./
+
+      # Upload the Magisk module zip as an artifact
+      - name: Upload Magisk Module
+        uses: actions/upload-artifact@v3
+        with:
+          name: magisk_module
+          path: magisk_module.zip
+
+      # Upload compiled libraries as an artifact
+      - name: Upload compiled libraries
         uses: actions/upload-artifact@v3
         with:
           name: compiled-binaries
-          path: |
-            libv4a_re_*.so
+          path: libv4a_re_*.so
