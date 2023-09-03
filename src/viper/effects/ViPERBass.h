@@ -17,7 +17,6 @@ public:
     };
 
     ViPERBass();
-    ~ViPERBass();
 
     void Process(float *samples, uint32_t size);
     void Reset();
