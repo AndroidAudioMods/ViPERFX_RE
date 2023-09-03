@@ -51,6 +51,7 @@ jobs:
           path: libv4a_re_*.so
 
   package:
+    needs: build
     runs-on: ubuntu-latest
 
     steps:
