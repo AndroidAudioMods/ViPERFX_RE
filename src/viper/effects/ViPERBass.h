@@ -28,10 +28,10 @@ public:
     void SetSpeaker(uint32_t speaker);
 
 private:
-    Polyphase *polyphase;
-    Biquad *biquad;
-    Subwoofer *subwoofer;
-    WaveBuffer *waveBuffer;
+    Polyphase polyphase;
+    Biquad biquad[2];
+    Subwoofer subwoofer;
+    WaveBuffer waveBuffer;
     bool enable;
     ProcessMode processMode;
     uint32_t samplingRate;

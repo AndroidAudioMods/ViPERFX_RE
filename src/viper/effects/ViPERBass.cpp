@@ -3,7 +3,7 @@
 
 // Iscle: Verified with the latest version at 13/12/2022
 
-ViPERBass::ViPERBass() {
+ViPERBass::ViPERBass() : polyphase(2), waveBuffer(2, 4096) {
     this->speaker = 60;
     this->enable = false;
     this->processMode = ProcessMode::NATURAL_BASS;
@@ -11,22 +11,13 @@ ViPERBass::ViPERBass() {
     this->bassFactor = 0.0;
     this->samplingRate = VIPER_DEFAULT_SAMPLING_RATE;
     this->samplingRatePeriod = 1.0 / VIPER_DEFAULT_SAMPLING_RATE;
-    this->polyphase = new Polyphase(2);
-    this->biquad = new Biquad();
-    this->subwoofer = new Subwoofer();
-    this->waveBuffer = new WaveBuffer(1, 4096);
 
-    this->biquad->Reset();
-    this->biquad->SetLowPassParameter((float) this->speaker, this->samplingRate, 0.53);
-    this->subwoofer->SetBassGain(this->samplingRate, 0.0);
+    for (auto &biquad : this->biquad) {
+        biquad.Reset();
+        biquad.SetLowPassParameter((float) this->speaker, this->samplingRate, 0.53);
+    }
+    this->subwoofer.SetBassGain(this->samplingRate, 0.0);
     Reset();
-}
-
-ViPERBass::~ViPERBass() {
-    delete this->polyphase;
-    delete this->biquad;
-    delete this->subwoofer;
-    delete this->waveBuffer;
 }
 
 void ViPERBass::Process(float *samples, uint32_t size) {
@@ -48,49 +39,46 @@ void ViPERBass::Process(float *samples, uint32_t size) {
     switch (this->processMode) {
         case ProcessMode::NATURAL_BASS: {
             for (uint32_t i = 0; i < size * 2; i += 2) {
-                double sample = ((double) samples[i] + (double) samples[i + 1]) / 2.0;
-                float x = (float) this->biquad->ProcessSample(sample) * this->bassFactor;
-                samples[i] += x;
-                samples[i + 1] += x;
+                samples[i] += (float) this->biquad[0].ProcessSample(samples[i]) * this->bassFactor;
+                samples[i + 1] += (float) this->biquad[1].ProcessSample(samples[i + 1]) * this->bassFactor;
             }
             break;
         }
         case ProcessMode::PURE_BASS_PLUS: {
-            if (this->waveBuffer->PushSamples(samples, size)) {
-                float *buffer = this->waveBuffer->GetBuffer();
-                uint32_t bufferOffset = this->waveBuffer->GetBufferOffset();
+            if (this->waveBuffer.PushSamples(samples, size)) {
+                float *buffer = this->waveBuffer.GetBuffer();
+                uint32_t bufferOffset = this->waveBuffer.GetBufferOffset();
 
                 for (uint32_t i = 0; i < size * 2; i += 2) {
-                    double sample = ((double) samples[i] + (double) samples[i + 1]) / 2.0;
-                    auto x = (float) this->biquad->ProcessSample(sample);
-                    buffer[bufferOffset - size + i / 2] = x;
+                    buffer[bufferOffset - size + i] = (float) this->biquad[0].ProcessSample(samples[i]);
+                    buffer[bufferOffset - size + i + 1] = (float) this->biquad[1].ProcessSample(samples[i + 1]);
                 }
 
-                if (this->polyphase->Process(samples, size) == size) {
+                if (this->polyphase.Process(samples, size) == size) {
                     for (uint32_t i = 0; i < size * 2; i += 2) {
-                        float x = buffer[i / 2] * this->bassFactor;
-                        samples[i] += x;
-                        samples[i + 1] += x;
+                        samples[i] += buffer[i] * this->bassFactor;
+                        samples[i + 1] += buffer[i + 1] * this->bassFactor;
                     }
-                    this->waveBuffer->PopSamples(size, true);
+                    this->waveBuffer.PopSamples(size, true);
                 }
             }
             break;
         }
         case ProcessMode::SUBWOOFER: {
-            this->subwoofer->Process(samples, size);
+            this->subwoofer.Process(samples, size);
             break;
         }
     }
 }
 
 void ViPERBass::Reset() {
-    this->polyphase->SetSamplingRate(this->samplingRate);
-    this->polyphase->Reset();
-    this->waveBuffer->Reset();
-    this->waveBuffer->PushZeros(this->polyphase->GetLatency());
-    this->subwoofer->SetBassGain(this->samplingRate, this->bassFactor * 2.5f);
-    this->biquad->SetLowPassParameter((float) this->speaker, this->samplingRate, 0.53);
+    this->polyphase.SetSamplingRate(this->samplingRate);
+    this->polyphase.Reset();
+    this->waveBuffer.Reset();
+    this->waveBuffer.PushZeros(this->polyphase.GetLatency());
+    this->subwoofer.SetBassGain(this->samplingRate, this->bassFactor * 2.5f);
+    this->biquad[0].SetLowPassParameter((float) this->speaker, this->samplingRate, 0.53);
+    this->biquad[1].SetLowPassParameter((float) this->speaker, this->samplingRate, 0.53);
     this->samplingRatePeriod = 1.0f / (float) this->samplingRate;
     this->antiPop = 0.0f;
 }
@@ -98,7 +86,7 @@ void ViPERBass::Reset() {
 void ViPERBass::SetBassFactor(float bassFactor) {
     if (this->bassFactor != bassFactor) {
         this->bassFactor = bassFactor;
-        this->subwoofer->SetBassGain(this->samplingRate, this->bassFactor * 2.5f);
+        this->subwoofer.SetBassGain(this->samplingRate, this->bassFactor * 2.5f);
     }
 }
 
@@ -120,15 +108,17 @@ void ViPERBass::SetSamplingRate(uint32_t samplingRate) {
     if (this->samplingRate != samplingRate) {
         this->samplingRate = samplingRate;
         this->samplingRatePeriod = 1.0f / (float) samplingRate;
-        this->polyphase->SetSamplingRate(this->samplingRate);
-        this->biquad->SetLowPassParameter((float) this->speaker, this->samplingRate, 0.53);
-        this->subwoofer->SetBassGain(this->samplingRate, this->bassFactor * 2.5f);
+        this->polyphase.SetSamplingRate(this->samplingRate);
+        this->biquad[0].SetLowPassParameter((float) this->speaker, this->samplingRate, 0.53);
+        this->biquad[1].SetLowPassParameter((float) this->speaker, this->samplingRate, 0.53);
+        this->subwoofer.SetBassGain(this->samplingRate, this->bassFactor * 2.5f);
     }
 }
 
 void ViPERBass::SetSpeaker(uint32_t speaker) {
     if (this->speaker != speaker) {
         this->speaker = speaker;
-        this->biquad->SetLowPassParameter((float) this->speaker, this->samplingRate, 0.53);
+        this->biquad[0].SetLowPassParameter((float) this->speaker, this->samplingRate, 0.53);
+        this->biquad[1].SetLowPassParameter((float) this->speaker, this->samplingRate, 0.53);
     }
 }
