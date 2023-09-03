@@ -83,5 +83,5 @@ jobs:
       - name: Upload Magisk Module
         uses: actions/upload-artifact@v3
         with:
-          name: magisk_module
-          path: magisk_module.zip
+          name: V4A_Magisk_Module
+          path: ./
