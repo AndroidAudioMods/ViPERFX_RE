@@ -14,7 +14,7 @@ jobs:
         abi: ['armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64']
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Build with CMake
         run: |
@@ -26,7 +26,7 @@ jobs:
           mv libv4a_re.so libv4a_re_${{ matrix.abi }}.so
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: compiled-binaries
           path: libv4a_re_*.so
@@ -37,7 +37,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Download the compiled binaries from the 'build' workflow
       - name: Download compiled libraries
@@ -62,7 +62,7 @@ jobs:
 
       # Upload the zipped Magisk module as an artifact
       - name: Upload Magisk Module
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: V4A_Magisk_Module
           path: module
