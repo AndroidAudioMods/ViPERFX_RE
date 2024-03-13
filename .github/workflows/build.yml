@@ -3,7 +3,6 @@ name: build
 on: [push, pull_request]
 
 env:
-  NDK_VERSION: 25.2.9519653
   MIN_SDK_VERSION: 21
 
 jobs:
@@ -16,24 +15,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-
-      - name: Cache NDK
-        id: ndk-cache
-        uses: actions/cache@v3
-        with:
-          path: ndk
-          key: ndk-${{ env.NDK_VERSION }}
-          restore-keys: |
-            ndk-${{ env.NDK_VERSION }}
-
-      - name: Install NDK
-        if: steps.ndk-cache.outputs.cache-hit != 'true'
-        run: |
-          echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;${{ env.NDK_VERSION }}"
-          mv $ANDROID_HOME/ndk/${{ env.NDK_VERSION }} ndk
-
-      - name: Set NDK environment variable
-        run: echo "ANDROID_NDK_HOME=$(pwd)/ndk" >> $GITHUB_ENV
 
       - name: Build with CMake
         run: |
