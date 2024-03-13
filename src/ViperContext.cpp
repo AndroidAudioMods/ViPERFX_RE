@@ -69,14 +69,14 @@ void ViperContext::handleSetConfig(effect_config_t *newConfig) {
     if (config.inputCfg.buffer.frameCount != config.outputCfg.buffer.frameCount) {
         VIPER_LOGE("ViPER4Android disabled, reason [in.FC = %zu, out.FC = %zu]",
                    config.inputCfg.buffer.frameCount, config.outputCfg.buffer.frameCount);
-        setDisableReason(DisableReason::INVALID_FRAME_COUNT, "Input and output frame count mismatch");
+        setDisableReason(DisableReason::INVALID_FRAME_COUNT);
         return;
     }
 
     if (config.inputCfg.samplingRate != config.outputCfg.samplingRate) {
         VIPER_LOGE("ViPER4Android disabled, reason [in.SR = %d, out.SR = %d]",
                    config.inputCfg.samplingRate, config.outputCfg.samplingRate);
-        setDisableReason(DisableReason::INVALID_SAMPLING_RATE, "Input and output sampling rate mismatch");
+        setDisableReason(DisableReason::INVALID_SAMPLING_RATE);
         return;
     }
 
@@ -89,13 +89,13 @@ void ViperContext::handleSetConfig(effect_config_t *newConfig) {
     if (config.inputCfg.channels != config.outputCfg.channels) {
         VIPER_LOGE("ViPER4Android disabled, reason [in.CH = %d, out.CH = %d]",
                    config.inputCfg.channels, config.outputCfg.channels);
-        setDisableReason(DisableReason::INVALID_CHANNEL_COUNT, "Input and output channel count mismatch");
+        setDisableReason(DisableReason::INVALID_CHANNEL_COUNT);
         return;
     }
 
     if (config.inputCfg.channels != AUDIO_CHANNEL_OUT_STEREO) {
         VIPER_LOGE("ViPER4Android disabled, reason [CH != 2]");
-        setDisableReason(DisableReason::INVALID_CHANNEL_COUNT, "Invalid channel count: " + std::to_string(config.inputCfg.channels));
+        setDisableReason(DisableReason::INVALID_CHANNEL_COUNT);
         return;
     }
 
@@ -104,7 +104,7 @@ void ViperContext::handleSetConfig(effect_config_t *newConfig) {
         config.inputCfg.format != AUDIO_FORMAT_PCM_FLOAT) {
         VIPER_LOGE("ViPER4Android disabled, reason [in.FMT = %d]", config.inputCfg.format);
         VIPER_LOGE("We only accept AUDIO_FORMAT_PCM_16_BIT, AUDIO_FORMAT_PCM_32_BIT and AUDIO_FORMAT_PCM_FLOAT input format!");
-        setDisableReason(DisableReason::INVALID_FORMAT, "Invalid input format: " + std::to_string(config.inputCfg.format));
+        setDisableReason(DisableReason::INVALID_FORMAT);
         return;
     }
 
@@ -113,7 +113,7 @@ void ViperContext::handleSetConfig(effect_config_t *newConfig) {
         config.outputCfg.format != AUDIO_FORMAT_PCM_FLOAT) {
         VIPER_LOGE("ViPER4Android disabled, reason [out.FMT = %d]", config.outputCfg.format);
         VIPER_LOGE("We only accept AUDIO_FORMAT_PCM_16_BIT, AUDIO_FORMAT_PCM_32_BIT and AUDIO_FORMAT_PCM_FLOAT output format!");
-        setDisableReason(DisableReason::INVALID_FORMAT, "Invalid output format: " + std::to_string(config.outputCfg.format));
+        setDisableReason(DisableReason::INVALID_FORMAT);
         return;
     }
 
@@ -187,63 +187,22 @@ int32_t ViperContext::handleGetParam(effect_param_t *pCmdParam, effect_param_t *
     switch (*(uint32_t *) pCmdParam->data) {
         case PARAM_GET_ENABLED: {
             pReplyParam->status = 0;
-            pReplyParam->vsize = sizeof(int32_t);
-            *(int32_t *) (pReplyParam->data + vOffset) = enabled;
+            pReplyParam->vsize = sizeof(uint8_t);
+            *(uint8_t *) (pReplyParam->data + vOffset) = enabled;
             *pReplySize = sizeof(effect_param_t) + pReplyParam->psize + vOffset + pReplyParam->vsize;
             return 0;
         }
-        case PARAM_GET_CONFIGURE: {
+        case PARAM_GET_FRAME_COUNT: {
             pReplyParam->status = 0;
-            pReplyParam->vsize = sizeof(int32_t);
-            *(int32_t *) (pReplyParam->data + vOffset) = disableReason == DisableReason::NONE;
+            pReplyParam->vsize = sizeof(uint64_t);
+            *(uint64_t *) (pReplyParam->data + vOffset) = viper.frameCount;
             *pReplySize = sizeof(effect_param_t) + pReplyParam->psize + vOffset + pReplyParam->vsize;
             return 0;
         }
-        case PARAM_GET_STREAMING: { // Is processing
-            auto now = std::chrono::system_clock::now();
-            auto now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(now);
-
-            uint64_t currentMs = now_ms.time_since_epoch().count();
-            uint64_t lastProcessTime = viper.processTimeMs;
-
-            bool isProcessing;
-            if (currentMs >= lastProcessTime) {
-                isProcessing = currentMs - lastProcessTime < 5000;
-            } else {
-                isProcessing = false;
-            }
-
-            pReplyParam->status = 0;
-            pReplyParam->vsize = sizeof(int32_t);
-            *(int32_t *) (pReplyParam->data + vOffset) = isProcessing;
-            *pReplySize = sizeof(effect_param_t) + pReplyParam->psize + vOffset + pReplyParam->vsize;
-            return 0;
-        }
-        case PARAM_GET_SAMPLING_RATE: {
+        case PARAM_GET_VERSION: {
             pReplyParam->status = 0;
             pReplyParam->vsize = sizeof(uint32_t);
-            *(uint32_t *) (pReplyParam->data + vOffset) = viper.samplingRate;
-            *pReplySize = sizeof(effect_param_t) + pReplyParam->psize + vOffset + pReplyParam->vsize;
-            return 0;
-        }
-        case PARAM_GET_CONVOLUTION_KERNEL_ID: {
-            pReplyParam->status = 0;
-            pReplyParam->vsize = sizeof(uint32_t);
-            *(uint32_t *) (pReplyParam->data + vOffset) = viper.convolver.GetKernelID();
-            *pReplySize = sizeof(effect_param_t) + pReplyParam->psize + vOffset + pReplyParam->vsize;
-            return 0;
-        }
-        case PARAM_GET_DRIVER_VERSION_CODE: {
-            pReplyParam->status = 0;
-            pReplyParam->vsize = sizeof(uint32_t);
-            *(int32_t *) (pReplyParam->data + vOffset) = VERSION_CODE;
-            *pReplySize = sizeof(effect_param_t) + pReplyParam->psize + vOffset + pReplyParam->vsize;
-            return 0;
-        }
-        case PARAM_GET_DRIVER_VERSION_NAME: {
-            pReplyParam->status = 0;
-            pReplyParam->vsize = strlen(VERSION_NAME);
-            memcpy(pReplyParam->data + vOffset, VERSION_NAME, pReplyParam->vsize);
+            *(uint32_t *) (pReplyParam->data + vOffset) = VIPER_VERSION;
             *pReplySize = sizeof(effect_param_t) + pReplyParam->psize + vOffset + pReplyParam->vsize;
             return 0;
         }
@@ -251,13 +210,6 @@ int32_t ViperContext::handleGetParam(effect_param_t *pCmdParam, effect_param_t *
             pReplyParam->status = 0;
             pReplyParam->vsize = sizeof(int32_t);
             *(int32_t *) (pReplyParam->data + vOffset) = static_cast<int32_t>(disableReason);
-            *pReplySize = sizeof(effect_param_t) + pReplyParam->psize + vOffset + pReplyParam->vsize;
-            return 0;
-        }
-        case PARAM_GET_DISABLE_REASON_MESSAGE: {
-            pReplyParam->status = 0;
-            pReplyParam->vsize = disableReasonMessage.size();
-            memcpy(pReplyParam->data + vOffset, disableReasonMessage.c_str(), pReplyParam->vsize);
             *pReplySize = sizeof(effect_param_t) + pReplyParam->psize + vOffset + pReplyParam->vsize;
             return 0;
         }
@@ -283,15 +235,14 @@ int32_t ViperContext::handleGetParam(effect_param_t *pCmdParam, effect_param_t *
         }
         case PARAM_GET_ARCHITECTURE: {
             pReplyParam->status = 0;
-            pReplyParam->vsize = sizeof(VIPER_ARCHITECTURE) - 1; // Exclude null terminator
-            memcpy(pReplyParam->data + vOffset, VIPER_ARCHITECTURE, pReplyParam->vsize);
+            pReplyParam->vsize = sizeof(uint8_t);
+            *(uint8_t *) (pReplyParam->data + vOffset) = VIPER_ARCHITECTURE;
             *pReplySize = sizeof(effect_param_t) + pReplyParam->psize + vOffset + pReplyParam->vsize;
             return 0;
         }
-        default: {
-            return -EINVAL;
-        }
     }
+
+    return -EINVAL;
 }
 
 int32_t ViperContext::handleCommand(uint32_t cmdCode, uint32_t cmdSize, void *pCmdData, uint32_t *pReplySize, void *pReplyData) {
@@ -476,10 +427,5 @@ int32_t ViperContext::process(audio_buffer_t *inBuffer, audio_buffer_t *outBuffe
 }
 
 void ViperContext::setDisableReason(DisableReason reason) {
-    setDisableReason(reason, "");
-}
-
-void ViperContext::setDisableReason(DisableReason reason, std::string message) {
     this->disableReason = reason;
-    this->disableReasonMessage = std::move(message);
 }

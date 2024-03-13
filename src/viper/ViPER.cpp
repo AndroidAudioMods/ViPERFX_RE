@@ -4,14 +4,13 @@
 #include "constants.h"
 
 ViPER::ViPER() : 
-    updateProcessTime(false),
-    processTimeMs(0),
+    frameCount(0),
     samplingRate(VIPER_DEFAULT_SAMPLING_RATE),
     adaptiveBuffer(AdaptiveBuffer(2, 4096)),
     waveBuffer(WaveBuffer(2, 4096)),
     iirFilter(IIRFilter(10)) {
     VIPER_LOGI("Welcome to ViPER FX");
-    VIPER_LOGI("Current version is %s (%d)", VERSION_NAME, VERSION_CODE);
+    VIPER_LOGI("Current version is %d", VIPER_VERSION);
 
     this->convolver.SetEnable(false);
     this->convolver.SetSamplingRate(this->samplingRate);
@@ -87,16 +86,11 @@ ViPER::ViPER() :
     this->frameScale = 1.0;
     this->leftPan = 1.0;
     this->rightPan = 1.0;
-    this->updateProcessTime = false;
-    this->processTimeMs = 0;
+    this->frameCount = 0;
 }
 
 void ViPER::process(std::vector<float>& buffer, uint32_t size) {
-    if (this->updateProcessTime) {
-        auto now = std::chrono::system_clock::now();
-        auto now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(now);
-        this->processTimeMs = now_ms.time_since_epoch().count();
-    }
+    this->frameCount += size;
 
     uint32_t ret;
     float *tmpBuf;
@@ -190,10 +184,6 @@ void ViPER::DispatchCommand(int param, int val1, int val2, int val3, int val4, u
                             signed char *arr) {
     VIPER_LOGD("Dispatch command: %d, %d, %d, %d, %d, %d, %p", param, val1, val2, val3, val4, arrSize, arr);
     switch (param) {
-        case PARAM_SET_UPDATE_STATUS: {
-            this->updateProcessTime = val1 != 0;
-            break;
-        }
         case PARAM_SET_RESET_STATUS: {
             this->resetAllEffects();
             break;

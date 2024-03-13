@@ -8,8 +8,7 @@ set(CMAKE_CXX_COMPILER_VERSION 20)
 #add_compile_definitions(ANDROID_PLATFORM=android-24)
 
 project("ViPER4Android")
-add_compile_definitions(VERSION_CODE=20231210)
-add_compile_definitions(VERSION_NAME="0.6.1")
+add_compile_definitions(VIPER_VERSION=20240314)
 
 # FFTS
 #add_subdirectory(src/viper/ffts)

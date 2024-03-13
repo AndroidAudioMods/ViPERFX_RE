@@ -25,7 +25,6 @@ public:
 private:
     effect_config_t config;
     DisableReason disableReason;
-    std::string disableReasonMessage;
 
     // Processing buffer
     std::vector<float> buffer;
@@ -41,5 +40,4 @@ private:
     int32_t handleGetParam(effect_param_t *pCmdParam, effect_param_t *pReplyParam, uint32_t *pReplySize);
 
     void setDisableReason(DisableReason reason);
-    void setDisableReason(DisableReason reason, std::string message);
 };

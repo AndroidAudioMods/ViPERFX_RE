@@ -33,8 +33,7 @@ public:
     void resetAllEffects();
 
 //private:
-    bool updateProcessTime;
-    uint64_t processTimeMs;
+    uint64_t frameCount;
     uint32_t samplingRate;
 
     // Effects
