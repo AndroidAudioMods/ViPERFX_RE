@@ -45,7 +45,6 @@ jobs:
         run: |
           for abi in armeabi-v7a arm64-v8a x86 x86_64; do
             mkdir -p module/common/files
-            ls .
             cp libv4a_re_$abi/libv4a_re.so module/common/files/libv4a_re_$abi.so
           done
 
