@@ -28,8 +28,8 @@ uint32_t AdaptiveBuffer::GetChannels() const {
     return this->channels;
 }
 
-void AdaptiveBuffer::PanFrames(float left, float right) {
-    if (this->channels == 2) {
+void AdaptiveBuffer::SetGain(float left, float right) {
+    //if (this->channels == 2) {
         for (uint32_t i = 0; i < this->offset * this->channels; i++) {
             if (i % 2 == 0) {
                 this->buffer[i] = this->buffer[i] * left;
@@ -37,7 +37,7 @@ void AdaptiveBuffer::PanFrames(float left, float right) {
                 this->buffer[i] = this->buffer[i] * right;
             }
         }
-    }
+    //}
 }
 
 int AdaptiveBuffer::PopFrames(float *frames, uint32_t length) {
@@ -80,12 +80,6 @@ int AdaptiveBuffer::PushZero(uint32_t length) {
     this->offset = this->offset + length;
 
     return 1;
-}
-
-void AdaptiveBuffer::ScaleFrames(float scale) {
-    for (uint32_t i = 0; i < this->offset * this->channels; i++) {
-        this->buffer[i] = this->buffer[i] * scale;
-    }
 }
 
 void AdaptiveBuffer::SetBufferOffset(uint32_t offset) {

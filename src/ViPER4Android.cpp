@@ -31,11 +31,11 @@ static int32_t viperInterfaceProcess(effect_handle_t self, audio_buffer_t *inBuf
 
 static int32_t viperInterfaceCommand(effect_handle_t self,
                                      uint32_t cmdCode, uint32_t cmdSize, void *pCmdData,
-                                     uint32_t *replySize, void *pReplyData) {
+                                     uint32_t *pReplySize, void *pReplyData) {
     auto viperHandle = reinterpret_cast<ViperHandle *>(self);
     if (viperHandle == nullptr) return -EINVAL;
 
-    return viperHandle->context->handleCommand(cmdCode, cmdSize, pCmdData, replySize, pReplyData);
+    return viperHandle->context->handleCommand(cmdCode, cmdSize, pCmdData, pReplySize, pReplyData);
 }
 
 static int32_t viperInterfaceGetDescriptor(effect_handle_t self, effect_descriptor_t *pDescriptor) {

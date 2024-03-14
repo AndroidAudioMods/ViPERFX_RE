@@ -3,16 +3,16 @@
 #include "../constants.h"
 
 static const float ANALOGX_HARMONICS[] = {
-        0.01,
-        0.02,
-        0.0001,
-        0.001,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0
+        0.01f,
+        0.02f,
+        0.0001f,
+        0.001f,
+        0.0f,
+        0.0f,
+        0.0f,
+        0.0f,
+        0.0f,
+        0.0f,
 };
 
 AnalogX::AnalogX() {

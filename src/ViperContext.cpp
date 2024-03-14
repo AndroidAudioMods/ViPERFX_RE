@@ -10,7 +10,7 @@
 
 ViperContext::ViperContext() :
         config({}),
-        disableReason(DisableReason::NONE),
+        disableReason(DisableReason::UNKNOWN),
         buffer(std::vector<float>()),
         bufferFrameCount(0),
         enabled(false) {
@@ -125,8 +125,8 @@ void ViperContext::handleSetConfig(effect_config_t *newConfig) {
     bufferFrameCount = config.inputCfg.buffer.frameCount;
 
     // ViPER
-    viper.samplingRate = config.inputCfg.samplingRate;
-    viper.resetAllEffects();
+    viper.setSamplingRate(config.inputCfg.samplingRate);
+    viper.reset();
 }
 
 int32_t ViperContext::handleSetParam(effect_param_t *pCmdParam, void *pReplyData) {
@@ -134,42 +134,332 @@ int32_t ViperContext::handleSetParam(effect_param_t *pCmdParam, void *pReplyData
     // the parameter size to the next 32 bit alignment.
     uint32_t vOffset = ((pCmdParam->psize + sizeof(int32_t) - 1) / sizeof(int32_t)) * sizeof(int32_t);
 
-    *(int *) pReplyData = 0;
+    if (pCmdParam->psize != sizeof(uint32_t)) {
+        VIPER_LOGE("handleSetParam() EFFECT_CMD_SET_PARAM called with invalid psize = %d, expected psize = %zu", pCmdParam->vsize, sizeof(uint32_t));
+        return -EINVAL;
+    }
 
-    int param = *(int *) (pCmdParam->data);
-    int *intValues = (int *) (pCmdParam->data + vOffset);
-    switch (pCmdParam->vsize) {
-        case sizeof(int): {
-            viper.DispatchCommand(param, intValues[0], 0, 0, 0, 0, nullptr);
+    *(int32_t *) pReplyData = 0;
+
+    uint32_t key = *(uint32_t *) (pCmdParam->data);
+    switch (key) {
+        case PARAM_SET_RESET: {
+            viper.reset();
             return 0;
         }
-        case sizeof(int) * 2: {
-            viper.DispatchCommand(param, intValues[0], intValues[1], 0, 0, 0, nullptr);
+        case PARAM_SET_DDC_ENABLE: {
+
             return 0;
         }
-        case sizeof(int) * 3: {
-            viper.DispatchCommand(param, intValues[0], intValues[1], intValues[2], 0, 0, nullptr);
+        case PARAM_SET_DDC_COEFFICIENTS: {
+
             return 0;
         }
-        case sizeof(int) * 4: {
-            viper.DispatchCommand(param, intValues[0], intValues[1], intValues[2], intValues[3], 0, nullptr);
+        case PARAM_SET_VIPER_BASS_ENABLE: {
+            if (pCmdParam->vsize != sizeof(uint8_t)) {
+                VIPER_LOGE("handleSetParam() PARAM_SET_VIPER_BASS_ENABLE called with invalid vsize = %d, expected vsize = %zu", pCmdParam->vsize, sizeof(uint8_t));
+                return -EINVAL;
+            }
+            bool enable = *(uint8_t *) (pCmdParam->data + vOffset) != 0;
+            viper.viperBass.SetEnable(enable);
             return 0;
         }
-        case 256:
-        case 1024: {
-            uint32_t arrSize = *(uint32_t *) (pCmdParam->data + vOffset);
-            signed char *arr = (signed char *) (pCmdParam->data + vOffset + sizeof(uint32_t));
-            viper.DispatchCommand(param, 0, 0, 0, 0, arrSize, arr);
+        case PARAM_SET_VIPER_BASS_MODE: {
+            if (pCmdParam->vsize != sizeof(uint8_t)) {
+                VIPER_LOGE("handleSetParam() PARAM_SET_VIPER_BASS_MODE called with invalid vsize = %d, expected vsize = %zu", pCmdParam->vsize, sizeof(uint8_t));
+                return -EINVAL;
+            }
+            uint8_t mode = *(uint8_t *) (pCmdParam->data + vOffset);
+            if (mode > 2) {
+                VIPER_LOGE("handleSetParam() PARAM_SET_VIPER_BASS_MODE called with invalid mode = %d, expected mode = 0, 1 or 2", mode);
+                *(int32_t *) pReplyData = -EINVAL;
+                return 0;
+            }
+
+            viper.viperBass.SetProcessMode(static_cast<ViPERBass::ProcessMode>(mode));
             return 0;
         }
-        case 8192: {
-            int value1 = *(int *) (pCmdParam->data + vOffset);
-            uint32_t arrSize = *(uint32_t *) (pCmdParam->data + vOffset + sizeof(int));
-            signed char *arr = (signed char *) (pCmdParam->data + vOffset + sizeof(int) + sizeof(uint32_t));
-            viper.DispatchCommand(param, value1, 0, 0, 0, arrSize, arr);
+        case PARAM_SET_VIPER_BASS_FREQUENCY: {
+            if (pCmdParam->vsize != sizeof(uint8_t)) {
+                VIPER_LOGE("handleSetParam() PARAM_SET_VIPER_BASS_FREQUENCY called with invalid vsize = %d, expected vsize = %zu", pCmdParam->vsize, sizeof(uint8_t));
+                return -EINVAL;
+            }
+            uint8_t frequency = *(uint8_t *) (pCmdParam->data + vOffset);
+            viper.viperBass.SetSpeaker(frequency);
+            return 0;
+        }
+        case PARAM_SET_VIPER_BASS_GAIN: {
+            if (pCmdParam->vsize != sizeof(uint16_t)) {
+                VIPER_LOGE("handleSetParam() PARAM_SET_VIPER_BASS_GAIN called with invalid vsize = %d, expected vsize = %zu", pCmdParam->vsize, sizeof(uint16_t));
+                return -EINVAL;
+            }
+            uint16_t gain = *(uint16_t *) (pCmdParam->data + vOffset);
+            viper.viperBass.SetBassFactor(static_cast<float>(gain) / 100.0f);
+            return 0;
+        }
+        case PARAM_SET_VIPER_CLARITY_ENABLE: {
+            if (pCmdParam->vsize != sizeof(uint8_t)) {
+                VIPER_LOGE("handleSetParam() PARAM_SET_VIPER_CLARITY_ENABLE called with invalid vsize = %d, expected vsize = %zu", pCmdParam->vsize, sizeof(uint8_t));
+                return -EINVAL;
+            }
+            bool enable = *(uint8_t *) (pCmdParam->data + vOffset) != 0;
+            viper.viperClarity.SetEnable(enable);
+            return 0;
+        }
+        case PARAM_SET_VIPER_CLARITY_MODE: {
+            if (pCmdParam->vsize != sizeof(uint8_t)) {
+                VIPER_LOGE("handleSetParam() PARAM_SET_VIPER_CLARITY_MODE called with invalid vsize = %d, expected vsize = %zu", pCmdParam->vsize, sizeof(uint8_t));
+                return -EINVAL;
+            }
+            uint8_t mode = *(uint8_t *) (pCmdParam->data + vOffset);
+            if (mode > 2) {
+                VIPER_LOGE("handleSetParam() PARAM_SET_VIPER_CLARITY_MODE called with invalid mode = %d, expected mode = 0, 1 or 2", mode);
+                *(int32_t *) pReplyData = -EINVAL;
+                return 0;
+            }
+
+            viper.viperClarity.SetProcessMode(static_cast<ViPERClarity::ClarityMode>(mode));
+            return 0;
+        }
+        case PARAM_SET_VIPER_CLARITY_GAIN: {
+            if (pCmdParam->vsize != sizeof(uint16_t)) {
+                VIPER_LOGE("handleSetParam() PARAM_SET_VIPER_CLARITY_GAIN called with invalid vsize = %d, expected vsize = %zu", pCmdParam->vsize, sizeof(uint16_t));
+                return -EINVAL;
+            }
+            uint16_t gain = *(uint16_t *) (pCmdParam->data + vOffset);
+            viper.viperClarity.SetClarity(static_cast<float>(gain) / 100.0f);
+            return 0;
+        }
+        case PARAM_SET_OUTPUT_GAIN: {
+            // 0 - 255
+            if (pCmdParam->vsize != sizeof(uint8_t) * 2) {
+                VIPER_LOGE("handleSetParam() PARAM_SET_OUTPUT_GAIN called with invalid vsize = %d, expected vsize = %zu", pCmdParam->vsize, sizeof(uint8_t) * 2);
+                return -EINVAL;
+            }
+            uint8_t gainL = *(uint8_t *) (pCmdParam->data + vOffset);
+            uint8_t gainR = *(uint8_t *) (pCmdParam->data + vOffset + sizeof(uint8_t));
+            viper.setGain(static_cast<float>(gainL) / 100.0f, static_cast<float>(gainR) / 100.0f);
+            return 0;
+        }
+        case PARAM_SET_THRESHOLD_LIMIT: {
+            // 0 - 100 (TODO: Check range)
+            if (pCmdParam->vsize != sizeof(uint8_t)) {
+                VIPER_LOGE("handleSetParam() PARAM_SET_THRESHOLD_LIMIT called with invalid vsize = %d, expected vsize = %zu", pCmdParam->vsize, sizeof(uint8_t));
+                return -EINVAL;
+            }
+            uint8_t limit = *(uint8_t *) (pCmdParam->data + vOffset);
+            viper.setThresholdLimit(static_cast<float>(limit) / 100.0f);
+            return 0;
+        }
+        case PARAM_SET_SPEAKER_OPTIMIZATION_ENABLE: {
+            if (pCmdParam->vsize != sizeof(uint8_t)) {
+                VIPER_LOGE("handleSetParam() PARAM_SET_SPEAKER_OPTIMIZATION_ENABLE called with invalid vsize = %d, expected vsize = %zu", pCmdParam->vsize, sizeof(uint8_t));
+                return -EINVAL;
+            }
+            bool enable = *(uint8_t *) (pCmdParam->data + vOffset) != 0;
+            viper.speakerCorrection.SetEnable(enable);
+            return 0;
+        }
+        case PARAM_SET_ANALOGX_ENABLE: {
+            if (pCmdParam->vsize != sizeof(uint8_t)) {
+                VIPER_LOGE("handleSetParam() PARAM_SET_ANALOGX_ENABLE called with invalid vsize = %d, expected vsize = %zu", pCmdParam->vsize, sizeof(uint8_t));
+                return -EINVAL;
+            }
+            bool enable = *(uint8_t *) (pCmdParam->data + vOffset) != 0;
+            viper.analogX.SetEnable(enable);
+            return 0;
+        }
+        case PARAM_SET_ANALOGX_LEVEL: {
+            if (pCmdParam->vsize != sizeof(uint8_t)) {
+                VIPER_LOGE("handleSetParam() PARAM_SET_ANALOGX_LEVEL called with invalid vsize = %d, expected vsize = %zu", pCmdParam->vsize, sizeof(uint8_t));
+                return -EINVAL;
+            }
+            uint8_t level = *(uint8_t *) (pCmdParam->data + vOffset);
+            if (level > 2) {
+                VIPER_LOGE("handleSetParam() PARAM_SET_ANALOGX_LEVEL called with invalid level = %d, expected level = 0, 1 or 2", level);
+                *(int32_t *) pReplyData = -EINVAL;
+                return 0;
+            }
+
+            viper.analogX.SetProcessingModel(level);
+            return 0;
+        }
+        case PARAM_SET_TUBE_SIMULATOR_ENABLE: {
+            if (pCmdParam->vsize != sizeof(uint8_t)) {
+                VIPER_LOGE("handleSetParam() PARAM_SET_TUBE_SIMULATOR_ENABLE called with invalid vsize = %d, expected vsize = %zu", pCmdParam->vsize, sizeof(uint8_t));
+                return -EINVAL;
+            }
+            bool enable = *(uint8_t *) (pCmdParam->data + vOffset) != 0;
+            viper.tubeSimulator.SetEnable(enable);
+            return 0;
+        }
+        case PARAM_SET_CURE_ENABLE: {
+            if (pCmdParam->vsize != sizeof(uint8_t)) {
+                VIPER_LOGE("handleSetParam() PARAM_SET_CURE_ENABLE called with invalid vsize = %d, expected vsize = %zu", pCmdParam->vsize, sizeof(uint8_t));
+                return -EINVAL;
+            }
+            bool enable = *(uint8_t *) (pCmdParam->data + vOffset) != 0;
+            viper.cure.SetEnable(enable);
+            return 0;
+        }
+        case PARAM_SET_CURE_LEVEL: {
+            if (pCmdParam->vsize != sizeof(uint8_t)) {
+                VIPER_LOGE("handleSetParam() PARAM_SET_CURE_LEVEL called with invalid vsize = %d, expected vsize = %zu", pCmdParam->vsize, sizeof(uint8_t));
+                return -EINVAL;
+            }
+            uint8_t level = *(uint8_t *) (pCmdParam->data + vOffset);
+            switch (level) {
+                case 0: {
+                    struct Crossfeed::Preset preset = {
+                            .cutoff = 650,
+                            .feedback = 95,
+                    };
+                    viper.cure.SetPreset(preset);
+                    break;
+                }
+                case 1: {
+                    struct Crossfeed::Preset preset = {
+                            .cutoff = 700,
+                            .feedback = 60,
+                    };
+                    viper.cure.SetPreset(preset);
+                    break;
+                }
+                case 2: {
+                    struct Crossfeed::Preset preset = {
+                            .cutoff = 700,
+                            .feedback = 45,
+                    };
+                    viper.cure.SetPreset(preset);
+                    break;
+                }
+                default:
+                    VIPER_LOGE("handleSetParam() PARAM_SET_CURE_LEVEL called with invalid level = %d, expected level = 0, 1 or 2", level);
+                    *(int32_t *) pReplyData = -EINVAL;
+                    break;
+            }
+            return 0;
+        }
+        case PARAM_SET_REVERBERATION_ENABLE: {
+            if (pCmdParam->vsize != sizeof(uint8_t)) {
+                VIPER_LOGE("handleSetParam() PARAM_SET_REVERBERATION_ENABLE called with invalid vsize = %d, expected vsize = %zu", pCmdParam->vsize, sizeof(uint8_t));
+                return -EINVAL;
+            }
+            bool enable = *(uint8_t *) (pCmdParam->data + vOffset) != 0;
+            viper.reverberation.SetEnable(enable);
+            return 0;
+        }
+        case PARAM_SET_REVERBERATION_ROOM_SIZE: {
+            if (pCmdParam->vsize != sizeof(uint8_t)) {
+                VIPER_LOGE("handleSetParam() PARAM_SET_REVERBERATION_ROOM_SIZE called with invalid vsize = %d, expected vsize = %zu", pCmdParam->vsize, sizeof(uint8_t));
+                return -EINVAL;
+            }
+            uint8_t roomSize = *(uint8_t *) (pCmdParam->data + vOffset);
+            viper.reverberation.SetRoomSize(static_cast<float>(roomSize) / 100.0f);
+            return 0;
+        }
+        case PARAM_SET_REVERBERATION_SOUND_FIELD: {
+            if (pCmdParam->vsize != sizeof(uint8_t)) {
+                VIPER_LOGE("handleSetParam() PARAM_SET_REVERBERATION_SOUND_FIELD called with invalid vsize = %d, expected vsize = %zu", pCmdParam->vsize, sizeof(uint8_t));
+                return -EINVAL;
+            }
+            uint8_t soundField = *(uint8_t *) (pCmdParam->data + vOffset);
+            viper.reverberation.SetWidth(static_cast<float>(soundField) / 100.0f);
+            return 0;
+        }
+        case PARAM_SET_REVERBERATION_DAMPING: {
+            if (pCmdParam->vsize != sizeof(uint8_t)) {
+                VIPER_LOGE("handleSetParam() PARAM_SET_REVERBERATION_DAMPING called with invalid vsize = %d, expected vsize = %zu", pCmdParam->vsize, sizeof(uint8_t));
+                return -EINVAL;
+            }
+            uint8_t damping = *(uint8_t *) (pCmdParam->data + vOffset);
+            viper.reverberation.SetDamp(static_cast<float>(damping) / 100.0f);
+            return 0;
+        }
+        case PARAM_SET_REVERBERATION_WET_SIGNAL: {
+            if (pCmdParam->vsize != sizeof(uint8_t)) {
+                VIPER_LOGE("handleSetParam() PARAM_SET_REVERBERATION_WET_SIGNAL called with invalid vsize = %d, expected vsize = %zu", pCmdParam->vsize, sizeof(uint8_t));
+                return -EINVAL;
+            }
+            uint8_t wetSignal = *(uint8_t *) (pCmdParam->data + vOffset);
+            viper.reverberation.SetWet(static_cast<float>(wetSignal) / 100.0f);
+            return 0;
+        }
+        case PARAM_SET_REVERBERATION_DRY_SIGNAL: {
+            if (pCmdParam->vsize != sizeof(uint8_t)) {
+                VIPER_LOGE("handleSetParam() PARAM_SET_REVERBERATION_DRY_SIGNAL called with invalid vsize = %d, expected vsize = %zu", pCmdParam->vsize, sizeof(uint8_t));
+                return -EINVAL;
+            }
+            uint8_t drySignal = *(uint8_t *) (pCmdParam->data + vOffset);
+            viper.reverberation.SetDry(static_cast<float>(drySignal) / 100.0f);
+            return 0;
+        }
+        case PARAM_SET_DIFFERENTIAL_SURROUND_ENABLE: {
+            if (pCmdParam->vsize != sizeof(uint8_t)) {
+                VIPER_LOGE("handleSetParam() PARAM_SET_DIFFERENTIAL_SURROUND_ENABLE called with invalid vsize = %d, expected vsize = %zu", pCmdParam->vsize, sizeof(uint8_t));
+                return -EINVAL;
+            }
+            bool enable = *(uint8_t *) (pCmdParam->data + vOffset) != 0;
+            viper.diffSurround.SetEnable(enable);
+            return 0;
+        }
+        case PARAM_SET_DIFFERENTIAL_SURROUND_DELAY: {
+            if (pCmdParam->vsize != sizeof(uint16_t)) {
+                VIPER_LOGE("handleSetParam() PARAM_SET_DIFFERENTIAL_SURROUND_DELAY called with invalid vsize = %d, expected vsize = %zu", pCmdParam->vsize, sizeof(uint16_t));
+                return -EINVAL;
+            }
+            uint16_t delay = *(uint16_t *) (pCmdParam->data + vOffset);
+            viper.diffSurround.SetDelayTime(static_cast<float>(delay) / 100.0f);
+            return 0;
+        }
+        case PARAM_SET_FIELD_SURROUND_ENABLE: {
+            if (pCmdParam->vsize != sizeof(uint8_t)) {
+                VIPER_LOGE("handleSetParam() PARAM_SET_FIELD_SURROUND_ENABLE called with invalid vsize = %d, expected vsize = %zu", pCmdParam->vsize, sizeof(uint8_t));
+                return -EINVAL;
+            }
+            bool enable = *(uint8_t *) (pCmdParam->data + vOffset) != 0;
+            viper.colorfulMusic.SetEnable(enable);
+            return 0;
+        }
+        case PARAM_SET_FIELD_SURROUND_DEPTH: {
+            if (pCmdParam->vsize != sizeof(uint16_t)) {
+                VIPER_LOGE("handleSetParam() PARAM_SET_FIELD_SURROUND_DEPTH called with invalid vsize = %d, expected vsize = %zu", pCmdParam->vsize, sizeof(uint16_t));
+                return -EINVAL;
+            }
+            uint16_t depth = *(uint16_t *) (pCmdParam->data + vOffset);
+            viper.colorfulMusic.SetDepthValue(depth);
+            return 0;
+        }
+        case PARAM_SET_FIELD_SURROUND_MID_IMAGE: {
+            if (pCmdParam->vsize != sizeof(uint8_t)) {
+                VIPER_LOGE("handleSetParam() PARAM_SET_FIELD_SURROUND_MID_IMAGE called with invalid vsize = %d, expected vsize = %zu", pCmdParam->vsize, sizeof(uint8_t));
+                return -EINVAL;
+            }
+            uint8_t midImage = *(uint8_t *) (pCmdParam->data + vOffset);
+            viper.colorfulMusic.SetMidImageValue(static_cast<float>(midImage) / 100.0f);
+            return 0;
+        }
+        case PARAM_SET_IIR_EQUALIZER_ENABLE: {
+            if (pCmdParam->vsize != sizeof(uint8_t)) {
+                VIPER_LOGE("handleSetParam() PARAM_SET_IIR_EQUALIZER_ENABLE called with invalid vsize = %d, expected vsize = %zu", pCmdParam->vsize, sizeof(uint8_t));
+                return -EINVAL;
+            }
+            bool enable = *(uint8_t *) (pCmdParam->data + vOffset) != 0;
+            viper.iirFilter.SetEnable(enable);
+            return 0;
+        }
+        case PARAM_SET_IIR_EQUALIZER_BAND_LEVEL: {
+            if (pCmdParam->vsize != sizeof(uint8_t) + sizeof(int16_t)) {
+                VIPER_LOGE("handleSetParam() PARAM_SET_IIR_EQUALIZER_BAND_LEVEL called with invalid vsize = %d, expected vsize = %zu", pCmdParam->vsize, sizeof(uint8_t) + sizeof(int16_t));
+                return -EINVAL;
+            }
+            uint8_t band = *(uint8_t *) (pCmdParam->data + vOffset);
+            int16_t level = *(int16_t *) (pCmdParam->data + vOffset + sizeof(uint8_t));
+            viper.iirFilter.SetBandLevel(band, static_cast<float>(level) / 100.0f);
             return 0;
         }
         default: {
+            VIPER_LOGE("handleSetParam() called with unknown key: %d", key);
             return -EINVAL;
         }
     }
@@ -180,11 +470,15 @@ int32_t ViperContext::handleGetParam(effect_param_t *pCmdParam, effect_param_t *
     // the parameter size to the next 32 bit alignment.
     uint32_t vOffset = ((pCmdParam->psize + sizeof(int32_t) - 1) / sizeof(int32_t)) * sizeof(int32_t);
 
-    VIPER_LOGD("handleGetParam() EFFECT_CMD_GET_PARAM called with data = %d, psize = %d, vsize = %d", *(uint32_t *) pCmdParam->data, pCmdParam->psize, pCmdParam->vsize);
+    if (pCmdParam->psize != sizeof(uint32_t)) {
+        VIPER_LOGE("handleGetParam() EFFECT_CMD_GET_PARAM called with invalid psize = %d, expected psize = %zu", pCmdParam->vsize, sizeof(uint32_t));
+        return -EINVAL;
+    }
 
     memcpy(pReplyParam, pCmdParam, sizeof(effect_param_t) + pCmdParam->psize);
 
-    switch (*(uint32_t *) pCmdParam->data) {
+    uint32_t key = *(uint32_t *) (pCmdParam->data);
+    switch (key) {
         case PARAM_GET_ENABLED: {
             pReplyParam->status = 0;
             pReplyParam->vsize = sizeof(uint8_t);
@@ -195,7 +489,7 @@ int32_t ViperContext::handleGetParam(effect_param_t *pCmdParam, effect_param_t *
         case PARAM_GET_FRAME_COUNT: {
             pReplyParam->status = 0;
             pReplyParam->vsize = sizeof(uint64_t);
-            *(uint64_t *) (pReplyParam->data + vOffset) = viper.frameCount;
+            *(uint64_t *) (pReplyParam->data + vOffset) = viper.getFrameCount();
             *pReplySize = sizeof(effect_param_t) + pReplyParam->psize + vOffset + pReplyParam->vsize;
             return 0;
         }
@@ -236,13 +530,15 @@ int32_t ViperContext::handleGetParam(effect_param_t *pCmdParam, effect_param_t *
         case PARAM_GET_ARCHITECTURE: {
             pReplyParam->status = 0;
             pReplyParam->vsize = sizeof(uint8_t);
-            *(uint8_t *) (pReplyParam->data + vOffset) = VIPER_ARCHITECTURE;
+            *(uint8_t *) (pReplyParam->data + vOffset) = static_cast<uint8_t>(VIPER_ARCHITECTURE);
             *pReplySize = sizeof(effect_param_t) + pReplyParam->psize + vOffset + pReplyParam->vsize;
             return 0;
         }
+        default: {
+            VIPER_LOGE("handleGetParam() called with unknown key: %d", key);
+            return -EINVAL;
+        }
     }
-
-    return -EINVAL;
 }
 
 int32_t ViperContext::handleCommand(uint32_t cmdCode, uint32_t cmdSize, void *pCmdData, uint32_t *pReplySize, void *pReplyData) {
@@ -257,8 +553,8 @@ int32_t ViperContext::handleCommand(uint32_t cmdCode, uint32_t cmdSize, void *pC
             return 0;
         }
         case EFFECT_CMD_SET_CONFIG: {
-            if (cmdSize < sizeof(effect_config_t) || pCmdData == nullptr || replySize != sizeof(int32_t) || pReplyData == nullptr) {
-                VIPER_LOGE("EFFECT_CMD_SET_CONFIG called with invalid cmdSize = %d, pCmdData = %p, replySize = %d, pReplyData = %p, expected cmdSize = %zu, replySize = %zu", cmdSize, pCmdData, replySize, pReplyData, sizeof(effect_config_t), sizeof(int32_t));
+            if (cmdSize != sizeof(effect_config_t) || pCmdData == nullptr || replySize != sizeof(int32_t) || pReplyData == nullptr) {
+                VIPER_LOGE("EFFECT_CMD_SET_CONFIG called with invalid cmdSize = %d, pCmdData = %p, replySize = %d, pReplyData = %p, expected cmdSize = %zu, expected replySize = %zu", cmdSize, pCmdData, replySize, pReplyData, sizeof(effect_config_t), sizeof(int32_t));
                 return -EINVAL;
             }
             handleSetConfig((effect_config_t *) pCmdData);
@@ -270,7 +566,7 @@ int32_t ViperContext::handleCommand(uint32_t cmdCode, uint32_t cmdSize, void *pC
                 VIPER_LOGE("EFFECT_CMD_RESET called with invalid replySize = %d, pReplyData = %p, expected replySize = %zu", replySize, pReplyData, sizeof(int32_t));
                 return -EINVAL;
             }
-            viper.resetAllEffects();
+            viper.reset();
             SET(int32_t, pReplyData, 0);
             return 0;
         }
@@ -294,14 +590,14 @@ int32_t ViperContext::handleCommand(uint32_t cmdCode, uint32_t cmdSize, void *pC
         }
         case EFFECT_CMD_SET_PARAM: {
             if (cmdSize < sizeof(effect_param_t) || pCmdData == nullptr || replySize != sizeof(int32_t) || pReplyData == nullptr) {
-                VIPER_LOGE("EFFECT_CMD_SET_PARAM called with invalid cmdSize = %d, pCmdData = %p, replySize = %d, pReplyData = %p, expected cmdSize = %zu, replySize = %zu", cmdSize, pCmdData, replySize, pReplyData, sizeof(effect_param_t), sizeof(int32_t));
+                VIPER_LOGE("EFFECT_CMD_SET_PARAM called with invalid cmdSize = %d, pCmdData = %p, replySize = %d, pReplyData = %p, expected cmdSize >= %zu, expected replySize >= %zu", cmdSize, pCmdData, replySize, pReplyData, sizeof(effect_param_t), sizeof(int32_t));
                 return -EINVAL;
             }
             return handleSetParam((effect_param_t *) pCmdData, pReplyData);
         }
         case EFFECT_CMD_GET_PARAM: {
             if (cmdSize < sizeof(effect_param_t) || pCmdData == nullptr || replySize < sizeof(effect_param_t) || pReplyData == nullptr) {
-                VIPER_LOGE("EFFECT_CMD_GET_PARAM called with invalid cmdSize = %d, pCmdData = %p, replySize = %d, pReplyData = %p, expected cmdSize = %zu, replySize = %zu", cmdSize, pCmdData, replySize, pReplyData, sizeof(effect_param_t), sizeof(effect_param_t));
+                VIPER_LOGE("EFFECT_CMD_GET_PARAM called with invalid cmdSize = %d, pCmdData = %p, replySize = %d, pReplyData = %p, expected cmdSize >= %zu, expected replySize >= %zu", cmdSize, pCmdData, replySize, pReplyData, sizeof(effect_param_t), sizeof(effect_param_t));
                 return -EINVAL;
             }
             return handleGetParam((effect_param_t *) pCmdData, (effect_param_t *) pReplyData, pReplySize);

@@ -9,8 +9,8 @@
 
 class ViPERClarity {
 public:
-    enum ClarityMode {
-        NATURAL,
+    enum class ClarityMode : uint8_t {
+        NATURAL = 0,
         OZONE,
         XHIFI
     };

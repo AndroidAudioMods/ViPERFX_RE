@@ -28,13 +28,11 @@ public:
     ViPER();
 
     void process(std::vector<float>& buffer, uint32_t size);
-    // TODO: Parameter types/names
-    void DispatchCommand(int param, int val1, int val2, int val3, int val4, uint32_t arrSize, signed char *arr);
-    void resetAllEffects();
-
-//private:
-    uint64_t frameCount;
-    uint32_t samplingRate;
+    void reset();
+    uint64_t getFrameCount();
+    void setSamplingRate(uint32_t samplingRate);
+    void setGain(float gainL, float gainR);
+    void setThresholdLimit(float thresholdLimit);
 
     // Effects
     AdaptiveBuffer adaptiveBuffer;
@@ -56,9 +54,11 @@ public:
     TubeSimulator tubeSimulator;
     AnalogX analogX;
     SpeakerCorrection speakerCorrection;
-    std::array<SoftwareLimiter, 2> softwareLimiters;
 
-    float frameScale;
-    float leftPan;
-    float rightPan;
+private:
+    std::array<SoftwareLimiter, 2> softwareLimiters;
+    uint64_t frameCount;
+    uint32_t samplingRate;
+    float gainL;
+    float gainR;
 };

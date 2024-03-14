@@ -8,7 +8,9 @@ ViPER::ViPER() :
     samplingRate(VIPER_DEFAULT_SAMPLING_RATE),
     adaptiveBuffer(AdaptiveBuffer(2, 4096)),
     waveBuffer(WaveBuffer(2, 4096)),
-    iirFilter(IIRFilter(10)) {
+    iirFilter(IIRFilter(10)),
+    gainL(1.0),
+    gainR(1.0) {
     VIPER_LOGI("Welcome to ViPER FX");
     VIPER_LOGI("Current version is %d", VIPER_VERSION);
 
@@ -82,11 +84,6 @@ ViPER::ViPER() :
     for (auto &softwareLimiter: this->softwareLimiters) {
         softwareLimiter.Reset();
     }
-
-    this->frameScale = 1.0;
-    this->leftPan = 1.0;
-    this->rightPan = 1.0;
-    this->frameCount = 0;
 }
 
 void ViPER::process(std::vector<float>& buffer, uint32_t size) {
@@ -153,12 +150,8 @@ void ViPER::process(std::vector<float>& buffer, uint32_t size) {
         this->tubeSimulator.TubeProcess(tmpBuf, size);
         this->analogX.Process(tmpBuf, tmpBufSize);
 
-        if (this->frameScale != 1.0) {
-            this->adaptiveBuffer.ScaleFrames(this->frameScale);
-        }
-
-        if (this->leftPan < 1.0 || this->rightPan < 1.0) {
-            this->adaptiveBuffer.PanFrames(this->leftPan, this->rightPan);
+        if (this->gainL != 1.0f || this->gainR != 1.0f) {
+            this->adaptiveBuffer.SetGain(this->gainL, this->gainR);
         }
 
         for (uint32_t i = 0; i < tmpBufSize * 2; i += 2) {
@@ -180,310 +173,255 @@ void ViPER::process(std::vector<float>& buffer, uint32_t size) {
     memset(buffer.data(), 0, (size - tmpBufSize) * sizeof(float));
 }
 
-void ViPER::DispatchCommand(int param, int val1, int val2, int val3, int val4, uint32_t arrSize,
-                            signed char *arr) {
-    VIPER_LOGD("Dispatch command: %d, %d, %d, %d, %d, %d, %p", param, val1, val2, val3, val4, arrSize, arr);
-    switch (param) {
-        case PARAM_SET_RESET_STATUS: {
-            this->resetAllEffects();
-            break;
-        }
-        case PARAM_CONVOLUTION_ENABLE: {
+//void ViPER::DispatchCommand(int param, int val1, int val2, int val3, int val4, uint32_t arrSize,
+//                            signed char *arr) {
+//    VIPER_LOGD("Dispatch command: %d, %d, %d, %d, %d, %d, %p", param, val1, val2, val3, val4, arrSize, arr);
+//    switch (param) {
+//        case PARAM_SET_RESET_STATUS: {
+//            this->reset();
+//            break;
+//        }
+//        case PARAM_CONVOLUTION_ENABLE: {
 //            this->convolver.SetEnabled(val1 != 0);
-            break;
-        } // 0x10002
-        case PARAM_CONVOLUTION_PREPARE_BUFFER: {
-            break;
-        } // 0x10004
-        case PARAM_CONVOLUTION_SET_BUFFER: {
-            break;
-        } // 0x10005
-        case PARAM_CONVOLUTION_COMMIT_BUFFER: {
-            break;
-        } // 0x10006
-        case PARAM_CONVOLUTION_CROSS_CHANNEL: {
-            this->convolver.SetCrossChannel((float) val1 / 100.0f);
-            break;
-        } // 0x10007
-        case PARAM_HEADPHONE_SURROUND_ENABLE: {
-            this->vhe.SetEnable(val1 != 0);
-            break;
-        } // 0x10008
-        case PARAM_HEADPHONE_SURROUND_STRENGTH: {
-            this->vhe.SetEffectLevel(val1);
-            break;
-        } // 0x10009
-        case PARAM_DDC_ENABLE: {
-            this->viperDdc.SetEnable(val1 != 0);
-            break;
-        } // 0x1000A
-        case PARAM_DDC_COEFFICIENTS: {
-            this->viperDdc.SetCoeffs(arrSize, (float *) arr, (float *) (arr + arrSize * sizeof(float)));
-            break;
-        } // 0x1000B
-        case PARAM_SPECTRUM_EXTENSION_ENABLE: {
-            this->spectrumExtend.SetEnable(val1 != 0);
-            break;
-        } // 0x1000C
-        case PARAM_SPECTRUM_EXTENSION_BARK: {
-            this->spectrumExtend.SetReferenceFrequency(val1);
-            break;
-        } // 0x1000D
-        case PARAM_SPECTRUM_EXTENSION_BARK_RECONSTRUCT: {
-            this->spectrumExtend.SetExciter((float) val1 / 100.0f);
-            break;
-        } // 0x1000E
-        case PARAM_FIR_EQUALIZER_ENABLE: {
-            this->iirFilter.SetEnable(val1 != 0);
-            break;
-        } // 0x1000F
-        case PARAM_FIR_EQUALIZER_BAND_LEVEL: {
-            this->iirFilter.SetBandLevel((uint32_t) val1, (float) val2 / 100.0f);
-            break;
-        } // 0x10010
-        case PARAM_FIELD_SURROUND_ENABLE: {
-            this->colorfulMusic.SetEnable(val1 != 0);
-            break;
-        } // 0x10011
-        case PARAM_FIELD_SURROUND_WIDENING: {
-            this->colorfulMusic.SetWidenValue((float) val1 / 100.0f);
-            break;
-        } // 0x10012
-        case PARAM_FIELD_SURROUND_MID_IMAGE: {
-            this->colorfulMusic.SetMidImageValue((float) val1 / 100.0f);
-            break;
-        } // 0x10013
-        case PARAM_FIELD_SURROUND_DEPTH: {
-            this->colorfulMusic.SetDepthValue((short) val1);
-            break;
-        } // 0x10014
-        case PARAM_DIFFERENTIAL_SURROUND_ENABLE: {
-            this->diffSurround.SetEnable(val1 != 0);
-            break;
-        } // 0x10015
-        case PARAM_DIFFERENTIAL_SURROUND_DELAY: {
-            this->diffSurround.SetDelayTime((float) val1 / 100.0f);
-            break;
-        } // 0x10016
-        case PARAM_REVERBERATION_ENABLE: {
-            this->reverberation.SetEnable(val1 != 0);
-            break;
-        } // 0x10017
-        case PARAM_REVERBERATION_ROOM_SIZE: {
-            this->reverberation.SetRoomSize((float) val1 / 100.0f);
-            break;
-        } // 0x10018
-        case PARAM_REVERBERATION_ROOM_WIDTH: {
-            this->reverberation.SetWidth((float) val1 / 100.0f);
-            break;
-        } // 0x10019
-        case PARAM_REVERBERATION_ROOM_DAMPENING: {
-            this->reverberation.SetDamp((float) val1 / 100.0f);
-            break;
-        } // 0x1001A
-        case PARAM_REVERBERATION_ROOM_WET_SIGNAL: {
-            this->reverberation.SetWet((float) val1 / 100.0f);
-            break;
-        } // 0x1001B
-        case PARAM_REVERBERATION_ROOM_DRY_SIGNAL: {
-            this->reverberation.SetDry((float) val1 / 100.0f);
-            break;
-        } // 0x1001C
-        case PARAM_AUTOMATIC_GAIN_CONTROL_ENABLE: {
-            this->playbackGain.SetEnable(val1 != 0);
-            break;
-        } // 0x1001D
-        case PARAM_AUTOMATIC_GAIN_CONTROL_RATIO: {
-            this->playbackGain.SetRatio((float) val1 / 100.0f);
-            break;
-        } // 0x1001E
-        case PARAM_AUTOMATIC_GAIN_CONTROL_VOLUME: {
-            this->playbackGain.SetVolume((float) val1 / 100.0f);
-            break;
-        } // 0x1001F
-        case PARAM_AUTOMATIC_GAIN_CONTROL_MAX_SCALER: {
-            this->playbackGain.SetMaxGainFactor((float) val1 / 100.0f);
-            break;
-        } // 0x10020
-        case PARAM_DYNAMIC_SYSTEM_ENABLE: {
-            this->dynamicSystem.SetEnable(val1 != 0);
-            break;
-        } // 0x10021
-        case PARAM_DYNAMIC_SYSTEM_X_COEFFICIENTS: {
-            this->dynamicSystem.SetXCoeffs(val1, val2);
-            break;
-        } // 0x10022
-        case PARAM_DYNAMIC_SYSTEM_Y_COEFFICIENTS: {
-            this->dynamicSystem.SetYCoeffs(val1, val2);
-            break;
-        } // 0x10023
-        case PARAM_DYNAMIC_SYSTEM_SIDE_GAIN: {
-            this->dynamicSystem.SetSideGain((float) val1 / 100.0f, (float) val2 / 100.0f);
-            break;
-        } // 0x10024
-        case PARAM_DYNAMIC_SYSTEM_STRENGTH: {
-            this->dynamicSystem.SetBassGain((float) val1 / 100.0f);
-            break;
-        } // 0x10025
-        case PARAM_FIDELITY_BASS_ENABLE: {
-            this->viperBass.SetEnable(val1 != 0);
-            break;
-        } // 0x10026
-        case PARAM_FIDELITY_BASS_MODE: {
-            this->viperBass.SetProcessMode((ViPERBass::ProcessMode) val1);
-            break;
-        } // 0x10027
-        case PARAM_FIDELITY_BASS_FREQUENCY: {
-            this->viperBass.SetSpeaker((uint32_t) val1);
-            break;
-        } // 0x10028
-        case PARAM_FIDELITY_BASS_GAIN: {
-            this->viperBass.SetBassFactor((float) val1 / 100.0f);
-            break;
-        } // 0x10029
-        case PARAM_FIDELITY_CLARITY_ENABLE: {
-            this->viperClarity.SetEnable(val1 != 0);
-            break;
-        } // 0x1002A
-        case PARAM_FIDELITY_CLARITY_MODE: {
-            this->viperClarity.SetProcessMode((ViPERClarity::ClarityMode) val1);
-            break;
-        } // 0x1002B
-        case PARAM_FIDELITY_CLARITY_GAIN: {
-            this->viperClarity.SetClarity((float) val1 / 100.0f);
-            break;
-        } // 0x1002C
-        case PARAM_CURE_CROSS_FEED_ENABLED: {
-            this->cure.SetEnable(val1 != 0);
-            break;
-        } // 0x1002D
-        case PARAM_CURE_CROSS_FEED_STRENGTH: {
-            switch (val1) {
-                case 0: {
-                    // Cure_R::SetPreset(pCVar17,0x5f028a);
-                    struct Crossfeed::Preset preset = {
-                            .cutoff = 650,
-                            .feedback = 95,
-                    };
-                    this->cure.SetPreset(preset);
-                    break;
-                }
-                case 1: {
-                    // Cure_R::SetPreset(pCVar17,0x3c02bc);
-                    struct Crossfeed::Preset preset = {
-                            .cutoff = 700,
-                            .feedback = 60,
-                    };
-                    this->cure.SetPreset(preset);
-                    break;
-                }
-                case 2: {
-                    // Cure_R::SetPreset(pCVar17,0x2d02bc);
-                    struct Crossfeed::Preset preset = {
-                            .cutoff = 700,
-                            .feedback = 45,
-                    };
-                    this->cure.SetPreset(preset);
-                    break;
-                }
-            }
-            break;
-        } // 0x1002E
-        case PARAM_TUBE_SIMULATOR_ENABLED: {
-            this->tubeSimulator.SetEnable(val1 != 0);
-            break;
-        } // 0x1002F
-        case PARAM_ANALOGX_ENABLE: {
-            this->analogX.SetEnable(val1 != 0);
-            break;
-        } // 0x10030
-        case PARAM_ANALOGX_MODE: {
-            this->analogX.SetProcessingModel(val1);
-            break;
-        } // 0x10031
-        case PARAM_GATE_OUTPUT_VOLUME: {
-            this->frameScale = (float) val1 / 100.0f;
-            break;
-        } // 0x10032
-        case PARAM_GATE_CHANNEL_PAN: {
-            float tmp = (float) val1 / 100.0f;
-            if (tmp < 0.0f) {
-                this->leftPan = 1.0f;
-                this->rightPan = 1.0f + tmp;
-            } else {
-                this->leftPan = 1.0f - tmp;
-                this->rightPan = 1.0f;
-            }
-            break;
-        } // 0x10033
-        case PARAM_GATE_LIMIT: {
-            this->softwareLimiters[0].SetGate((float) val1 / 100.0f);
-            this->softwareLimiters[1].SetGate((float) val1 / 100.0f);
-            break;
-        } // 0x10034
-        case PARAM_SPEAKER_OPTIMIZATION: {
-            this->speakerCorrection.SetEnable(val1 != 0);
-            break;
-        } // 0x10043
-        case PARAM_FET_COMPRESSOR_ENABLE: {
-            break;
-        } // 0x10049
-        case PARAM_FET_COMPRESSOR_THRESHOLD: {
-            break;
-        } // 0x1004A
-        case PARAM_FET_COMPRESSOR_RATIO: {
-            this->fetCompressor.SetParameter(FETCompressor::THRESHOLD, (float) val1 / 100.0f);
-            break;
-        } // 0x1004B
-        case PARAM_FET_COMPRESSOR_KNEE: {
-            break;
-        } // 0x1004C
-        case PARAM_FET_COMPRESSOR_AUTO_KNEE: {
-            break;
-        } // 0x1004D
-        case PARAM_FET_COMPRESSOR_GAIN: {
-            break;
-        } // 0x1004E
-        case PARAM_FET_COMPRESSOR_AUTO_GAIN: {
-            this->fetCompressor.SetParameter(FETCompressor::GAIN, (float) val1 / 100.0f);
-            break;
-        } // 0x1004F
-        case PARAM_FET_COMPRESSOR_ATTACK: {
-            break;
-        } // 0x10050
-        case PARAM_FET_COMPRESSOR_AUTO_ATTACK: {
-            break;
-        } // 0x10051
-        case PARAM_FET_COMPRESSOR_RELEASE: {
-            break;
-        } // 0x10052
-        case PARAM_FET_COMPRESSOR_AUTO_RELEASE: {
-            break;
-        } // 0x10053
-        case PARAM_FET_COMPRESSOR_KNEE_MULTI: {
-            break;
-        } // 0x10054
-        case PARAM_FET_COMPRESSOR_MAX_ATTACK: {
-            break;
-        } // 0x10055
-        case PARAM_FET_COMPRESSOR_MAX_RELEASE: {
-            this->fetCompressor.SetParameter(FETCompressor::MAX_ATTACK, (float) val1 / 100.0f);
-            break;
-        } // 0x10056
-        case PARAM_FET_COMPRESSOR_CREST: {
-            break;
-        } // 0x10057
-        case PARAM_FET_COMPRESSOR_ADAPT: {
-            break;
-        } // 0x10058
-        case PARAM_FET_COMPRESSOR_NO_CLIP: {
-            this->fetCompressor.SetParameter(FETCompressor::ADAPT, (float) val1 / 100.0f);
-            break;
-        } // 0x10059
-    }
-}
+//            break;
+//        } // 0x10002
+//        case PARAM_CONVOLUTION_PREPARE_BUFFER: {
+//            break;
+//        } // 0x10004
+//        case PARAM_CONVOLUTION_SET_BUFFER: {
+//            break;
+//        } // 0x10005
+//        case PARAM_CONVOLUTION_COMMIT_BUFFER: {
+//            break;
+//        } // 0x10006
+//        case PARAM_CONVOLUTION_CROSS_CHANNEL: {
+//            this->convolver.SetCrossChannel((float) val1 / 100.0f);
+//            break;
+//        } // 0x10007
+//        case PARAM_HEADPHONE_SURROUND_ENABLE: {
+//            this->vhe.SetEnable(val1 != 0);
+//            break;
+//        } // 0x10008
+//        case PARAM_HEADPHONE_SURROUND_STRENGTH: {
+//            this->vhe.SetEffectLevel(val1);
+//            break;
+//        } // 0x10009
+//        case PARAM_DDC_ENABLE: {
+//            this->viperDdc.SetEnable(val1 != 0);
+//            break;
+//        } // 0x1000A
+//        case PARAM_DDC_COEFFICIENTS: {
+//            this->viperDdc.SetCoeffs(arrSize, (float *) arr, (float *) (arr + arrSize * sizeof(float)));
+//            break;
+//        } // 0x1000B
+//        case PARAM_SPECTRUM_EXTENSION_ENABLE: {
+//            this->spectrumExtend.SetEnable(val1 != 0);
+//            break;
+//        } // 0x1000C
+//        case PARAM_SPECTRUM_EXTENSION_BARK: {
+//            this->spectrumExtend.SetReferenceFrequency(val1);
+//            break;
+//        } // 0x1000D
+//        case PARAM_SPECTRUM_EXTENSION_BARK_RECONSTRUCT: {
+//            this->spectrumExtend.SetExciter((float) val1 / 100.0f);
+//            break;
+//        } // 0x1000E
+//        case PARAM_FIR_EQUALIZER_ENABLE: {
+//            this->iirFilter.SetEnable(val1 != 0);
+//            break;
+//        } // 0x1000F
+//        case PARAM_FIR_EQUALIZER_BAND_LEVEL: {
+//            this->iirFilter.SetBandLevel((uint32_t) val1, (float) val2 / 100.0f);
+//            break;
+//        } // 0x10010
+//        case PARAM_FIELD_SURROUND_ENABLE: {
+//            this->colorfulMusic.SetEnable(val1 != 0);
+//            break;
+//        } // 0x10011
+//        case PARAM_FIELD_SURROUND_WIDENING: {
+//            this->colorfulMusic.SetWidenValue((float) val1 / 100.0f);
+//            break;
+//        } // 0x10012
+//        case PARAM_FIELD_SURROUND_MID_IMAGE: {
+//            this->colorfulMusic.SetMidImageValue((float) val1 / 100.0f);
+//            break;
+//        } // 0x10013
+//        case PARAM_FIELD_SURROUND_DEPTH: {
+//            this->colorfulMusic.SetDepthValue((short) val1);
+//            break;
+//        } // 0x10014
+//        case PARAM_DIFFERENTIAL_SURROUND_ENABLE: {
+//            this->diffSurround.SetEnable(val1 != 0);
+//            break;
+//        } // 0x10015
+//        case PARAM_DIFFERENTIAL_SURROUND_DELAY: {
+//            this->diffSurround.SetDelayTime((float) val1 / 100.0f);
+//            break;
+//        } // 0x10016
+//        case PARAM_REVERBERATION_ENABLE: {
+//            this->reverberation.SetEnable(val1 != 0);
+//            break;
+//        } // 0x10017
+//        case PARAM_REVERBERATION_ROOM_SIZE: {
+//            this->reverberation.SetRoomSize((float) val1 / 100.0f);
+//            break;
+//        } // 0x10018
+//        case PARAM_REVERBERATION_ROOM_WIDTH: {
+//            this->reverberation.SetWidth((float) val1 / 100.0f);
+//            break;
+//        } // 0x10019
+//        case PARAM_REVERBERATION_ROOM_DAMPENING: {
+//            this->reverberation.SetDamp((float) val1 / 100.0f);
+//            break;
+//        } // 0x1001A
+//        case PARAM_REVERBERATION_ROOM_WET_SIGNAL: {
+//            this->reverberation.SetWet((float) val1 / 100.0f);
+//            break;
+//        } // 0x1001B
+//        case PARAM_REVERBERATION_ROOM_DRY_SIGNAL: {
+//            this->reverberation.SetDry((float) val1 / 100.0f);
+//            break;
+//        } // 0x1001C
+//        case PARAM_AUTOMATIC_GAIN_CONTROL_ENABLE: {
+//            this->playbackGain.SetEnable(val1 != 0);
+//            break;
+//        } // 0x1001D
+//        case PARAM_AUTOMATIC_GAIN_CONTROL_RATIO: {
+//            this->playbackGain.SetRatio((float) val1 / 100.0f);
+//            break;
+//        } // 0x1001E
+//        case PARAM_AUTOMATIC_GAIN_CONTROL_VOLUME: {
+//            this->playbackGain.SetVolume((float) val1 / 100.0f);
+//            break;
+//        } // 0x1001F
+//        case PARAM_AUTOMATIC_GAIN_CONTROL_MAX_SCALER: {
+//            this->playbackGain.SetMaxGainFactor((float) val1 / 100.0f);
+//            break;
+//        } // 0x10020
+//        case PARAM_DYNAMIC_SYSTEM_ENABLE: {
+//            this->dynamicSystem.SetEnable(val1 != 0);
+//            break;
+//        } // 0x10021
+//        case PARAM_DYNAMIC_SYSTEM_X_COEFFICIENTS: {
+//            this->dynamicSystem.SetXCoeffs(val1, val2);
+//            break;
+//        } // 0x10022
+//        case PARAM_DYNAMIC_SYSTEM_Y_COEFFICIENTS: {
+//            this->dynamicSystem.SetYCoeffs(val1, val2);
+//            break;
+//        } // 0x10023
+//        case PARAM_DYNAMIC_SYSTEM_SIDE_GAIN: {
+//            this->dynamicSystem.SetSideGain((float) val1 / 100.0f, (float) val2 / 100.0f);
+//            break;
+//        } // 0x10024
+//        case PARAM_DYNAMIC_SYSTEM_STRENGTH: {
+//            this->dynamicSystem.SetBassGain((float) val1 / 100.0f);
+//            break;
+//        } // 0x10025
+//        case PARAM_FIDELITY_BASS_ENABLE: {
+//            this->viperBass.SetEnable(val1 != 0);
+//            break;
+//        } // 0x10026
+//        case PARAM_FIDELITY_BASS_MODE: {
+//            this->viperBass.SetProcessMode((ViPERBass::ProcessMode) val1);
+//            break;
+//        } // 0x10027
+//        case PARAM_FIDELITY_BASS_FREQUENCY: {
+//            this->viperBass.SetSpeaker((uint32_t) val1);
+//            break;
+//        } // 0x10028
+//        case PARAM_FIDELITY_BASS_GAIN: {
+//            this->viperBass.SetBassFactor((float) val1 / 100.0f);
+//            break;
+//        } // 0x10029
+//        case PARAM_FIDELITY_CLARITY_ENABLE: {
+//            this->viperClarity.SetEnable(val1 != 0);
+//            break;
+//        } // 0x1002A
+//        case PARAM_FIDELITY_CLARITY_MODE: {
+//            this->viperClarity.SetProcessMode((ViPERClarity::ClarityMode) val1);
+//            break;
+//        } // 0x1002B
+//        case PARAM_FIDELITY_CLARITY_GAIN: {
+//            this->viperClarity.SetClarity((float) val1 / 100.0f);
+//            break;
+//        } // 0x1002C
+//        case PARAM_CURE_CROSS_FEED_ENABLED: {
+//            this->cure.SetEnable(val1 != 0);
+//            break;
+//        } // 0x1002D
+//        case PARAM_CURE_CROSS_FEED_STRENGTH: {
+//            switch (val1) {
+//                case 0: {
+//                    // Cure_R::SetPreset(pCVar17,0x5f028a);
+//                    struct Crossfeed::Preset preset = {
+//                            .cutoff = 650,
+//                            .feedback = 95,
+//                    };
+//                    this->cure.SetPreset(preset);
+//                    break;
+//                }
+//                case 1: {
+//                    // Cure_R::SetPreset(pCVar17,0x3c02bc);
+//                    struct Crossfeed::Preset preset = {
+//                            .cutoff = 700,
+//                            .feedback = 60,
+//                    };
+//                    this->cure.SetPreset(preset);
+//                    break;
+//                }
+//                case 2: {
+//                    // Cure_R::SetPreset(pCVar17,0x2d02bc);
+//                    struct Crossfeed::Preset preset = {
+//                            .cutoff = 700,
+//                            .feedback = 45,
+//                    };
+//                    this->cure.SetPreset(preset);
+//                    break;
+//                }
+//            }
+//            break;
+//        } // 0x1002E
+//        case PARAM_TUBE_SIMULATOR_ENABLED: {
+//            this->tubeSimulator.SetEnable(val1 != 0);
+//            break;
+//        } // 0x1002F
+//        case PARAM_ANALOGX_ENABLE: {
+//            this->analogX.SetEnable(val1 != 0);
+//            break;
+//        } // 0x10030
+//        case PARAM_ANALOGX_MODE: {
+//            this->analogX.SetProcessingModel(val1);
+//            break;
+//        } // 0x10031
+//        case PARAM_GATE_OUTPUT_VOLUME: {
+//            this->frameScale = (float) val1 / 100.0f;
+//            break;
+//        } // 0x10032
+//        case PARAM_GATE_CHANNEL_PAN: {
+//            float tmp = (float) val1 / 100.0f;
+//            if (tmp < 0.0f) {
+//                this->leftPan = 1.0f;
+//                this->rightPan = 1.0f + tmp;
+//            } else {
+//                this->leftPan = 1.0f - tmp;
+//                this->rightPan = 1.0f;
+//            }
+//            break;
+//        } // 0x10033
+//        case PARAM_GATE_LIMIT: {
+//            this->softwareLimiters[0].SetGate((float) val1 / 100.0f);
+//            this->softwareLimiters[1].SetGate((float) val1 / 100.0f);
+//            break;
+//        } // 0x10034
+//        case PARAM_SPEAKER_OPTIMIZATION: {
+//            this->speakerCorrection.SetEnable(val1 != 0);
+//            break;
+//        } // 0x10043
+//    }
+//}
 
-void ViPER::resetAllEffects() {
+void ViPER::reset() {
     this->adaptiveBuffer.FlushBuffer();
 
     this->waveBuffer.Reset();
@@ -539,5 +477,25 @@ void ViPER::resetAllEffects() {
 
     for (auto &softwareLimiter: softwareLimiters) {
         softwareLimiter.Reset();
+    }
+}
+
+void ViPER::setSamplingRate(uint32_t samplingRate) {
+    this->samplingRate = samplingRate;
+    // TODO: Set sampling rate to all other effects
+}
+
+uint64_t ViPER::getFrameCount() {
+    return this->frameCount;
+}
+
+void ViPER::setGain(float gainL, float gainR) {
+    this->gainL = gainL;
+    this->gainR = gainR;
+}
+
+void ViPER::setThresholdLimit(float thresholdLimit) {
+    for (auto &softwareLimiter: softwareLimiters) {
+        softwareLimiter.SetGate(thresholdLimit);
     }
 }

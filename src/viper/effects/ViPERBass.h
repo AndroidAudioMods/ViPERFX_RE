@@ -10,10 +10,10 @@
 
 class ViPERBass {
 public:
-    enum ProcessMode {
+    enum class ProcessMode : uint8_t {
         NATURAL_BASS = 0,
-        PURE_BASS_PLUS = 1,
-        SUBWOOFER = 2,
+        PURE_BASS_PLUS,
+        SUBWOOFER,
     };
 
     ViPERBass();
@@ -39,5 +39,3 @@ private:
     uint32_t speaker;
     float bassFactor;
 };
-
-

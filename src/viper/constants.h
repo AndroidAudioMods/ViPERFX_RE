@@ -8,25 +8,25 @@
 
 #include "../log.h" // TODO: Remove this dependency
 
-typedef enum {
-    ARCH_UNKNOWN = 0,
-    ARCH_ARM,
-    ARCH_ARM64,
-    ARCH_X86,
-    ARCH_X86_64,
-} arch_t;
+enum class Architecture : uint8_t {
+    UNKNOWN = 0,
+    ARM,
+    ARM64,
+    X86,
+    X86_64,
+};
 
 #if defined(__arm__)
-#define VIPER_ARCHITECTURE ARCH_ARM
+#define VIPER_ARCHITECTURE Architecture::ARM
 #elif defined(__aarch64__)
-#define VIPER_ARCHITECTURE ARCH_ARM64
+#define VIPER_ARCHITECTURE Architecture::ARM64
 #elif defined(__i386__)
-#define VIPER_ARCHITECTURE ARCH_X86
+#define VIPER_ARCHITECTURE Architecture::X86
 #elif defined(__x86_64__)
-#define VIPER_ARCHITECTURE ARCH_X86_64
+#define VIPER_ARCHITECTURE Architecture::X86_64
 #else
 #warning "Unknown architecture"
-#define VIPER_ARCHITECTURE ARCH_UNKNOWN
+#define VIPER_ARCHITECTURE Architecture::UNKNOWN
 /*
  * Note from the developer:
  *
