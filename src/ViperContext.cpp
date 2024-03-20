@@ -144,6 +144,7 @@ int32_t ViperContext::handleSetParam(effect_param_t *pCmdParam, void *pReplyData
     uint32_t key = *(uint32_t *) (pCmdParam->data);
     switch (key) {
         case PARAM_SET_RESET: {
+            VIPER_LOGD("handleSetParam() PARAM_SET_RESET called");
             viper.reset();
             return 0;
         }
@@ -161,6 +162,7 @@ int32_t ViperContext::handleSetParam(effect_param_t *pCmdParam, void *pReplyData
                 return -EINVAL;
             }
             bool enable = *(uint8_t *) (pCmdParam->data + vOffset) != 0;
+            VIPER_LOGD("handleSetParam() PARAM_SET_VIPER_BASS_ENABLE called with enable = %d", enable);
             viper.viperBass.SetEnable(enable);
             return 0;
         }
@@ -176,6 +178,7 @@ int32_t ViperContext::handleSetParam(effect_param_t *pCmdParam, void *pReplyData
                 return 0;
             }
 
+            VIPER_LOGD("handleSetParam() PARAM_SET_VIPER_BASS_MODE called with mode = %d", mode);
             viper.viperBass.SetProcessMode(static_cast<ViPERBass::ProcessMode>(mode));
             return 0;
         }
@@ -185,6 +188,7 @@ int32_t ViperContext::handleSetParam(effect_param_t *pCmdParam, void *pReplyData
                 return -EINVAL;
             }
             uint8_t frequency = *(uint8_t *) (pCmdParam->data + vOffset);
+            VIPER_LOGD("handleSetParam() PARAM_SET_VIPER_BASS_FREQUENCY called with frequency = %d", frequency);
             viper.viperBass.SetSpeaker(frequency);
             return 0;
         }
@@ -194,6 +198,7 @@ int32_t ViperContext::handleSetParam(effect_param_t *pCmdParam, void *pReplyData
                 return -EINVAL;
             }
             uint16_t gain = *(uint16_t *) (pCmdParam->data + vOffset);
+            VIPER_LOGD("handleSetParam() PARAM_SET_VIPER_BASS_GAIN called with gain = %d", gain);
             viper.viperBass.SetBassFactor(static_cast<float>(gain) / 100.0f);
             return 0;
         }
@@ -203,6 +208,7 @@ int32_t ViperContext::handleSetParam(effect_param_t *pCmdParam, void *pReplyData
                 return -EINVAL;
             }
             bool enable = *(uint8_t *) (pCmdParam->data + vOffset) != 0;
+            VIPER_LOGD("handleSetParam() PARAM_SET_VIPER_CLARITY_ENABLE called with enable = %d", enable);
             viper.viperClarity.SetEnable(enable);
             return 0;
         }
@@ -218,6 +224,7 @@ int32_t ViperContext::handleSetParam(effect_param_t *pCmdParam, void *pReplyData
                 return 0;
             }
 
+            VIPER_LOGD("handleSetParam() PARAM_SET_VIPER_CLARITY_MODE called with mode = %d", mode);
             viper.viperClarity.SetProcessMode(static_cast<ViPERClarity::ClarityMode>(mode));
             return 0;
         }
@@ -227,6 +234,7 @@ int32_t ViperContext::handleSetParam(effect_param_t *pCmdParam, void *pReplyData
                 return -EINVAL;
             }
             uint16_t gain = *(uint16_t *) (pCmdParam->data + vOffset);
+            VIPER_LOGD("handleSetParam() PARAM_SET_VIPER_CLARITY_GAIN called with gain = %d", gain);
             viper.viperClarity.SetClarity(static_cast<float>(gain) / 100.0f);
             return 0;
         }
@@ -238,6 +246,7 @@ int32_t ViperContext::handleSetParam(effect_param_t *pCmdParam, void *pReplyData
             }
             uint8_t gainL = *(uint8_t *) (pCmdParam->data + vOffset);
             uint8_t gainR = *(uint8_t *) (pCmdParam->data + vOffset + sizeof(uint8_t));
+            VIPER_LOGD("handleSetParam() PARAM_SET_OUTPUT_GAIN called with gainL = %d, gainR = %d", gainL, gainR);
             viper.setGain(static_cast<float>(gainL) / 100.0f, static_cast<float>(gainR) / 100.0f);
             return 0;
         }
@@ -248,6 +257,7 @@ int32_t ViperContext::handleSetParam(effect_param_t *pCmdParam, void *pReplyData
                 return -EINVAL;
             }
             uint8_t limit = *(uint8_t *) (pCmdParam->data + vOffset);
+            VIPER_LOGD("handleSetParam() PARAM_SET_THRESHOLD_LIMIT called with limit = %d", limit);
             viper.setThresholdLimit(static_cast<float>(limit) / 100.0f);
             return 0;
         }
@@ -257,6 +267,7 @@ int32_t ViperContext::handleSetParam(effect_param_t *pCmdParam, void *pReplyData
                 return -EINVAL;
             }
             bool enable = *(uint8_t *) (pCmdParam->data + vOffset) != 0;
+            VIPER_LOGD("handleSetParam() PARAM_SET_SPEAKER_OPTIMIZATION_ENABLE called with enable = %d", enable);
             viper.speakerCorrection.SetEnable(enable);
             return 0;
         }
@@ -266,6 +277,7 @@ int32_t ViperContext::handleSetParam(effect_param_t *pCmdParam, void *pReplyData
                 return -EINVAL;
             }
             bool enable = *(uint8_t *) (pCmdParam->data + vOffset) != 0;
+            VIPER_LOGD("handleSetParam() PARAM_SET_ANALOGX_ENABLE called with enable = %d", enable);
             viper.analogX.SetEnable(enable);
             return 0;
         }
@@ -281,6 +293,7 @@ int32_t ViperContext::handleSetParam(effect_param_t *pCmdParam, void *pReplyData
                 return 0;
             }
 
+            VIPER_LOGD("handleSetParam() PARAM_SET_ANALOGX_LEVEL called with level = %d", level);
             viper.analogX.SetProcessingModel(level);
             return 0;
         }
@@ -290,6 +303,7 @@ int32_t ViperContext::handleSetParam(effect_param_t *pCmdParam, void *pReplyData
                 return -EINVAL;
             }
             bool enable = *(uint8_t *) (pCmdParam->data + vOffset) != 0;
+            VIPER_LOGD("handleSetParam() PARAM_SET_TUBE_SIMULATOR_ENABLE called with enable = %d", enable);
             viper.tubeSimulator.SetEnable(enable);
             return 0;
         }
@@ -299,6 +313,7 @@ int32_t ViperContext::handleSetParam(effect_param_t *pCmdParam, void *pReplyData
                 return -EINVAL;
             }
             bool enable = *(uint8_t *) (pCmdParam->data + vOffset) != 0;
+            VIPER_LOGD("handleSetParam() PARAM_SET_CURE_ENABLE called with enable = %d", enable);
             viper.cure.SetEnable(enable);
             return 0;
         }
@@ -308,6 +323,7 @@ int32_t ViperContext::handleSetParam(effect_param_t *pCmdParam, void *pReplyData
                 return -EINVAL;
             }
             uint8_t level = *(uint8_t *) (pCmdParam->data + vOffset);
+            VIPER_LOGD("handleSetParam() PARAM_SET_CURE_LEVEL called with level = %d", level);
             switch (level) {
                 case 0: {
                     struct Crossfeed::Preset preset = {
@@ -346,6 +362,7 @@ int32_t ViperContext::handleSetParam(effect_param_t *pCmdParam, void *pReplyData
                 return -EINVAL;
             }
             bool enable = *(uint8_t *) (pCmdParam->data + vOffset) != 0;
+            VIPER_LOGD("handleSetParam() PARAM_SET_REVERBERATION_ENABLE called with enable = %d", enable);
             viper.reverberation.SetEnable(enable);
             return 0;
         }
@@ -355,6 +372,7 @@ int32_t ViperContext::handleSetParam(effect_param_t *pCmdParam, void *pReplyData
                 return -EINVAL;
             }
             uint8_t roomSize = *(uint8_t *) (pCmdParam->data + vOffset);
+            VIPER_LOGD("handleSetParam() PARAM_SET_REVERBERATION_ROOM_SIZE called with roomSize = %d", roomSize);
             viper.reverberation.SetRoomSize(static_cast<float>(roomSize) / 100.0f);
             return 0;
         }
@@ -364,6 +382,7 @@ int32_t ViperContext::handleSetParam(effect_param_t *pCmdParam, void *pReplyData
                 return -EINVAL;
             }
             uint8_t soundField = *(uint8_t *) (pCmdParam->data + vOffset);
+            VIPER_LOGD("handleSetParam() PARAM_SET_REVERBERATION_SOUND_FIELD called with soundField = %d", soundField);
             viper.reverberation.SetWidth(static_cast<float>(soundField) / 100.0f);
             return 0;
         }
@@ -373,6 +392,7 @@ int32_t ViperContext::handleSetParam(effect_param_t *pCmdParam, void *pReplyData
                 return -EINVAL;
             }
             uint8_t damping = *(uint8_t *) (pCmdParam->data + vOffset);
+            VIPER_LOGD("handleSetParam() PARAM_SET_REVERBERATION_DAMPING called with damping = %d", damping);
             viper.reverberation.SetDamp(static_cast<float>(damping) / 100.0f);
             return 0;
         }
@@ -382,6 +402,7 @@ int32_t ViperContext::handleSetParam(effect_param_t *pCmdParam, void *pReplyData
                 return -EINVAL;
             }
             uint8_t wetSignal = *(uint8_t *) (pCmdParam->data + vOffset);
+            VIPER_LOGD("handleSetParam() PARAM_SET_REVERBERATION_WET_SIGNAL called with wetSignal = %d", wetSignal);
             viper.reverberation.SetWet(static_cast<float>(wetSignal) / 100.0f);
             return 0;
         }
@@ -391,6 +412,7 @@ int32_t ViperContext::handleSetParam(effect_param_t *pCmdParam, void *pReplyData
                 return -EINVAL;
             }
             uint8_t drySignal = *(uint8_t *) (pCmdParam->data + vOffset);
+            VIPER_LOGD("handleSetParam() PARAM_SET_REVERBERATION_DRY_SIGNAL called with drySignal = %d", drySignal);
             viper.reverberation.SetDry(static_cast<float>(drySignal) / 100.0f);
             return 0;
         }
@@ -400,6 +422,7 @@ int32_t ViperContext::handleSetParam(effect_param_t *pCmdParam, void *pReplyData
                 return -EINVAL;
             }
             bool enable = *(uint8_t *) (pCmdParam->data + vOffset) != 0;
+            VIPER_LOGD("handleSetParam() PARAM_SET_DIFFERENTIAL_SURROUND_ENABLE called with enable = %d", enable);
             viper.diffSurround.SetEnable(enable);
             return 0;
         }
@@ -409,6 +432,7 @@ int32_t ViperContext::handleSetParam(effect_param_t *pCmdParam, void *pReplyData
                 return -EINVAL;
             }
             uint16_t delay = *(uint16_t *) (pCmdParam->data + vOffset);
+            VIPER_LOGD("handleSetParam() PARAM_SET_DIFFERENTIAL_SURROUND_DELAY called with delay = %d", delay);
             viper.diffSurround.SetDelayTime(static_cast<float>(delay) / 100.0f);
             return 0;
         }
@@ -418,6 +442,7 @@ int32_t ViperContext::handleSetParam(effect_param_t *pCmdParam, void *pReplyData
                 return -EINVAL;
             }
             bool enable = *(uint8_t *) (pCmdParam->data + vOffset) != 0;
+            VIPER_LOGD("handleSetParam() PARAM_SET_FIELD_SURROUND_ENABLE called with enable = %d", enable);
             viper.colorfulMusic.SetEnable(enable);
             return 0;
         }
@@ -427,6 +452,7 @@ int32_t ViperContext::handleSetParam(effect_param_t *pCmdParam, void *pReplyData
                 return -EINVAL;
             }
             uint16_t depth = *(uint16_t *) (pCmdParam->data + vOffset);
+            VIPER_LOGD("handleSetParam() PARAM_SET_FIELD_SURROUND_DEPTH called with depth = %d", depth);
             viper.colorfulMusic.SetDepthValue(depth);
             return 0;
         }
@@ -436,6 +462,7 @@ int32_t ViperContext::handleSetParam(effect_param_t *pCmdParam, void *pReplyData
                 return -EINVAL;
             }
             uint8_t midImage = *(uint8_t *) (pCmdParam->data + vOffset);
+            VIPER_LOGD("handleSetParam() PARAM_SET_FIELD_SURROUND_MID_IMAGE called with midImage = %d", midImage);
             viper.colorfulMusic.SetMidImageValue(static_cast<float>(midImage) / 100.0f);
             return 0;
         }
@@ -445,6 +472,7 @@ int32_t ViperContext::handleSetParam(effect_param_t *pCmdParam, void *pReplyData
                 return -EINVAL;
             }
             bool enable = *(uint8_t *) (pCmdParam->data + vOffset) != 0;
+            VIPER_LOGD("handleSetParam() PARAM_SET_IIR_EQUALIZER_ENABLE called with enable = %d", enable);
             viper.iirFilter.SetEnable(enable);
             return 0;
         }
@@ -455,6 +483,7 @@ int32_t ViperContext::handleSetParam(effect_param_t *pCmdParam, void *pReplyData
             }
             uint8_t band = *(uint8_t *) (pCmdParam->data + vOffset);
             int16_t level = *(int16_t *) (pCmdParam->data + vOffset + sizeof(uint8_t));
+            VIPER_LOGD("handleSetParam() PARAM_SET_IIR_EQUALIZER_BAND_LEVEL called with band = %d, level = %d", band, level);
             viper.iirFilter.SetBandLevel(band, static_cast<float>(level) / 100.0f);
             return 0;
         }
