@@ -562,12 +562,7 @@ int32_t ViperContext::handleCommand(uint32_t cmdCode, uint32_t cmdSize, void *pC
             return 0;
         }
         case EFFECT_CMD_RESET: {
-            if (replySize != sizeof(int32_t) || pReplyData == nullptr) {
-                VIPER_LOGE("EFFECT_CMD_RESET called with invalid replySize = %d, pReplyData = %p, expected replySize = %zu", replySize, pReplyData, sizeof(int32_t));
-                return -EINVAL;
-            }
             viper.reset();
-            SET(int32_t, pReplyData, 0);
             return 0;
         }
         case EFFECT_CMD_ENABLE: {
