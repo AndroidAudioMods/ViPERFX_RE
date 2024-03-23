@@ -487,6 +487,46 @@ int32_t ViperContext::handleSetParam(effect_param_t *pCmdParam, void *pReplyData
             viper.iirFilter.SetBandLevel(band, static_cast<float>(level) / 100.0f);
             return 0;
         }
+        case PARAM_SET_SPECTRUM_EXTENSION_ENABLE: {
+            if (pCmdParam->vsize != sizeof(uint8_t)) {
+                VIPER_LOGE("handleSetParam() PARAM_SET_SPECTRUM_EXTENSION_ENABLE called with invalid vsize = %d, expected vsize = %zu", pCmdParam->vsize, sizeof(uint8_t));
+                return -EINVAL;
+            }
+            bool enable = *(uint8_t *) (pCmdParam->data + vOffset) != 0;
+            VIPER_LOGD("handleSetParam() PARAM_SET_SPECTRUM_EXTENSION_ENABLE called with enable = %d", enable);
+            viper.spectrumExtend.SetEnable(enable);
+            return 0;
+        }
+        case PARAM_SET_SPECTRUM_EXTENSION_STRENGTH: {
+            if (pCmdParam->vsize != sizeof(uint8_t)) {
+                VIPER_LOGE("handleSetParam() PARAM_SET_SPECTRUM_EXTENSION_STRENGTH called with invalid vsize = %d, expected vsize = %zu", pCmdParam->vsize, sizeof(uint8_t));
+                return -EINVAL;
+            }
+            uint8_t strength = *(uint8_t *) (pCmdParam->data + vOffset);
+            VIPER_LOGD("handleSetParam() PARAM_SET_SPECTRUM_EXTENSION_STRENGTH called with strength = %d", strength);
+            viper.spectrumExtend.SetExciter(static_cast<float>(strength) / 100.0f);
+            return 0;
+        }
+        case PARAM_SET_HEADPHONE_SURROUND_ENABLE: {
+            if (pCmdParam->vsize != sizeof(uint8_t)) {
+                VIPER_LOGE("handleSetParam() PARAM_SET_HEADPHONE_SURROUND_ENABLE called with invalid vsize = %d, expected vsize = %zu", pCmdParam->vsize, sizeof(uint8_t));
+                return -EINVAL;
+            }
+            bool enable = *(uint8_t *) (pCmdParam->data + vOffset) != 0;
+            VIPER_LOGD("handleSetParam() PARAM_SET_HEADPHONE_SURROUND_ENABLE called with enable = %d", enable);
+            viper.vhe.SetEnable(enable);
+            return 0;
+        }
+        case PARAM_SET_HEADPHONE_SURROUND_LEVEL: {
+            if (pCmdParam->vsize != sizeof(uint8_t)) {
+                VIPER_LOGE("handleSetParam() PARAM_SET_HEADPHONE_SURROUND_LEVEL called with invalid vsize = %d, expected vsize = %zu", pCmdParam->vsize, sizeof(uint8_t));
+                return -EINVAL;
+            }
+            uint8_t level = *(uint8_t *) (pCmdParam->data + vOffset);
+            VIPER_LOGD("handleSetParam() PARAM_SET_HEADPHONE_SURROUND_LEVEL called with level = %d", level);
+            viper.vhe.SetEffectLevel(level);
+            return 0;
+        }
         default: {
             VIPER_LOGE("handleSetParam() called with unknown key: %d", key);
             return -EINVAL;
