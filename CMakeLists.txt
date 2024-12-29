@@ -14,7 +14,7 @@ add_compile_definitions(VIPER_VERSION=20240314)
 #add_subdirectory(src/viper/ffts)
 
 # ViPERFX
-include_directories(src/include)
+include_directories(src/include src/viper/effects src/viper/utils)
 
 set(FILES
         # Main
