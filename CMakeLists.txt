@@ -80,6 +80,8 @@ add_library(
         # Provides a relative path to your source file(s).
         ${FILES})
 
+if (ANDROID)
 target_link_libraries(v4a_re log) # kissfft)
+endif()
 target_compile_options(v4a_re PRIVATE -flto -O3 -DNDEBUG)
 #target_compile_options(v4afx_r PRIVATE -O2 -DNDEBUG -Wall -Wsign-conversion -Wno-unused-result -Wno-unneeded-internal-declaration -fstrict-aliasing -fvisibility=hidden -Wextra -Wno-unused-parameter)
