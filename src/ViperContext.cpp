@@ -38,9 +38,9 @@ void ViperContext::copyBufferConfig(buffer_config_t *dest, buffer_config_t *src)
         dest->accessMode = src->accessMode;
     }
 
-    if (src->mask & EFFECT_CONFIG_PROVIDER) {
-        dest->bufferProvider = src->bufferProvider;
-    }
+    //if (src->mask & EFFECT_CONFIG_PROVIDER) {
+    //    dest->bufferProvider = src->bufferProvider;
+    //}
 
     dest->mask |= src->mask;
 }
@@ -86,6 +86,7 @@ void ViperContext::handleSetConfig(effect_config_t *newConfig) {
 //        return;
 //    }
 
+    // TODO: this is wrong (AUDIO_CHANNEL_IN_STEREO != AUDIO_CHANNEL_OUT_STEREO)
     if (config.inputCfg.channels != config.outputCfg.channels) {
         VIPER_LOGE("ViPER4Android disabled, reason [in.CH = %d, out.CH = %d]",
                    config.inputCfg.channels, config.outputCfg.channels);
@@ -809,7 +810,7 @@ int32_t ViperContext::process(audio_buffer_t *inBuffer, audio_buffer_t *outBuffe
     if (!enabled) {
         return -ENODATA;
     }
-    
+
     inBuffer = getBuffer(&config.inputCfg, inBuffer);
     outBuffer = getBuffer(&config.outputCfg, outBuffer);
     if (inBuffer == nullptr || outBuffer == nullptr ||
