@@ -14,7 +14,7 @@ add_compile_definitions(VIPER_VERSION=20240314)
 #add_subdirectory(src/viper/ffts)
 
 # ViPERFX
-include_directories(src/include)
+include_directories(src/include src/viper/effects src/viper/utils)
 
 set(FILES
         # Main
@@ -80,6 +80,8 @@ add_library(
         # Provides a relative path to your source file(s).
         ${FILES})
 
+if (ANDROID)
 target_link_libraries(v4a_re log) # kissfft)
+endif()
 target_compile_options(v4a_re PRIVATE -flto -O3 -DNDEBUG)
 #target_compile_options(v4afx_r PRIVATE -O2 -DNDEBUG -Wall -Wsign-conversion -Wno-unused-result -Wno-unneeded-internal-declaration -fstrict-aliasing -fvisibility=hidden -Wextra -Wno-unused-parameter)
