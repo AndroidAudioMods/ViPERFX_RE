@@ -1,4 +1,5 @@
 #include "HighShelf.h"
+#include "../constants.h"
 #include <cmath>
 
 double HighShelf::Process(double sample) {

@@ -24,6 +24,8 @@ build.ninja
 
 # CMake
 cmake-build-*/
+android_*/
+hexagon_*/
 
 # Mongo Explorer plugin
 .idea/**/mongoSettings.xml
@@ -147,3 +149,7 @@ local.properties
 .gradle/
 build/
 .cxx/
+
+### Misc
+LOGS/
+*-hexagon/

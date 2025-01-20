@@ -1,5 +1,6 @@
 #include <cmath>
 #include "IIR_1st.h"
+#include "../constants.h"
 
 // Seems to be taken from https://github.com/michaelwillis/dragonfly-reverb/blob/master/common/freeverb/efilter.cpp
 // Or similar sources

@@ -1,4 +1,5 @@
 #include "MultiBiquad.h"
+#include "../constants.h"
 #include <cmath>
 
 MultiBiquad::MultiBiquad() {

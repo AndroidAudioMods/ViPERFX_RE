@@ -1,0 +1,9 @@
+#include "AEEStdDef.idl"
+#include "remote.idl"
+
+const string IDL_VERSION = "1.0.0";
+
+interface v4a : remote_handle64 {
+    int32_t command(in uint32_t cmdCode, in sequence<uint8_t> cmdData, inrout sequence<uint8_t> replyData, inrout uint32_t replySize);
+    int32_t process(in sequence<uint8_t> inPcm, rout sequence<uint8_t> outPcm, in uint32_t frameCount);
+};

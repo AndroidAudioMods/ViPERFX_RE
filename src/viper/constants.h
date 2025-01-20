@@ -8,12 +8,17 @@
 
 #include "../log.h" // TODO: Remove this dependency
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 enum class Architecture : uint8_t {
     UNKNOWN = 0,
     ARM,
     ARM64,
     X86,
     X86_64,
+    HEXAGON,
 };
 
 #if defined(__arm__)
@@ -24,6 +29,8 @@ enum class Architecture : uint8_t {
 #define VIPER_ARCHITECTURE Architecture::X86
 #elif defined(__x86_64__)
 #define VIPER_ARCHITECTURE Architecture::X86_64
+#elif defined(__hexagon__)
+#define VIPER_ARCHITECTURE Architecture::HEXAGON
 #else
 #warning "Unknown architecture"
 #define VIPER_ARCHITECTURE Architecture::UNKNOWN

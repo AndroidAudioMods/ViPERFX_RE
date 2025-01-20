@@ -6,7 +6,15 @@
 #include "log.h"
 #include "viper/constants.h"
 
+#ifdef __hexagon__
+#define SET(type, ptr, value)          \
+    do {                               \
+        type v = value;                \
+        memcpy(ptr, &v, sizeof(type)); \
+    } while (false)
+#else
 #define SET(type, ptr, value) (*(type *) (ptr) = (value))
+#endif
 
 ViperContext::ViperContext() :
         config({}),
@@ -16,6 +24,8 @@ ViperContext::ViperContext() :
         enabled(false) {
     VIPER_LOGI("ViperContext created");
 }
+
+ViperContext::~ViperContext() {}
 
 void ViperContext::copyBufferConfig(buffer_config_t *dest, buffer_config_t *src) {
     if (src->mask & EFFECT_CONFIG_BUFFER) {
@@ -809,7 +819,7 @@ int32_t ViperContext::process(audio_buffer_t *inBuffer, audio_buffer_t *outBuffe
     if (!enabled) {
         return -ENODATA;
     }
-    
+
     inBuffer = getBuffer(&config.inputCfg, inBuffer);
     outBuffer = getBuffer(&config.outputCfg, outBuffer);
     if (inBuffer == nullptr || outBuffer == nullptr ||

@@ -10,6 +10,8 @@ typedef enum {
     PARAM_GET_DISABLE_REASON,
     PARAM_GET_CONFIG,
     PARAM_GET_ARCHITECTURE,
+
+    PARAM_GET_MAX,
 } param_get_t;
 
 typedef enum {
@@ -53,4 +55,6 @@ typedef enum {
     PARAM_SET_DYNAMIC_SYSTEM_Y_COEFFICIENTS,
     PARAM_SET_DYNAMIC_SYSTEM_SIDE_GAIN,
     PARAM_SET_DYNAMIC_SYSTEM_STRENGTH,
+
+    PARAM_SET_MAX,
 } param_set_t;
