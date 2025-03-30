@@ -78,8 +78,31 @@ static int32_t viperLibraryGetDescriptor(const effect_uuid_t *uuid, effect_descr
     *pDescriptor = viperDescriptor;
     return 0;
 }
+} // extern "C"
 
-__attribute__ ((visibility ("default")))
+extern "C"
+__attribute__((visibility("default")))
+int createEffect() {
+    VIPER_LOGD("createEffect called");
+    return -3;
+}
+
+extern "C"
+__attribute__((visibility("default")))
+int destroyEffect() {
+    VIPER_LOGD("destroyEffect called");
+    return -5;
+}
+
+extern "C"
+__attribute__((visibility("default")))
+int queryEffect() {
+    VIPER_LOGD("queryEffect called");
+    return -3;
+}
+
+extern "C"
+__attribute__((visibility("default")))
 audio_effect_library_t AUDIO_EFFECT_LIBRARY_INFO_SYM = {
         .tag = AUDIO_EFFECT_LIBRARY_TAG,
         .version = EFFECT_LIBRARY_API_VERSION,
@@ -89,4 +112,3 @@ audio_effect_library_t AUDIO_EFFECT_LIBRARY_INFO_SYM = {
         .release_effect = viperLibraryRelease,
         .get_descriptor = viperLibraryGetDescriptor,
 };
-} // extern "C"
