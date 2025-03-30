@@ -14,16 +14,14 @@ for OFILE in ${CFGS}; do
   cp_ch -n $OFILE $FILE
   case $FILE in
     *.conf)
-        sed -i "/v4a_standard_re {/,/}/d" $FILE
         sed -i "/v4a_re {/,/}/d" $FILE
-        sed -i "s/^effects {/effects {\n  v4a_standard_re {\n    library v4a_re\n    uuid 90380da3-8536-4744-a6a3-5731970e640f\n  }/g" $FILE
+        sed -i "s/^effects {/effects {\n  v4a_re {\n    library v4a_re\n    uuid 90380da3-8536-4744-a6a3-5731970e640f\n    type b9bc100c-26cd-42e6-acb6-cad8c3f778de\n  }/g" $FILE
         sed -i "s/^libraries {/libraries {\n  v4a_re {\n    path $LIBPATCH\/lib\/soundfx\/libv4a_re.so\n  }/g" $FILE
         ;;
     *.xml) 
-        sed -i "/v4a_standard_re/d" $FILE
         sed -i "/v4a_re/d" $FILE
         sed -i "/<libraries>/ a\        <library name=\"v4a_re\" path=\"libv4a_re.so\"\/>" $FILE
-        sed -i "/<effects>/ a\        <effect name=\"v4a_standard_re\" library=\"v4a_re\" uuid=\"90380da3-8536-4744-a6a3-5731970e640f\"\/>" $FILE
+        sed -i "/<effects>/ a\        <effect name=\"v4a_re\" library=\"v4a_re\" uuid=\"90380da3-8536-4744-a6a3-5731970e640f\" type=\"b9bc100c-26cd-42e6-acb6-cad8c3f778de\"\/>" $FILE
         ;;
   esac
 done
