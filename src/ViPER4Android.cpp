@@ -4,11 +4,13 @@
 #include "viper/constants.h"
 #include "ViperContext.h"
 #include <aidl/android/hardware/audio/effect/Descriptor.h>
+#include <aidl/android/hardware/audio/effect/Flags.h>
 #include <aidl/android/hardware/audio/effect/IEffect.h>
 #include <aidl/android/media/audio/common/AudioUuid.h>
 #include <android/binder_status.h>
 
 using aidl::android::hardware::audio::effect::Descriptor;
+using aidl::android::hardware::audio::effect::Flags;
 using aidl::android::hardware::audio::effect::IEffect;
 using aidl::android::media::audio::common::AudioUuid;
 
@@ -111,9 +113,56 @@ binder_exception_t destroyEffect(const std::shared_ptr<IEffect> &instanceSp) {
 //    return EX_NONE;
 //}
 
+inline AudioUuid stringToUuid(const char* str) {
+    AudioUuid uuid{};
+    uint32_t tmp[10];
+    if (!str || sscanf(str, "%08x-%04x-%04x-%04x-%02x%02x%02x%02x%02x%02x", tmp,
+                       tmp + 1, tmp + 2, tmp + 3, tmp + 4, tmp + 5, tmp + 6,
+                       tmp + 7, tmp + 8, tmp + 9) < 10) {
+        return uuid;
+    }
+
+    uuid.timeLow = (uint32_t)tmp[0];
+    uuid.timeMid = (uint16_t)tmp[1];
+    uuid.timeHiAndVersion = (uint16_t)tmp[2];
+    uuid.clockSeq = (uint16_t)tmp[3];
+    uuid.node.insert(uuid.node.end(), {(uint8_t)tmp[4], (uint8_t)tmp[5], (uint8_t)tmp[6],
+                                       (uint8_t)tmp[7], (uint8_t)tmp[8], (uint8_t)tmp[9]});
+    return uuid;
+}
+
+const std::string kEffectName = "ViPER4Android";
+const AudioUuid kType = stringToUuid("b9bc100c-26cd-42e6-acb6-cad8c3f778de");
+const AudioUuid kUuid = stringToUuid("90380da3-8536-4744-a6a3-5731970e640f");
+const Descriptor kDescriptor = {
+        .common = {
+                .id = {
+                        .type = kType,
+                        .uuid = kUuid,
+                        .proxy = std::nullopt
+                },
+                .flags = {
+                        .type = Flags::Type::INSERT,
+                        .insert = Flags::Insert::LAST,
+                        .volume = Flags::Volume::NONE
+                },
+                .name = kEffectName,
+                .implementor = "Iscle",
+        },
+};
+
 extern "C" binder_exception_t queryEffect(const AudioUuid *audio_uuid, Descriptor *descriptor) {
-    VIPER_LOGD("queryEffect called");
-    return EX_ILLEGAL_ARGUMENT;
+    if (audio_uuid == nullptr || descriptor == nullptr) {
+        VIPER_LOGE("queryEffect called with null arguments");
+        return EX_ILLEGAL_ARGUMENT;
+    }
+    if (*audio_uuid != kUuid) {
+        VIPER_LOGE("queryEffect called with invalid uuid");
+        return EX_ILLEGAL_ARGUMENT;
+    }
+    VIPER_LOGD("queryEffect: returning descriptor");
+    *descriptor = kDescriptor;
+    return EX_NONE;
 }
 
 extern "C"
