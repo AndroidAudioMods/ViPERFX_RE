@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.16.3)
+
 set(CMAKE_CXX_COMPILER_VERSION 20)
+set(CMAKE_CXX_STANDARD 20)
 
 # NDK Settings
 #add_compile_definitions(ANDROID_ABI=arm64-v8a)

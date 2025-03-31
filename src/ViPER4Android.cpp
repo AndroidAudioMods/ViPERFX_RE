@@ -3,6 +3,14 @@
 #include "essential.h"
 #include "viper/constants.h"
 #include "ViperContext.h"
+#include <aidl/android/hardware/audio/effect/Descriptor.h>
+#include <aidl/android/hardware/audio/effect/IEffect.h>
+#include <aidl/android/media/audio/common/AudioUuid.h>
+#include <android/binder_status.h>
+
+using aidl::android::hardware::audio::effect::Descriptor;
+using aidl::android::hardware::audio::effect::IEffect;
+using aidl::android::media::audio::common::AudioUuid;
 
 extern "C" {
 struct ViperHandle {
@@ -82,23 +90,30 @@ static int32_t viperLibraryGetDescriptor(const effect_uuid_t *uuid, effect_descr
 
 extern "C"
 __attribute__((visibility("default")))
-int createEffect() {
+binder_exception_t createEffect(const AudioUuid *audio_uuid, std::shared_ptr<IEffect> *instance) {
     VIPER_LOGD("createEffect called");
-    return -3;
+    return EX_ILLEGAL_ARGUMENT;
 }
 
 extern "C"
 __attribute__((visibility("default")))
-int destroyEffect() {
+binder_exception_t destroyEffect(const std::shared_ptr<IEffect> &instanceSp) {
     VIPER_LOGD("destroyEffect called");
-    return -5;
+    return EX_ILLEGAL_STATE;
 }
 
-extern "C"
-__attribute__((visibility("default")))
-int queryEffect() {
+//extern "C" binder_exception_t queryEffect(const AudioUuid* in_impl_uuid, Descriptor* _aidl_return) {
+//    if (!in_impl_uuid || *in_impl_uuid != getEffectImplUuidVisualizer()) {
+//        LOG(ERROR) << __func__ << "uuid not supported";
+//        return EX_ILLEGAL_ARGUMENT;
+//    }
+//    *_aidl_return = VisualizerImpl::kDescriptor;
+//    return EX_NONE;
+//}
+
+extern "C" binder_exception_t queryEffect(const AudioUuid *audio_uuid, Descriptor *descriptor) {
     VIPER_LOGD("queryEffect called");
-    return -3;
+    return EX_ILLEGAL_ARGUMENT;
 }
 
 extern "C"
