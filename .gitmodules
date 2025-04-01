@@ -1,0 +1,6 @@
+[submodule "src/external/system_hardware_interfaces"]
+	path = src/external/system_hardware_interfaces
+	url = https://android.googlesource.com/platform/system/hardware/interfaces
+[submodule "src/external/hardware_interfaces"]
+	path = src/external/hardware_interfaces
+	url = https://android.googlesource.com/platform/hardware/interfaces
