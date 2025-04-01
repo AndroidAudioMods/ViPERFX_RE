@@ -70,7 +70,7 @@ set(AIDL_GENERATED_SRC
 #add_subdirectory(src/viper/ffts)
 
 # ViPERFX
-include_directories(src/include)
+include_directories(src/cpp/include)
 include_directories(src/generated/include)  # Add generated headers to include path
 
 set(FILES
