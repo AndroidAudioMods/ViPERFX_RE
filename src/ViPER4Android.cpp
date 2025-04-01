@@ -99,7 +99,7 @@ extern "C" binder_exception_t createEffect(const AudioUuid *audio_uuid, std::sha
     }
     VIPER_LOGD("createEffect called");
     *instance = ndk::SharedRefBase::make<ViPER4AndroidAIDL>();
-    return EX_ILLEGAL_ARGUMENT;
+    return EX_NONE;
 }
 
 extern "C" binder_exception_t destroyEffect(const std::shared_ptr<IEffect> &instanceSp) {
