@@ -1,0 +1,9 @@
+[submodule "external/core"]
+	path = external/core
+	url = https://android.googlesource.com/platform/system/core
+[submodule "external/libbase"]
+	path = external/libbase
+	url = https://android.googlesource.com/platform/system/libbase
+[submodule "external/libfmq"]
+	path = external/libfmq
+	url = https://android.googlesource.com/platform/system/libfmq

@@ -5,6 +5,13 @@ set(CMAKE_CXX_STANDARD 20)
 project("ViPER4Android")
 add_compile_definitions(VIPER_VERSION=20240314)
 
+# External
+include_directories(
+        external/libbase/include
+        external/core/include
+        external/libfmq/include
+        external/libfmq/base)
+
 # AIDL
 set(AIDL_SRC
         generated/android/media/audio/common/AudioPortDeviceExt.cpp
@@ -135,12 +142,10 @@ set(AIDL_SRC
         generated/android/hardware/common/fmq/GrantorDescriptor.cpp
         generated/android/hardware/common/fmq/UnsynchronizedWrite.cpp)
 
-set(AIDL_INCLUDE_DIRS
-        generated/include)
+include_directories(generated/include)
 
 # ViPERFX
 include_directories(src/include)
-include_directories(${AIDL_INCLUDE_DIRS})
 
 set(FILES
         # Main
