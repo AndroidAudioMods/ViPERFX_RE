@@ -92,7 +92,6 @@ static int32_t viperLibraryGetDescriptor(const effect_uuid_t *uuid, effect_descr
 }
 } // extern "C"
 
-
 extern "C" binder_exception_t createEffect(const AudioUuid *audio_uuid, std::shared_ptr<IEffect> *instance) {
     if (audio_uuid == nullptr || instance == nullptr) {
         VIPER_LOGE("createEffect called with null arguments");
