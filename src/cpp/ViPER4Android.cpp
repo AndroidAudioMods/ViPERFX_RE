@@ -3,11 +3,13 @@
 #include "essential.h"
 #include "viper/constants.h"
 #include "ViperContext.h"
-#include <aidl/android/hardware/audio/effect/Descriptor.h>
-#include <aidl/android/hardware/audio/effect/Flags.h>
-#include <aidl/android/hardware/audio/effect/IEffect.h>
-#include <aidl/android/media/audio/common/AudioUuid.h>
+#include "aidl/android/hardware/audio/effect/Descriptor.h"
+#include "aidl/android/hardware/audio/effect/Flags.h"
+#include "aidl/android/hardware/audio/effect/IEffect.h"
+#include "aidl/android/media/audio/common/AudioUuid.h"
 #include <android/binder_status.h>
+#include <android/binder_auto_utils.h>
+#include "viper_aidl.h"
 
 using aidl::android::hardware::audio::effect::Descriptor;
 using aidl::android::hardware::audio::effect::Flags;
@@ -90,28 +92,21 @@ static int32_t viperLibraryGetDescriptor(const effect_uuid_t *uuid, effect_descr
 }
 } // extern "C"
 
-extern "C"
-__attribute__((visibility("default")))
-binder_exception_t createEffect(const AudioUuid *audio_uuid, std::shared_ptr<IEffect> *instance) {
+
+extern "C" binder_exception_t createEffect(const AudioUuid *audio_uuid, std::shared_ptr<IEffect> *instance) {
+    if (audio_uuid == nullptr || instance == nullptr) {
+        VIPER_LOGE("createEffect called with null arguments");
+        return EX_ILLEGAL_ARGUMENT;
+    }
     VIPER_LOGD("createEffect called");
+    *instance = ndk::SharedRefBase::make<ViPER4AndroidAIDL>();
     return EX_ILLEGAL_ARGUMENT;
 }
 
-extern "C"
-__attribute__((visibility("default")))
-binder_exception_t destroyEffect(const std::shared_ptr<IEffect> &instanceSp) {
+extern "C" binder_exception_t destroyEffect(const std::shared_ptr<IEffect> &instanceSp) {
     VIPER_LOGD("destroyEffect called");
     return EX_ILLEGAL_STATE;
 }
-
-//extern "C" binder_exception_t queryEffect(const AudioUuid* in_impl_uuid, Descriptor* _aidl_return) {
-//    if (!in_impl_uuid || *in_impl_uuid != getEffectImplUuidVisualizer()) {
-//        LOG(ERROR) << __func__ << "uuid not supported";
-//        return EX_ILLEGAL_ARGUMENT;
-//    }
-//    *_aidl_return = VisualizerImpl::kDescriptor;
-//    return EX_NONE;
-//}
 
 inline AudioUuid stringToUuid(const char* str) {
     AudioUuid uuid{};
@@ -131,7 +126,6 @@ inline AudioUuid stringToUuid(const char* str) {
     return uuid;
 }
 
-const std::string kEffectName = "ViPER4Android";
 const AudioUuid kType = stringToUuid("b9bc100c-26cd-42e6-acb6-cad8c3f778de");
 const AudioUuid kUuid = stringToUuid("90380da3-8536-4744-a6a3-5731970e640f");
 const Descriptor kDescriptor = {
@@ -146,8 +140,8 @@ const Descriptor kDescriptor = {
                         .insert = Flags::Insert::LAST,
                         .volume = Flags::Volume::NONE
                 },
-                .name = kEffectName,
-                .implementor = "Iscle",
+                .name = VIPER_NAME,
+                .implementor = VIPER_AUTHORS,
         },
 };
 
