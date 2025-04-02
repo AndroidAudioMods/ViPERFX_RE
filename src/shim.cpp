@@ -15,18 +15,10 @@ void *native_handle_create;
 void *native_handle_delete;
 void *native_handle_close;
 
-void logError() {
-    ALOGD("_ZN7android8hardware7details8logErrorERKNSt6__ndk112basic_stringIcNS2_11char_traitsIcEENS2_9allocatorIcEEEE called");
-}
-
-void createEventFlag() {
-    ALOGD("_ZN7android8hardware9EventFlag15createEventFlagEPNSt6__ndk16atomicIjEEPPS1_ called");
-}
-
 // libfmq
 void *_ZN7android8hardware7details5checkEbPKc;
-void *_ZN7android8hardware7details8logErrorERKNSt6__ndk112basic_stringIcNS2_11char_traitsIcEENS2_9allocatorIcEEEE = (void *) (logError); // ndk
-void *_ZN7android8hardware9EventFlag15createEventFlagEPNSt6__ndk16atomicIjEEPPS1_ = (void *) (createEventFlag); // ndk
+void *_ZN7android8hardware7details8logErrorERKNSt6__ndk112basic_stringIcNS2_11char_traitsIcEENS2_9allocatorIcEEEE; // ndk
+void *_ZN7android8hardware9EventFlag15createEventFlagEPNSt6__ndk16atomicIjEEPPS1_; // ndk
 void *_ZN7android8hardware9EventFlag15deleteEventFlagEPPS1_;
 
 static void init_libcutils() {
@@ -90,18 +82,18 @@ static void init_libfmq() {
     }
 
     // ndk variant, real symbol: _ZN7android8hardware7details8logErrorERKNSt3__112basic_stringIcNS2_11char_traitsIcEENS2_9allocatorIcEEEE
-//    _ZN7android8hardware7details8logErrorERKNSt6__ndk112basic_stringIcNS2_11char_traitsIcEENS2_9allocatorIcEEEE = dlsym(libfmq, "_ZN7android8hardware7details8logErrorERKNSt3__112basic_stringIcNS2_11char_traitsIcEENS2_9allocatorIcEEEE");
-//    if (_ZN7android8hardware7details8logErrorERKNSt6__ndk112basic_stringIcNS2_11char_traitsIcEENS2_9allocatorIcEEEE == nullptr) {
-//        ALOGE("Failed to load symbol _ZN7android8hardware7details8logErrorERKNSt6__ndk112basic_stringIcNS2_11char_traitsIcEENS2_9allocatorIcEEEE from libfmq.so");
-//        goto exit;
-//    }
+    _ZN7android8hardware7details8logErrorERKNSt6__ndk112basic_stringIcNS2_11char_traitsIcEENS2_9allocatorIcEEEE = dlsym(libfmq, "_ZN7android8hardware7details8logErrorERKNSt3__112basic_stringIcNS2_11char_traitsIcEENS2_9allocatorIcEEEE");
+    if (_ZN7android8hardware7details8logErrorERKNSt6__ndk112basic_stringIcNS2_11char_traitsIcEENS2_9allocatorIcEEEE == nullptr) {
+        ALOGE("Failed to load symbol _ZN7android8hardware7details8logErrorERKNSt6__ndk112basic_stringIcNS2_11char_traitsIcEENS2_9allocatorIcEEEE from libfmq.so");
+        goto exit;
+    }
 
     // ndk variant, real symbol: _ZN7android8hardware9EventFlag15createEventFlagEPNSt3__16atomicIjEEPPS1_
-//    _ZN7android8hardware9EventFlag15createEventFlagEPNSt6__ndk16atomicIjEEPPS1_ = dlsym(libfmq, "_ZN7android8hardware9EventFlag15createEventFlagEPNSt3__16atomicIjEEPPS1_");
-//    if (_ZN7android8hardware9EventFlag15createEventFlagEPNSt6__ndk16atomicIjEEPPS1_ == nullptr) {
-//        ALOGE("Failed to load symbol _ZN7android8hardware9EventFlag15createEventFlagEPNSt3__16atomicIjEEPPS1_ from libfmq.so");
-//        goto exit;
-//    }
+    _ZN7android8hardware9EventFlag15createEventFlagEPNSt6__ndk16atomicIjEEPPS1_ = dlsym(libfmq, "_ZN7android8hardware9EventFlag15createEventFlagEPNSt3__16atomicIjEEPPS1_");
+    if (_ZN7android8hardware9EventFlag15createEventFlagEPNSt6__ndk16atomicIjEEPPS1_ == nullptr) {
+        ALOGE("Failed to load symbol _ZN7android8hardware9EventFlag15createEventFlagEPNSt3__16atomicIjEEPPS1_ from libfmq.so");
+        goto exit;
+    }
 
     _ZN7android8hardware9EventFlag15deleteEventFlagEPPS1_ = dlsym(libfmq, "_ZN7android8hardware9EventFlag15deleteEventFlagEPPS1_");
     if (_ZN7android8hardware9EventFlag15deleteEventFlagEPPS1_ == nullptr) {
