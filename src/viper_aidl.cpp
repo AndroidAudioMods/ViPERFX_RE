@@ -238,8 +238,11 @@ ndk::ScopedAStatus ViPER4AndroidAIDL::command(CommandId id) {
             stopThread();
             break;
         }
+        default:
+            ALOGE("command: unknown command %d", static_cast<int>(id));
+            return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
     }
-    return ndk::ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
+    return ndk::ScopedAStatus::ok();
 }
 
 ndk::ScopedAStatus ViPER4AndroidAIDL::getState(State *state) {

@@ -7,13 +7,13 @@ add_compile_definitions(VIPER_VERSION=20240314)
 
 # External
 set(CORE_SRC
-        external/core/libcutils/ashmem-host.cpp
+        #[[external/core/libcutils/ashmem-host.cpp
         external/core/libcutils/native_handle.cpp
         external/core/libutils/SystemClock.cpp
-        external/core/libutils/Timers.cpp)
+        external/core/libutils/Timers.cpp]])
 
 set(LIBFMQ_SRC
-        external/libfmq/EventFlag.cpp)
+        #[[external/libfmq/EventFlag.cpp]])
 
 include_directories(
         external/libbase/include
@@ -223,5 +223,6 @@ add_library(v4a_re SHARED
         ${FILES})
 
 target_link_libraries(v4a_re log binder_ndk) # kissfft)
+target_link_options(v4a_re PRIVATE "LINKER:--no-demangle")
 target_compile_options(v4a_re PRIVATE -flto -O3 -DNDEBUG)
 #target_compile_options(v4afx_r PRIVATE -O2 -DNDEBUG -Wall -Wsign-conversion -Wno-unused-result -Wno-unneeded-internal-declaration -fstrict-aliasing -fvisibility=hidden -Wextra -Wno-unused-parameter)
