@@ -2,7 +2,11 @@
 
 #include <vector>
 #include <cstddef>
+#ifdef AOSP_SOONG_BUILD
+#include <system/audio_effect.h>
+#else
 #include "essential.h"
+#endif
 #include "viper/ViPER.h"
 #include <string>
 

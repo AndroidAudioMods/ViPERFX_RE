@@ -1,6 +1,12 @@
 #include <cstring>
-#include "viper/ViPER.h"
+
+#ifdef AOSP_SOONG_BUILD
+#include <hardware/audio_effect.h>
+#else
 #include "essential.h"
+#endif
+
+#include "viper/ViPER.h"
 #include "viper/constants.h"
 #include "ViperContext.h"
 
