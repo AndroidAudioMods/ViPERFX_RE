@@ -1,7 +1,7 @@
 #include "ViPER.h"
 #include <cstring>
-#include <chrono>
-#include "constants.h"
+#include <constants.h>
+#include <log.h>
 
 ViPER::ViPER() : 
     frameCount(0),
@@ -11,8 +11,8 @@ ViPER::ViPER() :
     iirFilter(IIRFilter(10)),
     gainL(1.0),
     gainR(1.0) {
-    VIPER_LOGI("Welcome to ViPER FX");
-    VIPER_LOGI("Current version is %d", VIPER_VERSION);
+    ALOGI("Welcome to ViPER FX");
+    ALOGI("Current version is %d", VIPER_VERSION);
 
     this->convolver.SetEnable(false);
     this->convolver.SetSamplingRate(this->samplingRate);
@@ -94,7 +94,7 @@ void ViPER::process(std::vector<float>& buffer, uint32_t size) {
     uint32_t tmpBufSize;
 
     if (this->convolver.GetEnabled() || this->vhe.GetEnabled()) {
-//        VIPER_LOGD("Convolver or VHE is enable, use wave buffer");
+//        ALOGD("Convolver or VHE is enable, use wave buffer");
 
         if (!this->waveBuffer.PushSamples(buffer.data(), size)) {
             this->waveBuffer.Reset();
@@ -119,7 +119,7 @@ void ViPER::process(std::vector<float>& buffer, uint32_t size) {
         tmpBuf = ptr;
         tmpBufSize = ret;
     } else {
-//        VIPER_LOGD("Convolver and VHE are disabled, use adaptive buffer");
+//        ALOGD("Convolver and VHE are disabled, use adaptive buffer");
 
         if (this->adaptiveBuffer.PushFrames(buffer.data(), size)) {
             this->adaptiveBuffer.SetBufferOffset(size);
@@ -132,7 +132,7 @@ void ViPER::process(std::vector<float>& buffer, uint32_t size) {
         }
     }
 
-//    VIPER_LOGD("Process buffer size: %d", tmpBufSize);
+//    ALOGD("Process buffer size: %d", tmpBufSize);
     if (tmpBufSize != 0) {
         this->viperDdc.Process(tmpBuf, size);
         this->spectrumExtend.Process(tmpBuf, size);
@@ -175,7 +175,7 @@ void ViPER::process(std::vector<float>& buffer, uint32_t size) {
 
 //void ViPER::DispatchCommand(int param, int val1, int val2, int val3, int val4, uint32_t arrSize,
 //                            signed char *arr) {
-//    VIPER_LOGD("Dispatch command: %d, %d, %d, %d, %d, %d, %p", param, val1, val2, val3, val4, arrSize, arr);
+//    ALOGD("Dispatch command: %d, %d, %d, %d, %d, %d, %p", param, val1, val2, val3, val4, arrSize, arr);
 //    switch (param) {
 //        case PARAM_SET_RESET_STATUS: {
 //            this->reset();

@@ -1,5 +1,4 @@
 #include "Reverberation.h"
-#include "../constants.h"
 
 Reverberation::Reverberation() {
     this->model.SetRoomSize(0.0);

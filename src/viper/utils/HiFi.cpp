@@ -1,5 +1,5 @@
 #include "HiFi.h"
-#include "../constants.h"
+#include <constants.h>
 
 HiFi::HiFi() {
     this->gain = 1.f;

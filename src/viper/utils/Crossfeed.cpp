@@ -1,7 +1,7 @@
 #include <cstring>
 #include <cmath>
 #include "Crossfeed.h"
-#include "../constants.h"
+#include <constants.h>
 
 // Basically Bauer-to-Stereophonic Binaural filter
 // See: http://bs2b.sourceforge.net/

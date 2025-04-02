@@ -1,5 +1,5 @@
 #include "DynamicSystem.h"
-#include "../constants.h"
+#include <constants.h>
 
 DynamicSystem::DynamicSystem() {
     this->samplingRate = VIPER_DEFAULT_SAMPLING_RATE;

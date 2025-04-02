@@ -1,5 +1,5 @@
 #include "Polyphase.h"
-#include "../constants.h"
+#include <constants.h>
 
 static const float POLYPHASE_COEFFICIENTS_2[] = {
         -0.002339,

@@ -1,5 +1,5 @@
 #include "DynamicBass.h"
-#include "../constants.h"
+#include <constants.h>
 
 DynamicBass::DynamicBass() {
     this->qPeak = 0;

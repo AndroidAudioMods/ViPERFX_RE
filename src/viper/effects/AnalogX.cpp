@@ -1,6 +1,6 @@
 #include "AnalogX.h"
 #include <cstring>
-#include "../constants.h"
+#include <constants.h>
 
 static const float ANALOGX_HARMONICS[] = {
         0.01f,

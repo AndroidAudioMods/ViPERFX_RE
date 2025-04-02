@@ -1,5 +1,5 @@
 #include "ViPERBass.h"
-#include "../constants.h"
+#include <constants.h>
 
 // Iscle: Verified with the latest version at 13/12/2022
 

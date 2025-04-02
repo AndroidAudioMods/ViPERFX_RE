@@ -5,7 +5,7 @@
 #ifdef AOSP_SOONG_BUILD
 #include <system/audio_effect.h>
 #else
-#include "essential.h"
+#include <essential.h>
 #endif
 #include "viper/ViPER.h"
 #include <string>

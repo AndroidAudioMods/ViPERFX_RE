@@ -1,6 +1,6 @@
 #include <cstring>
 #include "DiffSurround.h"
-#include "../constants.h"
+#include <constants.h>
 
 DiffSurround::DiffSurround() : buffers({
     WaveBuffer(1, 0x1000),

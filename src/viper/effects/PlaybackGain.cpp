@@ -1,6 +1,6 @@
 #include <cmath>
 #include "PlaybackGain.h"
-#include "../constants.h"
+#include <constants.h>
 
 PlaybackGain::PlaybackGain() {
     this->enable = false;

@@ -1,5 +1,5 @@
 #include "Convolver.h"
-#include "../constants.h"
+#include <constants.h>
 #include <cstring>
 #include <cstddef>
 

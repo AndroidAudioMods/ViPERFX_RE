@@ -1,6 +1,6 @@
 #include "ViPERDDC.h"
-#include "../../log.h"
-#include "../constants.h"
+#include <log.h>
+#include <constants.h>
 #include <cstring>
 
 ViPERDDC::ViPERDDC() :
@@ -146,7 +146,7 @@ void ViPERDDC::SetSamplingRate(uint32_t samplingRate) {
     if (this->samplingRate != samplingRate) {
         this->samplingRate = samplingRate;
         if (!isSamplingRateValid()) {
-            VIPER_LOGE("ViPERDDC::SetSamplingRate() -> Invalid sampling rate: %d", this->samplingRate);
+            ALOGE("ViPERDDC::SetSamplingRate() -> Invalid sampling rate: %d", this->samplingRate);
         }
         Reset();
     }

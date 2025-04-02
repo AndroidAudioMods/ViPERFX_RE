@@ -1,6 +1,6 @@
 #include <cmath>
 #include "FETCompressor.h"
-#include "../constants.h"
+#include <constants.h>
 
 static const float DEFAULT_FETCOMP_PARAMETERS[] = {
         1.000000,

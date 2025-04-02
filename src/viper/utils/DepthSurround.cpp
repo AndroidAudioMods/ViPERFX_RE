@@ -1,6 +1,6 @@
 #include "DepthSurround.h"
 #include <cmath>
-#include "../constants.h"
+#include <constants.h>
 
 DepthSurround::DepthSurround() {
     this->strength = 0;

@@ -1,5 +1,5 @@
 #include "Subwoofer.h"
-#include "../constants.h"
+#include <constants.h>
 #include <cmath>
 
 Subwoofer::Subwoofer() {

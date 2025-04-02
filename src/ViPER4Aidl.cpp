@@ -26,7 +26,7 @@
 #include <media/AidlConversionNdk.h>
 #include <system/audio_effects/effect_uuid.h>
 
-#include "viper/constants.h"
+#include <constants.h>
 #include "ViPER4Aidl.h"
 
 using aidl::android::hardware::audio::effect::Descriptor;

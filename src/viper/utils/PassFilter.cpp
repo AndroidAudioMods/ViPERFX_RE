@@ -1,5 +1,5 @@
 #include "PassFilter.h"
-#include "../constants.h"
+#include <constants.h>
 
 PassFilter::PassFilter() : filters({
     IIR_NOrder_BW_LH(3),

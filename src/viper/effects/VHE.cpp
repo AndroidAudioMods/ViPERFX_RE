@@ -1,5 +1,5 @@
 #include "VHE.h"
-#include "../constants.h"
+#include <constants.h>
 #include "VHE_L0.h"
 #include "VHE_L1.h"
 #include "VHE_L2.h"
@@ -48,12 +48,12 @@ void VHE::Reset() {
     this->convRight.UnloadKernel();
 
     if (this->effectLevel > 4) {
-        VIPER_LOGD("Invalid effect level %d", this->effectLevel);
+        ALOGD("Invalid effect level %d", this->effectLevel);
         return;
     }
 
     if (this->samplingRate != 44100 && this->samplingRate != 48000) {
-        VIPER_LOGD("Invalid sampling rate %d", this->samplingRate);
+        ALOGD("Invalid sampling rate %d", this->samplingRate);
         return;
     }
 

@@ -1,17 +1,9 @@
 cmake_minimum_required(VERSION 3.16.3)
-set(CMAKE_CXX_COMPILER_VERSION 20)
 
-# NDK Settings
-#add_compile_definitions(ANDROID_ABI=arm64-v8a)
-#add_compile_definitions(ANDROID_ABI=armeabi-v7a)
-#add_compile_definitions(ANDROID_ARM_NEON=true)
-#add_compile_definitions(ANDROID_PLATFORM=android-24)
+set(CMAKE_CXX_STANDARD 20)
 
 project("ViPER4Android")
 add_compile_definitions(VIPER_VERSION=20240314)
-
-# FFTS
-#add_subdirectory(src/viper/ffts)
 
 # ViPERFX
 include_directories(src/include)
@@ -70,16 +62,9 @@ set(FILES
         src/viper/utils/TimeConstDelay.cpp
         src/viper/utils/WaveBuffer.cpp)
 
-add_library(
-        # Sets the name of the library.
-        v4a_re
-
-        # Sets the library as a shared library.
-        SHARED
-
-        # Provides a relative path to your source file(s).
+add_library(v4a_re SHARED
         ${FILES})
 
-target_link_libraries(v4a_re log) # kissfft)
+target_link_libraries(v4a_re log)
 target_compile_options(v4a_re PRIVATE -flto -O3 -DNDEBUG)
 #target_compile_options(v4afx_r PRIVATE -O2 -DNDEBUG -Wall -Wsign-conversion -Wno-unused-result -Wno-unneeded-internal-declaration -fstrict-aliasing -fvisibility=hidden -Wextra -Wno-unused-parameter)

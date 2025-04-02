@@ -1,5 +1,5 @@
 #include "ColorfulMusic.h"
-#include "../constants.h"
+#include <constants.h>
 
 ColorfulMusic::ColorfulMusic() {
     this->samplingRate = VIPER_DEFAULT_SAMPLING_RATE;
