@@ -1,0 +1,115 @@
+filegroup {
+    name: "v4aCommonFile",
+    srcs: [
+        // Main
+        "src/viper/ViPER.cpp",
+        "src/ViperContext.cpp",
+        // Effects
+        "src/viper/effects/AnalogX.cpp",
+        "src/viper/effects/ColorfulMusic.cpp",
+        "src/viper/effects/Convolver.cpp",
+        "src/viper/effects/Cure.cpp",
+        "src/viper/effects/DiffSurround.cpp",
+        "src/viper/effects/DynamicSystem.cpp",
+        "src/viper/effects/FETCompressor.cpp",
+        "src/viper/effects/IIRFilter.cpp",
+        "src/viper/effects/PlaybackGain.cpp",
+        "src/viper/effects/Reverberation.cpp",
+        "src/viper/effects/SoftwareLimiter.cpp",
+        "src/viper/effects/SpeakerCorrection.cpp",
+        "src/viper/effects/SpectrumExtend.cpp",
+        "src/viper/effects/TubeSimulator.cpp",
+        "src/viper/effects/VHE.cpp",
+        "src/viper/effects/ViPERBass.cpp",
+        "src/viper/effects/ViPERClarity.cpp",
+        "src/viper/effects/ViPERDDC.cpp",
+        // Utils
+        "src/viper/utils/AdaptiveBuffer.cpp",
+        "src/viper/utils/Biquad.cpp",
+        "src/viper/utils/CAllpassFilter.cpp",
+        "src/viper/utils/CCombFilter.cpp",
+        "src/viper/utils/CRevModel.cpp",
+        "src/viper/utils/Crossfeed.cpp",
+        "src/viper/utils/DepthSurround.cpp",
+        "src/viper/utils/DynamicBass.cpp",
+        "src/viper/utils/FIR.cpp",
+        "src/viper/utils/Harmonic.cpp",
+        "src/viper/utils/HiFi.cpp",
+        "src/viper/utils/HighShelf.cpp",
+        "src/viper/utils/IIR_1st.cpp",
+        "src/viper/utils/IIR_NOrder_BW_BP.cpp",
+        "src/viper/utils/IIR_NOrder_BW_LH.cpp",
+        "src/viper/utils/MinPhaseIIRCoeffs.cpp",
+        "src/viper/utils/MultiBiquad.cpp",
+        "src/viper/utils/NoiseSharpening.cpp",
+        "src/viper/utils/PassFilter.cpp",
+        "src/viper/utils/PConvSingle.cpp",
+        "src/viper/utils/PolesFilter.cpp",
+        "src/viper/utils/Polyphase.cpp",
+        "src/viper/utils/Stereo3DSurround.cpp",
+        "src/viper/utils/Subwoofer.cpp",
+        "src/viper/utils/TimeConstDelay.cpp",
+        "src/viper/utils/WaveBuffer.cpp",
+    ],
+}
+
+cc_defaults {
+    name: "v4aDefaults",
+    srcs: [
+        ":v4aCommonFile",
+    ],
+    cflags: [
+        "-O3",
+        "-DNDEBUG",
+        "-DVIPER_VERSION=20240314",
+        "-DAOSP_SOONG_BUILD",
+    ],
+    header_libs: [
+        "libhardware_headers",
+    ],
+    lto: {
+        // TODO: full was removed in https://android-review.googlesource.com/c/platform/build/soong/+/2609595
+        thin: true,
+    },
+}
+
+cc_library_shared {
+    name: "libv4aidl_re",
+    vendor: true,
+    relative_install_path: "soundfx",
+    defaults: [
+        "aidlaudioeffectservice_defaults",
+        "v4aDefaults",
+    ],
+    srcs: [
+        "src/ViPER4Aidl.cpp",
+        // AOSP
+        ":effectCommonFile",
+    ],
+    cflags: [
+        "-O3",
+        "-DNDEBUG",
+        "-DVIPER_VERSION=20240314",
+        "-DAOSP_SOONG_BUILD",
+        "-DBACKEND_NDK",
+    ],
+    whole_static_libs: [
+        "libaudio_aidl_conversion_common_ndk",
+        "libstagefright_foundation",
+    ],
+}
+
+cc_library_shared {
+    name: "libv4a_re",
+    vendor: true,
+    relative_install_path: "soundfx",
+    defaults: [
+        "v4aDefaults",
+    ],
+    srcs: [
+        "src/ViPER4Android.cpp",
+    ],
+    shared_libs: [
+        "liblog",
+    ],
+}
