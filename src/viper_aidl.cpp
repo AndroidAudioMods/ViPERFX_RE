@@ -1,5 +1,4 @@
 #include "viper_aidl.h"
-#include "log.h"
 #include "viper/constants.h"
 #include <aidl/android/media/audio/common/PcmType.h>
 #include <android-base/thread_annotations.h>
@@ -118,14 +117,14 @@ ndk::ScopedAStatus ViPER4AndroidAIDL::open(const Parameter::Common &common,
                                            const std::optional<Parameter::Specific> &specific,
                                            IEffect::OpenEffectReturn *ret) {
     if (common.input.base.format.pcm != PcmType::FLOAT_32_BIT) {
-        VIPER_LOGE("open called with invalid PCM type");
+        ALOGE("open called with invalid PCM type");
         return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
     }
 
     std::lock_guard lg(mMutex);
 
     if (mState != State::INIT) {
-        VIPER_LOGD("open: already opened");
+        ALOGD("open: already opened");
         return ndk::ScopedAStatus::ok();
     }
 
@@ -143,21 +142,21 @@ ndk::ScopedAStatus ViPER4AndroidAIDL::open(const Parameter::Common &common,
     mOutputMQ = std::make_shared<DataMQ>(outBufferSizeInFloat);
 
     if (!mStatusMQ->isValid() || !mInputMQ->isValid() || !mOutputMQ->isValid()) {
-        VIPER_LOGE("open: failed to create message queues");
+        ALOGE("open: failed to create message queues");
         return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_STATE);
     }
 
     android::status_t status = EventFlag::createEventFlag(
             mStatusMQ->getEventFlagWord(), &mEventFlag);
     if (status != android::OK || mEventFlag == nullptr) {
-        VIPER_LOGE("open: failed to create event flag");
+        ALOGE("open: failed to create event flag");
         return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_STATE);
     }
 
     mWorkBuffer.resize(std::max(inBufferSizeInFloat, outBufferSizeInFloat));
 
     if (specific.has_value()) {
-        VIPER_LOGD("open: specific parameters provided, ignoring for now...");
+        ALOGD("open: specific parameters provided, ignoring for now...");
     }
 
     mState = State::IDLE;
@@ -172,58 +171,58 @@ ndk::ScopedAStatus ViPER4AndroidAIDL::open(const Parameter::Common &common,
 }
 
 ndk::ScopedAStatus ViPER4AndroidAIDL::close() {
-    VIPER_LOGD("close called");
+    ALOGD("close called");
     return ndk::ScopedAStatus::ok();
 }
 
 ndk::ScopedAStatus
 ViPER4AndroidAIDL::getDescriptor(Descriptor *descriptor) {
     if (descriptor == nullptr) {
-        VIPER_LOGE("getDescriptor called with null descriptor");
+        ALOGE("getDescriptor called with null descriptor");
         return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
     }
-    VIPER_LOGD("getDescriptor: returning descriptor");
+    ALOGD("getDescriptor: returning descriptor");
     *descriptor = kDescriptor;
     return ndk::ScopedAStatus::ok();
 }
 
 ndk::ScopedAStatus ViPER4AndroidAIDL::command(CommandId command_id) {
-    VIPER_LOGD("command called");
+    ALOGD("command called");
     return ndk::ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
 }
 
 ndk::ScopedAStatus ViPER4AndroidAIDL::getState(State *state) {
-    VIPER_LOGD("getState called");
+    ALOGD("getState called");
     return ndk::ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
 }
 
 ndk::ScopedAStatus
 ViPER4AndroidAIDL::setParameter(const Parameter &parameter) {
-    VIPER_LOGD("setParameter called");
+    ALOGD("setParameter called");
     return ndk::ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
 }
 
 ndk::ScopedAStatus
 ViPER4AndroidAIDL::getParameter(const Parameter::Id &parameter_id, Parameter *parameter) {
-    VIPER_LOGD("getParameter called");
+    ALOGD("getParameter called");
     return ndk::ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
 }
 
 ndk::ScopedAStatus
 ViPER4AndroidAIDL::reopen(IEffect::OpenEffectReturn *open_effect_return) {
-    VIPER_LOGD("reopen called");
+    ALOGD("reopen called");
     return ndk::ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
 }
 
 void ViPER4AndroidAIDL::threadLoop() {
-    VIPER_LOGD("threadLoop started");
+    ALOGD("threadLoop started");
     while (true) {
         {
             std::unique_lock l(mThreadMutex);
             ::android::base::ScopedLockAssertion lock_assertion(mThreadMutex);
             mThreadCv.wait(l, [&]() REQUIRES(mThreadMutex) { return mThreadExit || !mThreadStop; });
             if (mThreadExit) {
-                VIPER_LOGD("threadLoop exiting");
+                ALOGD("threadLoop exiting");
                 return;
             }
         }
@@ -240,14 +239,14 @@ void ViPER4AndroidAIDL::process() {
     if (!mEventFlag ||
         mEventFlag->wait(kEventFlagDataMqNotEmpty, &efState, 0 /* no timeout */, true /* retry */) != android::OK ||
         !(efState & kEventFlagDataMqNotEmpty)) {
-        VIPER_LOGE("process: failed to wait for event flag");
+        ALOGE("process: failed to wait for event flag");
         return;
     }
 
     {
         std::lock_guard lg(mMutex);
         if (mState != State::PROCESSING && mState != State::DRAINING) {
-            VIPER_LOGD("process: skip process in state: %d", mState);
+            ALOGD("process: skip process in state: %d", mState);
             return;
         }
 
@@ -256,7 +255,7 @@ void ViPER4AndroidAIDL::process() {
         if (processSamples) {
             mInputMQ->read(buffer, processSamples);
 //            IEffect::Status status = effectProcessImpl(buffer, buffer, processSamples);
-            VIPER_LOGD("process: processing %zu samples", processSamples);
+            ALOGD("process: processing %zu samples", processSamples);
             IEffect::Status status = {STATUS_OK, static_cast<int32_t>(processSamples), static_cast<int32_t>(processSamples)};
             mOutputMQ->write(buffer, status.fmqProduced);
             mStatusMQ->writeBlocking(&status, 1);
@@ -266,29 +265,29 @@ void ViPER4AndroidAIDL::process() {
 
 extern "C" binder_exception_t createEffect(const AudioUuid *audio_uuid, std::shared_ptr<IEffect> *instance) {
     if (audio_uuid == nullptr || instance == nullptr) {
-        VIPER_LOGE("createEffect called with null arguments");
+        ALOGE("createEffect called with null arguments");
         return EX_ILLEGAL_ARGUMENT;
     }
-    VIPER_LOGD("createEffect: creating effect instance");
+    ALOGD("createEffect: creating effect instance");
     *instance = ndk::SharedRefBase::make<ViPER4AndroidAIDL>();
     return EX_NONE;
 }
 
 extern "C" binder_exception_t destroyEffect(const std::shared_ptr<IEffect> &instance) {
-    VIPER_LOGD("destroyEffect called");
+    ALOGD("destroyEffect called");
     return EX_ILLEGAL_STATE;
 }
 
 extern "C" binder_exception_t queryEffect(const AudioUuid *audio_uuid, Descriptor *descriptor) {
     if (audio_uuid == nullptr || descriptor == nullptr) {
-        VIPER_LOGE("queryEffect called with null arguments");
+        ALOGE("queryEffect called with null arguments");
         return EX_ILLEGAL_ARGUMENT;
     }
     if (*audio_uuid != kUuid) {
-        VIPER_LOGE("queryEffect called with invalid uuid");
+        ALOGE("queryEffect called with invalid uuid");
         return EX_ILLEGAL_ARGUMENT;
     }
-    VIPER_LOGD("queryEffect: returning descriptor");
+    ALOGD("queryEffect: returning descriptor");
     *descriptor = kDescriptor;
     return EX_NONE;
 }

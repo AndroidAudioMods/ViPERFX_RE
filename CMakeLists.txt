@@ -6,6 +6,15 @@ project("ViPER4Android")
 add_compile_definitions(VIPER_VERSION=20240314)
 
 # External
+set(CORE_SRC
+        external/core/libcutils/ashmem-host.cpp
+        external/core/libcutils/native_handle.cpp
+        external/core/libutils/SystemClock.cpp
+        external/core/libutils/Timers.cpp)
+
+set(LIBFMQ_SRC
+        external/libfmq/EventFlag.cpp)
+
 include_directories(
         external/libbase/include
         external/core/include
@@ -148,6 +157,9 @@ include_directories(generated/include)
 include_directories(src/include)
 
 set(FILES
+        # Shim
+        src/shim.cpp
+
         # Main
         src/viper/ViPER.cpp
         src/ViPER4Android.cpp
@@ -203,6 +215,8 @@ set(FILES
         src/viper/utils/WaveBuffer.cpp)
 
 add_library(v4a_re SHARED
+        ${CORE_SRC}
+        ${LIBFMQ_SRC}
         ${AIDL_SRC}
         ${FILES})
 

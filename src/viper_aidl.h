@@ -11,8 +11,6 @@ using aidl::android::hardware::audio::effect::State;
 
 class ViPER4AndroidAIDL : public BnEffect {
 public:
-    ViPER4AndroidAIDL();
-
     ::ndk::ScopedAStatus open(const ::aidl::android::hardware::audio::effect::Parameter::Common &common, const std::optional< ::aidl::android::hardware::audio::effect::Parameter::Specific> &specific, ::aidl::android::hardware::audio::effect::IEffect::OpenEffectReturn *ret) override;
     ::ndk::ScopedAStatus close() override;
     ::ndk::ScopedAStatus getDescriptor(::aidl::android::hardware::audio::effect::Descriptor *_aidl_return) override;
