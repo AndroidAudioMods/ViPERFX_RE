@@ -1,3 +1,0 @@
-[submodule "src/viper/ffts"]
-	path = src/viper/ffts
-	url = git@github.com:anthonix/ffts.git
