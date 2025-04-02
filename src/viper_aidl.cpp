@@ -129,12 +129,16 @@ constexpr size_t getFrameSizeInBytes(
 ndk::ScopedAStatus ViPER4AndroidAIDL::open(const Parameter::Common &common,
                                            const std::optional<Parameter::Specific> &specific,
                                            IEffect::OpenEffectReturn *ret) {
-    if (common.input.base.format.pcm != PcmType::FLOAT_32_BIT) {
+    ALOGD("open called");
+    if (common.input.base.format.pcm != PcmType::FLOAT_32_BIT ||
+        common.output.base.format.pcm != PcmType::FLOAT_32_BIT) {
         ALOGE("open called with invalid PCM type");
         return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
     }
 
     std::lock_guard lg(mImplMutex);
+
+    ALOGD("mImplMutex locked");
 
     if (mState != State::INIT) {
         ALOGD("open: already opened");
@@ -149,10 +153,22 @@ ndk::ScopedAStatus ViPER4AndroidAIDL::open(const Parameter::Common &common,
     size_t inBufferSizeInFloat = common.input.frameCount * mInputFrameSize / sizeof(float);
     size_t outBufferSizeInFloat = common.output.frameCount * mOutputFrameSize / sizeof(float);
 
+    ALOGD("open: inBufferSizeInFloat %zu, outBufferSizeInFloat %zu", inBufferSizeInFloat,
+          outBufferSizeInFloat);
+
     // only status FMQ use the EventFlag
     mStatusMQ = std::make_shared<StatusMQ>(1, true /*configureEventFlagWord*/);
     mInputMQ = std::make_shared<DataMQ>(inBufferSizeInFloat);
     mOutputMQ = std::make_shared<DataMQ>(outBufferSizeInFloat);
+
+    if (!mStatusMQ || !mInputMQ || !mOutputMQ) {
+        ALOGE("open: failed to create message queues");
+        return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_STATE);
+    }
+
+    ALOGD("message queues created");
+    ALOGD("open: mStatusMQ %p, mInputMQ %p, mOutputMQ %p", mStatusMQ.get(), mInputMQ.get(),
+          mOutputMQ.get());
 
     if (!mStatusMQ->isValid() || !mInputMQ->isValid() || !mOutputMQ->isValid()) {
         ALOGE("open: failed to create message queues");
@@ -166,7 +182,11 @@ ndk::ScopedAStatus ViPER4AndroidAIDL::open(const Parameter::Common &common,
         return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_STATE);
     }
 
+    ALOGD("open: event flag created");
+
     mWorkBuffer.resize(std::max(inBufferSizeInFloat, outBufferSizeInFloat));
+
+    ALOGD("open: work buffer size %zu", mWorkBuffer.size());
 
     if (specific.has_value()) {
         ALOGD("open: specific parameters provided, ignoring for now...");
@@ -174,14 +194,20 @@ ndk::ScopedAStatus ViPER4AndroidAIDL::open(const Parameter::Common &common,
 
     mState = State::IDLE;
 
+    ALOGD("open: state set to IDLE");
+
     ret->statusMQ = mStatusMQ->dupeDesc();
     ret->inputDataMQ = mInputMQ->dupeDesc();
     ret->outputDataMQ = mOutputMQ->dupeDesc();
+
+    ALOGD("open: mq descriptors set");
 
     if (createThread(VIPER_NAME) != RetCode::SUCCESS) {
         ALOGE("open: failed to create thread");
         return ndk::ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
     }
+
+    ALOGD("open: thread created");
 
     return ndk::ScopedAStatus::ok();
 }
