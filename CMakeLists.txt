@@ -161,6 +161,8 @@ set(FILES
         src/shim.cpp
 
         # Main
+        src/aidl/EffectThread.cpp
+
         src/viper/ViPER.cpp
         src/ViPER4Android.cpp
         src/ViperContext.cpp
