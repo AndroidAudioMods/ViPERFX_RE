@@ -1,5 +1,6 @@
-filegroup {
-    name: "v4aCommonFile",
+cc_defaults {
+    name: "v4a_defaults",
+    vendor: true,
     srcs: [
         // Main
         "src/viper/ViPER.cpp",
@@ -51,65 +52,37 @@ filegroup {
         "src/viper/utils/TimeConstDelay.cpp",
         "src/viper/utils/WaveBuffer.cpp",
     ],
-}
-
-cc_defaults {
-    name: "v4aDefaults",
-    srcs: [
-        ":v4aCommonFile",
+    export_include_dirs: [
+        "src/include",
     ],
     cflags: [
-        "-O3",
-        "-DNDEBUG",
+        "-O2",
         "-DVIPER_VERSION=20240314",
-        "-DAOSP_SOONG_BUILD",
+
+        "-Wno-unused-parameter",
+    ],
+    cppflags: [
+        "-Wno-unused-parameter",
+    ],
+    shared_libs: [
+        "liblog",
     ],
     header_libs: [
-        "libhardware_headers",
+        "libaudioeffects",
+        "libaudioutils_headers",
     ],
-    lto: {
-        // TODO: full was removed in https://android-review.googlesource.com/c/platform/build/soong/+/2609595
-        thin: true,
-    },
-}
-
-cc_library_shared {
-    name: "libv4aidl_re",
-    vendor: true,
     relative_install_path: "soundfx",
-    defaults: [
-        "aidlaudioeffectservice_defaults",
-        "v4aDefaults",
-    ],
-    srcs: [
-        "src/ViPER4Aidl.cpp",
-        // AOSP
-        ":effectCommonFile",
-    ],
-    cflags: [
-        "-O3",
-        "-DNDEBUG",
-        "-DVIPER_VERSION=20240314",
-        "-DAOSP_SOONG_BUILD",
-        "-DBACKEND_NDK",
-    ],
-    whole_static_libs: [
-        "libaudio_aidl_conversion_common_ndk",
-        "libstagefright_foundation",
-    ],
 }
 
 cc_library_shared {
     name: "libv4a_re",
-    vendor: true,
-    relative_install_path: "soundfx",
     defaults: [
-        "v4aDefaults",
+        "aidlaudioeffectservice_defaults",
+        "v4a_defaults",
     ],
     srcs: [
+        ":effectCommonFile",
+        "src/ViPER4Aidl.cpp",
         "src/ViPER4Android.cpp",
-    ],
-    shared_libs: [
-        "liblog",
     ],
 }

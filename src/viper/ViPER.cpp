@@ -3,12 +3,12 @@
 #include <constants.h>
 #include <log.h>
 
-ViPER::ViPER() : 
+ViPER::ViPER() :
+    adaptiveBuffer(2, 4096),
+    waveBuffer(2, 4096),
+    iirFilter(10),
     frameCount(0),
     samplingRate(VIPER_DEFAULT_SAMPLING_RATE),
-    adaptiveBuffer(AdaptiveBuffer(2, 4096)),
-    waveBuffer(WaveBuffer(2, 4096)),
-    iirFilter(IIRFilter(10)),
     gainL(1.0),
     gainR(1.0) {
     ALOGI("Welcome to ViPER FX");
