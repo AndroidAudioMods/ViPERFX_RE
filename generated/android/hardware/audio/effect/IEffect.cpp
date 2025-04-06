@@ -19,6 +19,7 @@ namespace effect {
 static binder_status_t _aidl_android_hardware_audio_effect_IEffect_onTransact(AIBinder* _aidl_binder, transaction_code_t _aidl_code, const AParcel* _aidl_in, AParcel* _aidl_out) {
   (void)_aidl_in;
   (void)_aidl_out;
+  printf("aidl_android_hardware_audio_effect_IEffect_onTransact\n");
   binder_status_t _aidl_ret_status = STATUS_UNKNOWN_TRANSACTION;
   std::shared_ptr<BnEffect> _aidl_impl = std::static_pointer_cast<BnEffect>(::ndk::ICInterface::asInterface(_aidl_binder));
   switch (_aidl_code) {
