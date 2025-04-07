@@ -13,7 +13,7 @@
 #include <aidl/android/hardware/audio/effect/Descriptor.h>
 #include <aidl/android/hardware/audio/effect/IEffect.h>
 #include <aidl/android/hardware/audio/effect/Processing.h>
-#include <aidl/android/media/audio/common/AudioUuid.h>
+#include <aidl/android/media/audio/common/v1/AudioUuid.h>
 #ifdef BINDER_STABILITY_SUPPORT
 #include <android/binder_stability.h>
 #endif  // BINDER_STABILITY_SUPPORT
@@ -50,18 +50,18 @@ public:
   static binder_status_t readFromParcel(const AParcel* parcel, std::shared_ptr<IFactory>* instance);
   static bool setDefaultImpl(const std::shared_ptr<IFactory>& impl);
   static const std::shared_ptr<IFactory>& getDefaultImpl();
-  virtual ::ndk::ScopedAStatus queryEffects(const std::optional<::aidl::android::media::audio::common::AudioUuid>& in_type, const std::optional<::aidl::android::media::audio::common::AudioUuid>& in_implementation, const std::optional<::aidl::android::media::audio::common::AudioUuid>& in_proxy, std::vector<::aidl::android::hardware::audio::effect::Descriptor>* _aidl_return) = 0;
+  virtual ::ndk::ScopedAStatus queryEffects(const std::optional<::aidl::android::media::audio::common::v1::AudioUuid>& in_type, const std::optional<::aidl::android::media::audio::common::v1::AudioUuid>& in_implementation, const std::optional<::aidl::android::media::audio::common::v1::AudioUuid>& in_proxy, std::vector<::aidl::android::hardware::audio::effect::Descriptor>* _aidl_return) = 0;
   virtual ::ndk::ScopedAStatus queryProcessing(const std::optional<::aidl::android::hardware::audio::effect::Processing::Type>& in_type, std::vector<::aidl::android::hardware::audio::effect::Processing>* _aidl_return) = 0;
-  virtual ::ndk::ScopedAStatus createEffect(const ::aidl::android::media::audio::common::AudioUuid& in_implUuid, std::shared_ptr<::aidl::android::hardware::audio::effect::IEffect>* _aidl_return) = 0;
+  virtual ::ndk::ScopedAStatus createEffect(const ::aidl::android::media::audio::common::v1::AudioUuid& in_implUuid, std::shared_ptr<::aidl::android::hardware::audio::effect::IEffect>* _aidl_return) = 0;
   virtual ::ndk::ScopedAStatus destroyEffect(const std::shared_ptr<::aidl::android::hardware::audio::effect::IEffect>& in_handle) = 0;
 private:
   static std::shared_ptr<IFactory> default_impl;
 };
 class IFactoryDefault : public IFactory {
 public:
-  ::ndk::ScopedAStatus queryEffects(const std::optional<::aidl::android::media::audio::common::AudioUuid>& in_type, const std::optional<::aidl::android::media::audio::common::AudioUuid>& in_implementation, const std::optional<::aidl::android::media::audio::common::AudioUuid>& in_proxy, std::vector<::aidl::android::hardware::audio::effect::Descriptor>* _aidl_return) override;
+  ::ndk::ScopedAStatus queryEffects(const std::optional<::aidl::android::media::audio::common::v1::AudioUuid>& in_type, const std::optional<::aidl::android::media::audio::common::v1::AudioUuid>& in_implementation, const std::optional<::aidl::android::media::audio::common::v1::AudioUuid>& in_proxy, std::vector<::aidl::android::hardware::audio::effect::Descriptor>* _aidl_return) override;
   ::ndk::ScopedAStatus queryProcessing(const std::optional<::aidl::android::hardware::audio::effect::Processing::Type>& in_type, std::vector<::aidl::android::hardware::audio::effect::Processing>* _aidl_return) override;
-  ::ndk::ScopedAStatus createEffect(const ::aidl::android::media::audio::common::AudioUuid& in_implUuid, std::shared_ptr<::aidl::android::hardware::audio::effect::IEffect>* _aidl_return) override;
+  ::ndk::ScopedAStatus createEffect(const ::aidl::android::media::audio::common::v1::AudioUuid& in_implUuid, std::shared_ptr<::aidl::android::hardware::audio::effect::IEffect>* _aidl_return) override;
   ::ndk::ScopedAStatus destroyEffect(const std::shared_ptr<::aidl::android::hardware::audio::effect::IEffect>& in_handle) override;
   ::ndk::SpAIBinder asBinder() override;
   bool isRemote() override;

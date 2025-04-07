@@ -18,9 +18,9 @@ public:
   explicit BpFactory(const ::ndk::SpAIBinder& binder);
   virtual ~BpFactory();
 
-  ::ndk::ScopedAStatus queryEffects(const std::optional<::aidl::android::media::audio::common::AudioUuid>& in_type, const std::optional<::aidl::android::media::audio::common::AudioUuid>& in_implementation, const std::optional<::aidl::android::media::audio::common::AudioUuid>& in_proxy, std::vector<::aidl::android::hardware::audio::effect::Descriptor>* _aidl_return) override;
+  ::ndk::ScopedAStatus queryEffects(const std::optional<::aidl::android::media::audio::common::v1::AudioUuid>& in_type, const std::optional<::aidl::android::media::audio::common::v1::AudioUuid>& in_implementation, const std::optional<::aidl::android::media::audio::common::v1::AudioUuid>& in_proxy, std::vector<::aidl::android::hardware::audio::effect::Descriptor>* _aidl_return) override;
   ::ndk::ScopedAStatus queryProcessing(const std::optional<::aidl::android::hardware::audio::effect::Processing::Type>& in_type, std::vector<::aidl::android::hardware::audio::effect::Processing>* _aidl_return) override;
-  ::ndk::ScopedAStatus createEffect(const ::aidl::android::media::audio::common::AudioUuid& in_implUuid, std::shared_ptr<::aidl::android::hardware::audio::effect::IEffect>* _aidl_return) override;
+  ::ndk::ScopedAStatus createEffect(const ::aidl::android::media::audio::common::v1::AudioUuid& in_implUuid, std::shared_ptr<::aidl::android::hardware::audio::effect::IEffect>* _aidl_return) override;
   ::ndk::ScopedAStatus destroyEffect(const std::shared_ptr<::aidl::android::hardware::audio::effect::IEffect>& in_handle) override;
 };
 }  // namespace effect

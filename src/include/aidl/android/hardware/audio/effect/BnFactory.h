@@ -33,13 +33,13 @@ public:
   explicit IFactoryDelegator(const std::shared_ptr<IFactory> &impl) : _impl(impl) {
   }
 
-  ::ndk::ScopedAStatus queryEffects(const std::optional<::aidl::android::media::audio::common::AudioUuid>& in_type, const std::optional<::aidl::android::media::audio::common::AudioUuid>& in_implementation, const std::optional<::aidl::android::media::audio::common::AudioUuid>& in_proxy, std::vector<::aidl::android::hardware::audio::effect::Descriptor>* _aidl_return) override {
+  ::ndk::ScopedAStatus queryEffects(const std::optional<::aidl::android::media::audio::common::v1::AudioUuid>& in_type, const std::optional<::aidl::android::media::audio::common::v1::AudioUuid>& in_implementation, const std::optional<::aidl::android::media::audio::common::v1::AudioUuid>& in_proxy, std::vector<::aidl::android::hardware::audio::effect::Descriptor>* _aidl_return) override {
     return _impl->queryEffects(in_type, in_implementation, in_proxy, _aidl_return);
   }
   ::ndk::ScopedAStatus queryProcessing(const std::optional<::aidl::android::hardware::audio::effect::Processing::Type>& in_type, std::vector<::aidl::android::hardware::audio::effect::Processing>* _aidl_return) override {
     return _impl->queryProcessing(in_type, _aidl_return);
   }
-  ::ndk::ScopedAStatus createEffect(const ::aidl::android::media::audio::common::AudioUuid& in_implUuid, std::shared_ptr<::aidl::android::hardware::audio::effect::IEffect>* _aidl_return) override {
+  ::ndk::ScopedAStatus createEffect(const ::aidl::android::media::audio::common::v1::AudioUuid& in_implUuid, std::shared_ptr<::aidl::android::hardware::audio::effect::IEffect>* _aidl_return) override {
     return _impl->createEffect(in_implUuid, _aidl_return);
   }
   ::ndk::ScopedAStatus destroyEffect(const std::shared_ptr<::aidl::android::hardware::audio::effect::IEffect>& in_handle) override {

@@ -26,9 +26,9 @@ static binder_status_t _aidl_android_hardware_audio_effect_IFactory_onTransact(A
   std::shared_ptr<BnFactory> _aidl_impl = std::static_pointer_cast<BnFactory>(::ndk::ICInterface::asInterface(_aidl_binder));
   switch (_aidl_code) {
     case (FIRST_CALL_TRANSACTION + 0 /*queryEffects*/): {
-      std::optional<::aidl::android::media::audio::common::AudioUuid> in_type;
-      std::optional<::aidl::android::media::audio::common::AudioUuid> in_implementation;
-      std::optional<::aidl::android::media::audio::common::AudioUuid> in_proxy;
+      std::optional<::aidl::android::media::audio::common::v1::AudioUuid> in_type;
+      std::optional<::aidl::android::media::audio::common::v1::AudioUuid> in_implementation;
+      std::optional<::aidl::android::media::audio::common::v1::AudioUuid> in_proxy;
       std::vector<::aidl::android::hardware::audio::effect::Descriptor> _aidl_return;
 
       _aidl_ret_status = ::ndk::AParcel_readNullableData(_aidl_in, &in_type);
@@ -70,7 +70,7 @@ static binder_status_t _aidl_android_hardware_audio_effect_IFactory_onTransact(A
       break;
     }
     case (FIRST_CALL_TRANSACTION + 2 /*createEffect*/): {
-      ::aidl::android::media::audio::common::AudioUuid in_implUuid;
+      ::aidl::android::media::audio::common::v1::AudioUuid in_implUuid;
       std::shared_ptr<::aidl::android::hardware::audio::effect::IEffect> _aidl_return;
 
       _aidl_ret_status = ::ndk::AParcel_readData(_aidl_in, &in_implUuid);
@@ -110,7 +110,7 @@ static AIBinder_Class* _g_aidl_android_hardware_audio_effect_IFactory_clazz = ::
 BpFactory::BpFactory(const ::ndk::SpAIBinder& binder) : BpCInterface(binder) {}
 BpFactory::~BpFactory() {}
 
-::ndk::ScopedAStatus BpFactory::queryEffects(const std::optional<::aidl::android::media::audio::common::AudioUuid>& in_type, const std::optional<::aidl::android::media::audio::common::AudioUuid>& in_implementation, const std::optional<::aidl::android::media::audio::common::AudioUuid>& in_proxy, std::vector<::aidl::android::hardware::audio::effect::Descriptor>* _aidl_return) {
+::ndk::ScopedAStatus BpFactory::queryEffects(const std::optional<::aidl::android::media::audio::common::v1::AudioUuid>& in_type, const std::optional<::aidl::android::media::audio::common::v1::AudioUuid>& in_implementation, const std::optional<::aidl::android::media::audio::common::v1::AudioUuid>& in_proxy, std::vector<::aidl::android::hardware::audio::effect::Descriptor>* _aidl_return) {
   binder_status_t _aidl_ret_status = STATUS_OK;
   ::ndk::ScopedAStatus _aidl_status;
   ::ndk::ScopedAParcel _aidl_in;
@@ -196,7 +196,7 @@ BpFactory::~BpFactory() {}
   _aidl_status_return:
   return _aidl_status;
 }
-::ndk::ScopedAStatus BpFactory::createEffect(const ::aidl::android::media::audio::common::AudioUuid& in_implUuid, std::shared_ptr<::aidl::android::hardware::audio::effect::IEffect>* _aidl_return) {
+::ndk::ScopedAStatus BpFactory::createEffect(const ::aidl::android::media::audio::common::v1::AudioUuid& in_implUuid, std::shared_ptr<::aidl::android::hardware::audio::effect::IEffect>* _aidl_return) {
   binder_status_t _aidl_ret_status = STATUS_OK;
   ::ndk::ScopedAStatus _aidl_status;
   ::ndk::ScopedAParcel _aidl_in;
@@ -332,7 +332,7 @@ const std::shared_ptr<IFactory>& IFactory::getDefaultImpl() {
   return IFactory::default_impl;
 }
 std::shared_ptr<IFactory> IFactory::default_impl = nullptr;
-::ndk::ScopedAStatus IFactoryDefault::queryEffects(const std::optional<::aidl::android::media::audio::common::AudioUuid>& /*in_type*/, const std::optional<::aidl::android::media::audio::common::AudioUuid>& /*in_implementation*/, const std::optional<::aidl::android::media::audio::common::AudioUuid>& /*in_proxy*/, std::vector<::aidl::android::hardware::audio::effect::Descriptor>* /*_aidl_return*/) {
+::ndk::ScopedAStatus IFactoryDefault::queryEffects(const std::optional<::aidl::android::media::audio::common::v1::AudioUuid>& /*in_type*/, const std::optional<::aidl::android::media::audio::common::v1::AudioUuid>& /*in_implementation*/, const std::optional<::aidl::android::media::audio::common::v1::AudioUuid>& /*in_proxy*/, std::vector<::aidl::android::hardware::audio::effect::Descriptor>* /*_aidl_return*/) {
   ::ndk::ScopedAStatus _aidl_status;
   _aidl_status.set(AStatus_fromStatus(STATUS_UNKNOWN_TRANSACTION));
   return _aidl_status;
@@ -342,7 +342,7 @@ std::shared_ptr<IFactory> IFactory::default_impl = nullptr;
   _aidl_status.set(AStatus_fromStatus(STATUS_UNKNOWN_TRANSACTION));
   return _aidl_status;
 }
-::ndk::ScopedAStatus IFactoryDefault::createEffect(const ::aidl::android::media::audio::common::AudioUuid& /*in_implUuid*/, std::shared_ptr<::aidl::android::hardware::audio::effect::IEffect>* /*_aidl_return*/) {
+::ndk::ScopedAStatus IFactoryDefault::createEffect(const ::aidl::android::media::audio::common::v1::AudioUuid& /*in_implUuid*/, std::shared_ptr<::aidl::android::hardware::audio::effect::IEffect>* /*_aidl_return*/) {
   ::ndk::ScopedAStatus _aidl_status;
   _aidl_status.set(AStatus_fromStatus(STATUS_UNKNOWN_TRANSACTION));
   return _aidl_status;

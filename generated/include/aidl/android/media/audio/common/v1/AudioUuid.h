@@ -21,6 +21,7 @@ namespace android {
 namespace media {
 namespace audio {
 namespace common {
+namespace v1 {
 class AudioUuid {
 public:
   typedef std::false_type fixed_size;
@@ -67,6 +68,7 @@ public:
     return _aidl_os.str();
   }
 };
+}  // namespace v1
 }  // namespace common
 }  // namespace audio
 }  // namespace media
