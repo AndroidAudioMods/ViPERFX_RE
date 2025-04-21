@@ -222,7 +222,7 @@ add_library(v4a_re SHARED
         ${AIDL_SRC}
         ${FILES})
 
-target_link_libraries(v4a_re log binder_ndk) # kissfft)
+target_link_libraries(v4a_re log binder_ndk)
 target_link_options(v4a_re PRIVATE "LINKER:--no-demangle")
 target_compile_options(v4a_re PRIVATE -flto -O3 -DNDEBUG)
 #target_compile_options(v4afx_r PRIVATE -O2 -DNDEBUG -Wall -Wsign-conversion -Wno-unused-result -Wno-unneeded-internal-declaration -fstrict-aliasing -fvisibility=hidden -Wextra -Wno-unused-parameter)
