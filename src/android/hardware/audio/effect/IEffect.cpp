@@ -3,6 +3,7 @@
  * Using: /home/iscle/Android/Sdk/build-tools/35.0.1/aidl --lang=ndk -o generated -h generated/include --structured --stability=vintf --min_sdk_version=31 -I hardware_interfaces/common/aidl/aidl_api/android.hardware.common/current/ -I hardware_interfaces/common/fmq/aidl/aidl_api/android.hardware.common.fmq/current/ -I hardware_interfaces/audio/aidl/aidl_api/android.hardware.audio.common/current/ -I hardware_interfaces/audio/aidl/aidl_api/android.hardware.audio.effect/current/ -I system_hardware_interfaces/media/aidl_api/android.media.audio.common.types/current/ -I system_hardware_interfaces/media/aidl_api/android.media.audio.eraser.types/current/ hardware_interfaces/audio/aidl/aidl_api/android.hardware.audio.effect/current/android/hardware/audio/effect/IEffect.aidl
  */
 #include "aidl/android/hardware/audio/effect/IEffect.h"
+#include "log/log.h"
 
 #include <android/binder_parcel_utils.h>
 #include <aidl/android/hardware/audio/effect/BnEffect.h>
@@ -19,7 +20,7 @@ namespace effect {
 static binder_status_t _aidl_android_hardware_audio_effect_IEffect_onTransact(AIBinder* _aidl_binder, transaction_code_t _aidl_code, const AParcel* _aidl_in, AParcel* _aidl_out) {
   (void)_aidl_in;
   (void)_aidl_out;
-  printf("aidl_android_hardware_audio_effect_IEffect_onTransact\n");
+  ALOGD("aidl_android_hardware_audio_effect_IEffect_onTransact");
   binder_status_t _aidl_ret_status = STATUS_UNKNOWN_TRANSACTION;
   std::shared_ptr<BnEffect> _aidl_impl = std::static_pointer_cast<BnEffect>(::ndk::ICInterface::asInterface(_aidl_binder));
   switch (_aidl_code) {
@@ -458,6 +459,7 @@ BpEffect::~BpEffect() {}
 BnEffect::BnEffect() {}
 BnEffect::~BnEffect() {}
 ::ndk::SpAIBinder BnEffect::createBinder() {
+    ALOGD("createBinder");
   AIBinder* binder = AIBinder_new(_g_aidl_android_hardware_audio_effect_IEffect_clazz, static_cast<void*>(this));
   #ifdef BINDER_STABILITY_SUPPORT
   AIBinder_markVintfStability(binder);
@@ -471,6 +473,7 @@ IEffect::~IEffect() {}
 
 
 std::shared_ptr<IEffect> IEffect::fromBinder(const ::ndk::SpAIBinder& binder) {
+    ALOGD("fromBinder");
   if (!AIBinder_associateClass(binder.get(), _g_aidl_android_hardware_audio_effect_IEffect_clazz)) {
     #if __ANDROID_API__ >= 31
     const AIBinder_Class* originalClass = AIBinder_getClass(binder.get());
@@ -489,9 +492,11 @@ std::shared_ptr<IEffect> IEffect::fromBinder(const ::ndk::SpAIBinder& binder) {
 }
 
 binder_status_t IEffect::writeToParcel(AParcel* parcel, const std::shared_ptr<IEffect>& instance) {
+    ALOGD("writeToParcel");
   return AParcel_writeStrongBinder(parcel, instance ? instance->asBinder().get() : nullptr);
 }
 binder_status_t IEffect::readFromParcel(const AParcel* parcel, std::shared_ptr<IEffect>* instance) {
+    ALOGD("readFromParcel");
   ::ndk::SpAIBinder binder;
   binder_status_t status = AParcel_readStrongBinder(parcel, binder.getR());
   if (status != STATUS_OK) return status;
@@ -510,6 +515,7 @@ bool IEffect::setDefaultImpl(const std::shared_ptr<IEffect>& impl) {
   return false;
 }
 const std::shared_ptr<IEffect>& IEffect::getDefaultImpl() {
+    ALOGD("getDefaultImpl");
   return IEffect::default_impl;
 }
 std::shared_ptr<IEffect> IEffect::default_impl = nullptr;
