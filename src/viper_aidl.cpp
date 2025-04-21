@@ -3,8 +3,6 @@
 #include <aidl/android/media/audio/common/PcmType.h>
 #include <android-base/thread_annotations.h>
 
-#include <android/media/audio/common/AudioUuid.h>
-
 using aidl::android::hardware::audio::effect::CommandId;
 using aidl::android::hardware::audio::effect::Descriptor;
 using aidl::android::hardware::audio::effect::Flags;
@@ -12,7 +10,7 @@ using aidl::android::hardware::audio::effect::IEffect;
 using aidl::android::hardware::audio::effect::Parameter;
 using aidl::android::hardware::audio::effect::RetCode;
 using aidl::android::hardware::audio::effect::State;
-using android::media::audio::common::AudioUuid;
+using aidl::android::media::audio::common::AudioUuid;
 using aidl::android::media::audio::common::PcmType;
 using android::hardware::EventFlag;
 
@@ -22,8 +20,8 @@ using android::hardware::EventFlag;
  */
 static constexpr uint32_t kEventFlagDataMqNotEmpty = 0x1 << 11;
 
-inline android::media::audio::common::AudioUuid stringToUuid(const char* str) {
-    android::media::audio::common::AudioUuid uuid{};
+inline AudioUuid stringToUuid(const char* str) {
+    AudioUuid uuid{};
     uint32_t tmp[10];
     if (!str || sscanf(str, "%08x-%04x-%04x-%04x-%02x%02x%02x%02x%02x%02x", tmp,
                        tmp + 1, tmp + 2, tmp + 3, tmp + 4, tmp + 5, tmp + 6,
@@ -31,22 +29,22 @@ inline android::media::audio::common::AudioUuid stringToUuid(const char* str) {
         return uuid;
     }
 
-//    uuid.timeLow = (uint32_t)tmp[0];
-//    uuid.timeMid = (uint16_t)tmp[1];
-//    uuid.timeHiAndVersion = (uint16_t)tmp[2];
-//    uuid.clockSeq = (uint16_t)tmp[3];
-//    uuid.node.insert(uuid.node.end(), {(uint8_t)tmp[4], (uint8_t)tmp[5], (uint8_t)tmp[6],
-//                                       (uint8_t)tmp[7], (uint8_t)tmp[8], (uint8_t)tmp[9]});
+    uuid.timeLow = (uint32_t)tmp[0];
+    uuid.timeMid = (uint16_t)tmp[1];
+    uuid.timeHiAndVersion = (uint16_t)tmp[2];
+    uuid.clockSeq = (uint16_t)tmp[3];
+    uuid.node.insert(uuid.node.end(), {(uint8_t)tmp[4], (uint8_t)tmp[5], (uint8_t)tmp[6],
+                                       (uint8_t)tmp[7], (uint8_t)tmp[8], (uint8_t)tmp[9]});
     return uuid;
 }
 
-const android::media::audio::common::AudioUuid kType = stringToUuid("b9bc100c-26cd-42e6-acb6-cad8c3f778de");
-const android::media::audio::common::AudioUuid kUuid = stringToUuid("90380da3-8536-4744-a6a3-5731970e640f");
+const AudioUuid kType = stringToUuid("b9bc100c-26cd-42e6-acb6-cad8c3f778de");
+const AudioUuid kUuid = stringToUuid("90380da3-8536-4744-a6a3-5731970e640f");
 const Descriptor kDescriptor = {
         .common = {
                 .id = {
-//                        .type = kType,
-//                        .uuid = kUuid,
+                        .type = kType,
+                        .uuid = kUuid,
                         .proxy = std::nullopt
                 },
                 .flags = {
@@ -306,7 +304,7 @@ void ViPER4AndroidAIDL::process() {
     ALOGD("process called");
 }
 
-extern "C" binder_exception_t createEffect(const android::media::audio::common::AudioUuid *audio_uuid, std::shared_ptr<IEffect> *instance) {
+extern "C" binder_exception_t createEffect(const AudioUuid *audio_uuid, std::shared_ptr<IEffect> *instance) {
     if (audio_uuid == nullptr || instance == nullptr) {
         ALOGE("createEffect called with null arguments");
         return EX_ILLEGAL_ARGUMENT;
@@ -321,7 +319,7 @@ extern "C" binder_exception_t destroyEffect(const std::shared_ptr<IEffect> &inst
     return EX_ILLEGAL_STATE;
 }
 
-extern "C" binder_exception_t queryEffect(const android::media::audio::common::AudioUuid *audio_uuid, Descriptor *descriptor) {
+extern "C" binder_exception_t queryEffect(const AudioUuid *audio_uuid, Descriptor *descriptor) {
     if (audio_uuid == nullptr || descriptor == nullptr) {
         ALOGE("queryEffect called with null arguments");
         return EX_ILLEGAL_ARGUMENT;

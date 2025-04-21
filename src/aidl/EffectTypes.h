@@ -23,12 +23,12 @@
 //#include <system/audio_effects/aidl_effects_utils.h>
 
 typedef binder_exception_t (*EffectCreateFunctor)(
-        const ::aidl::android::media::audio::common::v1::AudioUuid*,
+        const ::aidl::android::media::audio::common::AudioUuid*,
         std::shared_ptr<::aidl::android::hardware::audio::effect::IEffect>*);
 typedef binder_exception_t (*EffectDestroyFunctor)(
         const std::shared_ptr<::aidl::android::hardware::audio::effect::IEffect>&);
 typedef binder_exception_t (*EffectQueryFunctor)(
-        const ::aidl::android::media::audio::common::v1::AudioUuid*,
+        const ::aidl::android::media::audio::common::AudioUuid*,
         ::aidl::android::hardware::audio::effect::Descriptor*);
 
 struct effect_dl_interface_s {

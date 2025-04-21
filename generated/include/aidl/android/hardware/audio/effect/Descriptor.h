@@ -15,7 +15,7 @@
 #include <aidl/android/hardware/audio/effect/Capability.h>
 #include <aidl/android/hardware/audio/effect/Descriptor.h>
 #include <aidl/android/hardware/audio/effect/Flags.h>
-#include <aidl/android/media/audio/common/v1/AudioUuid.h>
+#include <aidl/android/media/audio/common/AudioUuid.h>
 #ifdef BINDER_STABILITY_SUPPORT
 #include <android/binder_stability.h>
 #endif  // BINDER_STABILITY_SUPPORT
@@ -42,9 +42,9 @@ public:
     typedef std::false_type fixed_size;
     static const char* descriptor;
 
-    ::aidl::android::media::audio::common::v1::AudioUuid type;
-    ::aidl::android::media::audio::common::v1::AudioUuid uuid;
-    std::optional<::aidl::android::media::audio::common::v1::AudioUuid> proxy;
+    ::aidl::android::media::audio::common::AudioUuid type;
+    ::aidl::android::media::audio::common::AudioUuid uuid;
+    std::optional<::aidl::android::media::audio::common::AudioUuid> proxy;
 
     binder_status_t readFromParcel(const AParcel* parcel);
     binder_status_t writeToParcel(AParcel* parcel) const;
