@@ -5,6 +5,9 @@ cc_defaults {
         // Main
         "src/viper/ViPER.cpp",
         "src/ViperContext.cpp",
+        "src/ViPER4Aidl.cpp",
+        "src/ViPER4Android.cpp",
+        "src/EffectThread.cpp",
         // Effects
         "src/viper/effects/AnalogX.cpp",
         "src/viper/effects/ColorfulMusic.cpp",
@@ -60,29 +63,66 @@ cc_defaults {
         "-DVIPER_VERSION=20240314",
 
         "-Wno-unused-parameter",
+        "-DBACKEND_NDK",
     ],
     cppflags: [
         "-Wno-unused-parameter",
     ],
     shared_libs: [
+        "libaudioaidlcommon",
+        "libaudioutils",
+        "libbase",
+        "libbinder_ndk",
+        "libcutils",
+        "libfmq",
         "liblog",
+        "libutils",
     ],
     header_libs: [
         "libaudioeffects",
         "libaudioutils_headers",
+        "libaudioaidl_headers",
+        "libaudio_system_headers",
+        "libsystem_headers",
     ],
     relative_install_path: "soundfx",
 }
 
 cc_library_shared {
-    name: "libv4a_re",
+    name: "libv4a_re-V1",
     defaults: [
-        "aidlaudioeffectservice_defaults",
         "v4a_defaults",
     ],
-    srcs: [
-        ":effectCommonFile",
-        "src/ViPER4Aidl.cpp",
-        "src/ViPER4Android.cpp",
+    shared_libs: [
+        "android.hardware.audio.effect-V1-ndk",
+    ],
+    cflags: [
+        "-DVIPER_AIDL_VERSION=1",
+    ],
+}
+
+cc_library_shared {
+    name: "libv4a_re-V2",
+    defaults: [
+        "v4a_defaults",
+    ],
+    shared_libs: [
+        "android.hardware.audio.effect-V2-ndk",
+    ],
+    cflags: [
+        "-DVIPER_AIDL_VERSION=2",
+    ],
+}
+
+cc_library_shared {
+    name: "libv4a_re-V3",
+    defaults: [
+        "v4a_defaults",
+    ],
+    shared_libs: [
+        "android.hardware.audio.effect-V3-ndk",
+    ],
+    cflags: [
+        "-DVIPER_AIDL_VERSION=3",
     ],
 }
