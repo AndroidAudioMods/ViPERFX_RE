@@ -64,7 +64,7 @@ public:
         return !(_rhs < *this);
     }
 private:
-    uint32_t version = AidlVersions::instance().androidMediaAudioCommonTypesVersion;
+    uint32_t version = AidlVersions::androidMediaAudioCommonTypesVersion;
     v1::AudioUuid *uuid_v1 = (v1::AudioUuid *) this;
 };
 } // namespace android::media::audio::common
