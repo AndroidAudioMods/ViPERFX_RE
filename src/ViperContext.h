@@ -21,6 +21,7 @@ public:
 
     int32_t handleCommand(uint32_t cmdCode, uint32_t cmdSize, void *pCmdData, uint32_t *replySize, void *pReplyData);
     int32_t process(audio_buffer_t *inBuffer, audio_buffer_t *outBuffer);
+    int32_t process(float *inBuffer, float *outBuffer, size_t count);
 
 private:
     effect_config_t config;

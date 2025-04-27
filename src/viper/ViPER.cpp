@@ -1,7 +1,7 @@
 #include "ViPER.h"
 #include <cstring>
 #include <constants.h>
-#include <log.h>
+#include <log/log.h>
 
 ViPER::ViPER() :
     adaptiveBuffer(2, 4096),
@@ -86,7 +86,7 @@ ViPER::ViPER() :
     }
 }
 
-void ViPER::process(std::vector<float>& buffer, uint32_t size) {
+void ViPER::process(float *buffer, uint32_t size) {
     this->frameCount += size;
 
     uint32_t ret;
@@ -96,7 +96,7 @@ void ViPER::process(std::vector<float>& buffer, uint32_t size) {
     if (this->convolver.GetEnabled() || this->vhe.GetEnabled()) {
 //        ALOGD("Convolver or VHE is enable, use wave buffer");
 
-        if (!this->waveBuffer.PushSamples(buffer.data(), size)) {
+        if (!this->waveBuffer.PushSamples(buffer, size)) {
             this->waveBuffer.Reset();
             return;
         }
@@ -121,7 +121,7 @@ void ViPER::process(std::vector<float>& buffer, uint32_t size) {
     } else {
 //        ALOGD("Convolver and VHE are disabled, use adaptive buffer");
 
-        if (this->adaptiveBuffer.PushFrames(buffer.data(), size)) {
+        if (this->adaptiveBuffer.PushFrames(buffer, size)) {
             this->adaptiveBuffer.SetBufferOffset(size);
 
             tmpBuf = this->adaptiveBuffer.GetBuffer();
@@ -159,7 +159,7 @@ void ViPER::process(std::vector<float>& buffer, uint32_t size) {
             tmpBuf[i + 1] = this->softwareLimiters[1].Process(tmpBuf[i + 1]);
         }
 
-        if (!this->adaptiveBuffer.PopFrames(buffer.data(), tmpBufSize)) {
+        if (!this->adaptiveBuffer.PopFrames(buffer, tmpBufSize)) {
             this->adaptiveBuffer.FlushBuffer();
             return;
         }
@@ -169,8 +169,8 @@ void ViPER::process(std::vector<float>& buffer, uint32_t size) {
         }
     }
 
-    memmove(buffer.data() + (size - tmpBufSize) * 2, buffer.data(), tmpBufSize * sizeof(float));
-    memset(buffer.data(), 0, (size - tmpBufSize) * sizeof(float));
+    memmove(buffer + (size - tmpBufSize) * 2, buffer, tmpBufSize * sizeof(float));
+    memset(buffer, 0, (size - tmpBufSize) * sizeof(float));
 }
 
 //void ViPER::DispatchCommand(int param, int val1, int val2, int val3, int val4, uint32_t arrSize,

@@ -6,7 +6,7 @@
 #include <cerrno>
 #endif
 
-#include <log.h> // TODO: Remove this dependency
+#include <log/log.h> // TODO: Remove this dependency
 
 enum class Architecture : uint8_t {
     UNKNOWN = 0,

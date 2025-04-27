@@ -2,7 +2,7 @@
 #include <cstring>
 #include <cmath>
 #include "ViperContext.h"
-#include <log.h>
+#include <log/log.h>
 #include <constants.h>
 
 #define SET(type, ptr, value) (*(type *) (ptr) = (value))
@@ -840,7 +840,7 @@ int32_t ViperContext::process(audio_buffer_t *inBuffer, audio_buffer_t *outBuffe
             return -EINVAL;
     }
 
-    viper.process(buffer, frameCount);
+    viper.process(buffer.data(), frameCount);
 
     const bool accumulate = config.outputCfg.accessMode == EFFECT_BUFFER_ACCESS_ACCUMULATE;
     switch (config.outputCfg.format) {
@@ -857,6 +857,14 @@ int32_t ViperContext::process(audio_buffer_t *inBuffer, audio_buffer_t *outBuffe
             return -EINVAL;
     }
 
+    return 0;
+}
+
+int32_t ViperContext::process(float *inBuffer, float *outBuffer, size_t count) {
+    memcpy(outBuffer, inBuffer, count * sizeof(float));
+    // The viper process function expects the count to be the number of
+    // stereo frames, not the number of samples. Thus, we divide by 2.
+    viper.process(outBuffer, count / 2);
     return 0;
 }
 

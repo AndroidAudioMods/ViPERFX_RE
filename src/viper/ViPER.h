@@ -27,7 +27,7 @@ class ViPER {
 public:
     ViPER();
 
-    void process(std::vector<float>& buffer, uint32_t size);
+    void process(float *buffer, uint32_t size);
     void reset();
     uint64_t getFrameCount();
     void setSamplingRate(uint32_t samplingRate);
