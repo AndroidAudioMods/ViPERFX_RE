@@ -1,11 +1,7 @@
 #pragma once
 
-#include <mutex>
-#include <thread>
-#include <aidl/android/hardware/audio/effect/BnEffect.h>
-#include <fmq/AidlMessageQueue.h>
 #include <effect-impl/EffectThread.h>
-#include "ViperContext.h"
+#include "ViPERContext.h"
 
 using aidl::android::hardware::common::fmq::SynchronizedReadWrite;
 #if VIPER_AIDL_VERSION >= 2
@@ -26,15 +22,17 @@ using android::hardware::EventFlag;
 class ViPER4AIDL : public BnEffect, public EffectThread {
 public:
     // BnEffect
-    ndk::ScopedAStatus open(const Parameter::Common &common, const std::optional<Parameter::Specific> &specific, IEffect::OpenEffectReturn *ret) override;
+    ndk::ScopedAStatus open(const Parameter::Common &common,
+                            const std::optional<Parameter::Specific> &specific,
+                            IEffect::OpenEffectReturn *oer) override;
     ndk::ScopedAStatus close() override;
-    ndk::ScopedAStatus getDescriptor(Descriptor *_aidl_return) override;
-    ndk::ScopedAStatus command(CommandId id) override;
+    ndk::ScopedAStatus getDescriptor(Descriptor *descriptor) override;
+    ndk::ScopedAStatus command(CommandId command_id) override;
     ndk::ScopedAStatus getState(State *state) override;
-    ndk::ScopedAStatus setParameter(const Parameter &in_param) override;
-    ndk::ScopedAStatus getParameter(const Parameter::Id &in_paramId, Parameter *param) override;
+    ndk::ScopedAStatus setParameter(const Parameter &parameter) override;
+    ndk::ScopedAStatus getParameter(const Parameter::Id &parameter_id, Parameter *parameter) override;
 #if VIPER_AIDL_VERSION >= 2
-    ndk::ScopedAStatus reopen(IEffect::OpenEffectReturn *ret) override;
+    ndk::ScopedAStatus reopen(IEffect::OpenEffectReturn *oer) override;
 #endif
 
     // EffectThread
@@ -43,11 +41,11 @@ private:
     typedef android::AidlMessageQueue<IEffect::Status, SynchronizedReadWrite> StatusMQ;
     typedef android::AidlMessageQueue<float, SynchronizedReadWrite> DataMQ;
 
-    void dupeFmq(IEffect::OpenEffectReturn* ret);
-    void dupeFmqWithReopen(IEffect::OpenEffectReturn* ret);
+    void dupeFmq(IEffect::OpenEffectReturn* oer);
+    void dupeFmqWithReopen(IEffect::OpenEffectReturn* oer);
     RetCode notifyEventFlag(uint32_t flag);
     void resetBuffer();
-    IEffect::Status effectProcessImpl(float* in, float* out, int samples);
+    IEffect::Status effectProcessImpl(float *in, float *out, int32_t samples);
 
     std::mutex mImplMutex;
     State mState = State::INIT;
@@ -59,12 +57,10 @@ private:
 #endif
 
     Parameter::Common mCommon;
-
     std::shared_ptr<StatusMQ> mStatusMQ;
     std::shared_ptr<DataMQ> mInputMQ;
     std::shared_ptr<DataMQ> mOutputMQ;
     EventFlag *mEventFlag;
     std::vector<float> mWorkBuffer;
-
-    ViperContext viperContext;
+    ViPERContext viperContext;
 };

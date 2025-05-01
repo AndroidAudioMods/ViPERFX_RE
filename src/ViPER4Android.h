@@ -1,7 +1,12 @@
 #pragma once
 
-// Source: https://github.com/vipersaudio/viperfx_core_binary/blob/master/viperfx_intf.h
-// Updated parameters source: https://github.com/vipersaudio/viper4android_fx/blob/master/android_4.x/src/com/vipercn/viper4android_v2/service/ViPER4AndroidService.java
+namespace ViPER4Android {
+    static const char *const kName = "ViPER4Android";
+    static const char *const kImplementor = "Iscle, Martmists, ViPER ACOUSTIC";
+
+    static const char *const kTypeString = "b9bc100c-26cd-42e6-acb6-cad8c3f778de";
+    static const char *const kUuidString = "90380da3-8536-4744-a6a3-5731970e640f";
+};
 
 typedef enum {
     PARAM_GET_ENABLED = 0,

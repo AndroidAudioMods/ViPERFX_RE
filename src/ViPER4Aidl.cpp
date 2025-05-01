@@ -1,8 +1,8 @@
 #define LOG_TAG "ViPER4AIDL"
 
 #include "ViPER4Aidl.h"
+#include "ViPER4Android.h"
 #include "AidlUtils.h"
-#include <android-base/thread_annotations.h>
 #include <aidl/android/hardware/audio/effect/DefaultExtension.h>
 #include <system/audio_effect.h>
 
@@ -20,8 +20,11 @@ using aidl::android::media::audio::common::AudioUuid;
 using aidl::android::media::audio::common::PcmType;
 using android::hardware::EventFlag;
 
-static const AudioUuid kType = stringToUuid("b9bc100c-26cd-42e6-acb6-cad8c3f778de");
-static const AudioUuid kUuid = stringToUuid("90380da3-8536-4744-a6a3-5731970e640f");
+using ViPER4Android::getFrameSizeInBytes;
+using ViPER4Android::stringToUuid;
+
+static const AudioUuid kType = stringToUuid(ViPER4Android::kTypeString);
+static const AudioUuid kUuid = stringToUuid(ViPER4Android::kUuidString);
 static const Descriptor kDescriptor = {
         .common = {
                 .id = {
@@ -33,19 +36,19 @@ static const Descriptor kDescriptor = {
                         .type = Flags::Type::INSERT,
                         .insert = Flags::Insert::LAST,
                 },
-                .name = "ViPER4Android",
-                .implementor = "Iscle",
+                .name = ViPER4Android::kName,
+                .implementor = ViPER4Android::kImplementor,
         },
 };
 
 ndk::ScopedAStatus ViPER4AIDL::open(const Parameter::Common &common,
-    const std::optional<Parameter::Specific> &specific,
-    IEffect::OpenEffectReturn *ret) {
+                                    const std::optional<Parameter::Specific> &specific,
+                                    IEffect::OpenEffectReturn *oer) {
     if (common.input.base.format.pcm != PcmType::FLOAT_32_BIT ||
         common.output.base.format.pcm != PcmType::FLOAT_32_BIT) {
-        ALOGE("open: unsupported PCM type (input: %d, output: %d)",
-              static_cast<int>(common.input.base.format.pcm),
-              static_cast<int>(common.output.base.format.pcm));
+        ALOGE("open: unsupported PCM type (input: %s, output: %s)",
+              toString(common.input.base.format.pcm).c_str(),
+              toString(common.output.base.format.pcm).c_str());
         return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
     }
 
@@ -56,32 +59,25 @@ ndk::ScopedAStatus ViPER4AIDL::open(const Parameter::Common &common,
         return ndk::ScopedAStatus::ok();
     }
 
-    size_t inputFrameSize = getFrameSizeInBytes(
-            common.input.base.format, common.input.base.channelMask);
-    size_t outputFrameSize = getFrameSizeInBytes(
-            common.output.base.format, common.output.base.channelMask);
+    size_t inputFrameSize = getFrameSizeInBytes(common.input.base.format, common.input.base.channelMask);
+    size_t outputFrameSize = getFrameSizeInBytes(common.output.base.format, common.output.base.channelMask);
 
     /* EffectContext constructor start */
     mCommon = common;
     size_t inBufferSizeInFloat = common.input.frameCount * inputFrameSize / sizeof(float);
     size_t outBufferSizeInFloat = common.output.frameCount * outputFrameSize / sizeof(float);
 
-    ALOGD("open: inBufferSizeInFloat %zu, outBufferSizeInFloat %zu", inBufferSizeInFloat,
-          outBufferSizeInFloat);
-
     // only status FMQ use the EventFlag
     mStatusMQ = std::make_shared<StatusMQ>(1, true /* configureEventFlagWord */);
     mInputMQ = std::make_shared<DataMQ>(inBufferSizeInFloat);
     mOutputMQ = std::make_shared<DataMQ>(outBufferSizeInFloat);
-
     if (!mStatusMQ->isValid() || !mInputMQ->isValid() || !mOutputMQ->isValid()) {
-        ALOGE("open: invalid FMQ (status: %d, input: %d, output: %d)",
+        ALOGE("open: invalid FMQs (status: %d, input: %d, output: %d)",
               mStatusMQ->isValid(), mInputMQ->isValid(), mOutputMQ->isValid());
         return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_STATE);
     }
 
-    android::status_t status = EventFlag::createEventFlag(
-            mStatusMQ->getEventFlagWord(), &mEventFlag);
+    android::status_t status = EventFlag::createEventFlag(mStatusMQ->getEventFlagWord(), &mEventFlag);
     if (status != android::OK || mEventFlag == nullptr) {
         ALOGE("open: failed to create event flag");
         return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_STATE);
@@ -90,17 +86,13 @@ ndk::ScopedAStatus ViPER4AIDL::open(const Parameter::Common &common,
     mWorkBuffer.resize(std::max(inBufferSizeInFloat, outBufferSizeInFloat));
     /* EffectContext constructor end */
 
-    if (specific.has_value()) {
-        ALOGD("open: specific parameters provided, ignoring for now...");
-    }
-
     mState = State::IDLE;
 
-    dupeFmq(ret);
+    dupeFmq(oer);
 
-    if (createThread("ViPER4Android") != RetCode::SUCCESS) {
+    if (createThread(ViPER4Android::kName) != RetCode::SUCCESS) {
         ALOGE("open: failed to create thread");
-        return ndk::ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
+        return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_STATE);
     }
 
     return ndk::ScopedAStatus::ok();
@@ -130,7 +122,7 @@ ndk::ScopedAStatus ViPER4AIDL::close() {
 
     if (destroyThread() != RetCode::SUCCESS) {
         ALOGE("close: failed to destroy thread");
-        return ndk::ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
+        return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_STATE);
     }
 
     {
@@ -150,7 +142,7 @@ ndk::ScopedAStatus ViPER4AIDL::getDescriptor(Descriptor *descriptor) {
     return ndk::ScopedAStatus::ok();
 }
 
-ndk::ScopedAStatus ViPER4AIDL::command(CommandId command) {
+ndk::ScopedAStatus ViPER4AIDL::command(CommandId commandId) {
     std::lock_guard lg(mImplMutex);
 
     if (mState == State::INIT) {
@@ -158,15 +150,12 @@ ndk::ScopedAStatus ViPER4AIDL::command(CommandId command) {
         return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_STATE);
     }
 
-    switch (command) {
+    switch (commandId) {
         case CommandId::START: {
             if (mState == State::PROCESSING) {
                 ALOGD("command: already started");
                 return ndk::ScopedAStatus::ok();
             }
-
-            //RETURN_IF_ASTATUS_NOT_OK(commandImpl(command), "commandImplFailed");
-
             mState = State::PROCESSING;
 
             if (notifyEventFlag(mDataMqNotEmptyEf) != RetCode::SUCCESS) {
@@ -183,7 +172,6 @@ ndk::ScopedAStatus ViPER4AIDL::command(CommandId command) {
                 ALOGD("command: already stopped");
                 return ndk::ScopedAStatus::ok();
             }
-
             mState = State::IDLE;
 
             if (notifyEventFlag(mDataMqNotEmptyEf) != RetCode::SUCCESS) {
@@ -192,8 +180,6 @@ ndk::ScopedAStatus ViPER4AIDL::command(CommandId command) {
             }
 
             stopThread();
-            
-            //RETURN_IF_ASTATUS_NOT_OK(commandImpl(command), "commandImplFailed");
 
             break;
         }
@@ -206,14 +192,12 @@ ndk::ScopedAStatus ViPER4AIDL::command(CommandId command) {
             }
 
             stopThread();
-            
             resetBuffer();
-            //RETURN_IF_ASTATUS_NOT_OK(commandImpl(command), "commandImplFailed");
 
             break;
         }
         default:
-            ALOGE("command: unknown command %d", static_cast<uint32_t>(command));
+            ALOGE("command: unknown commandId (%s)", toString(commandId).c_str());
             return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
     }
 
@@ -229,8 +213,7 @@ ndk::ScopedAStatus ViPER4AIDL::getState(State *state) {
     return ndk::ScopedAStatus::ok();
 }
 
-ndk::ScopedAStatus
-ViPER4AIDL::setParameter(const Parameter &parameter) {
+ndk::ScopedAStatus ViPER4AIDL::setParameter(const Parameter &parameter) {
     std::lock_guard lg(mImplMutex);
 
     const auto &tag = parameter.getTag();
@@ -239,14 +222,14 @@ ViPER4AIDL::setParameter(const Parameter &parameter) {
             auto common = parameter.get<Parameter::Tag::common>();
             if (common.input.base.format.pcm != PcmType::FLOAT_32_BIT ||
                 common.output.base.format.pcm != PcmType::FLOAT_32_BIT) {
-                ALOGE("setParameter: common: unsupported PCM type (input: %d, output: %d)",
-                    static_cast<int>(common.input.base.format.pcm),
-                    static_cast<int>(common.output.base.format.pcm));
+                ALOGE("setParameter: common: unsupported PCM type (input: %s, output: %s)",
+                      toString(common.input.base.format.pcm).c_str(),
+                      toString(common.output.base.format.pcm).c_str());
                 return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
             }
 
 #if VIPER_AIDL_VERSION >= 2
-            if (mWorkBuffer.size() != 0 && mInputMQ != nullptr && mOutputMQ != nullptr) {
+            if (!mWorkBuffer.empty() && mInputMQ != nullptr && mOutputMQ != nullptr) {
                 size_t prevInputFrameSize = getFrameSizeInBytes(
                     mCommon.input.base.format, mCommon.input.base.channelMask);
                 size_t prevOutputFrameSize = getFrameSizeInBytes(
@@ -258,23 +241,15 @@ ViPER4AIDL::setParameter(const Parameter &parameter) {
                         common.output.base.format, common.output.base.channelMask);
 
                 bool needUpdateMq = false;
-                if (inputFrameSize != prevInputFrameSize ||
-                    mCommon.input.frameCount != common.input.frameCount) {
-                    ALOGD("setParameter: common: reset input MQ");
+                if (inputFrameSize != prevInputFrameSize || mCommon.input.frameCount != common.input.frameCount) {
                     mInputMQ.reset();
                     needUpdateMq = true;
                 }
                 if (outputFrameSize != prevOutputFrameSize ||
                     mCommon.output.frameCount != common.output.frameCount) {
-                    ALOGD("setParameter: common: reset output MQ");
                     mOutputMQ.reset();
                     needUpdateMq = true;
                 }
-
-                ALOGD("setParameter: common: inBufferSizeInFloat %zu, outBufferSizeInFloat %zu, needUpdateMq %d",
-                      (size_t) (common.input.frameCount * inputFrameSize / sizeof(float)),
-                      (size_t) (common.output.frameCount * outputFrameSize / sizeof(float)),
-                      needUpdateMq);
 
                 if (needUpdateMq && mEventFlag->wake(kEventFlagDataMqUpdate) != ::android::OK) {
                     ALOGE("setParameter: common: failed to wake event flag");
@@ -288,8 +263,7 @@ ViPER4AIDL::setParameter(const Parameter &parameter) {
         case Parameter::Tag::specific: {
             auto specific = parameter.get<Parameter::Tag::specific>();
             if (specific.getTag() != Parameter::Specific::Tag::vendorEffect) {
-                ALOGE("setParameter: specific: unsupported tag %d",
-                      static_cast<int32_t>(specific.getTag()));
+                ALOGE("setParameter: specific: unsupported tag (%s)", toString(specific.getTag()).c_str());
                 return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
             }
             
@@ -300,37 +274,25 @@ ViPER4AIDL::setParameter(const Parameter &parameter) {
                 return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
             }
 
-            auto data = defaultExtension->bytes;
+            auto cmd = defaultExtension->bytes;
 
-            ALOGD("setParameter: specific: vendorEffect data size %zu", data.size());
-
-            int32_t ret = 0;
-            uint32_t retSize = sizeof(ret);
-            if (viperContext.handleCommand(
-                EFFECT_CMD_SET_PARAM,
-                data.size(),
-                data.data(),
-                &retSize,
-                &ret
-            ) != 0) {
+            int32_t replyData = 0;
+            uint32_t replySize = sizeof(replyData);
+            if (viperContext.handleCommand(EFFECT_CMD_SET_PARAM,
+                                           cmd.size(), cmd.data(), &replySize, &replyData) != 0 || replyData != 0) {
                 ALOGE("setParameter: specific: failed to handle command");
-                return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
-            }
-            if (ret != 0) {
-                ALOGE("setParameter: specific: command failed with ret %d", ret);
                 return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
             }
 
             return ndk::ScopedAStatus::ok();
         }
         default:
-            ALOGE("setParameter: unsupported parameter tag %d", static_cast<int32_t>(tag));
+            ALOGE("setParameter: unsupported parameter tag (%s)", toString(tag).c_str());
             return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
     }
 }
 
-ndk::ScopedAStatus
-ViPER4AIDL::getParameter(const Parameter::Id &id, Parameter *param) {
+ndk::ScopedAStatus ViPER4AIDL::getParameter(const Parameter::Id &parameterId, Parameter *param) {
     if (param == nullptr) {
         ALOGE("getParameter: param is null");
         return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
@@ -338,66 +300,36 @@ ViPER4AIDL::getParameter(const Parameter::Id &id, Parameter *param) {
 
     std::lock_guard lg(mImplMutex);
 
-    const auto &tag = id.getTag();
+    const auto &tag = parameterId.getTag();
     switch (tag) {
         case Parameter::Id::commonTag: {
-            auto commonTag = id.get<Parameter::Id::Tag::commonTag>();
+            auto commonTag = parameterId.get<Parameter::Id::Tag::commonTag>();
             if (commonTag != Parameter::Tag::common) {
-                ALOGE("getParameter: commonTag: unsupported tag %d",
-                      static_cast<int32_t>(commonTag));
+                ALOGE("getParameter: commonTag: unsupported tag (%s)", toString(commonTag).c_str());
                 return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
             }
             param->set<Parameter::Tag::common>(mCommon);
             return ndk::ScopedAStatus::ok();
         }
         case Parameter::Id::vendorEffectTag: {
-            auto vendorEffectTag = id.get<Parameter::Id::Tag::vendorEffectTag>();
+            const auto &vendorEffectTag = parameterId.get<Parameter::Id::Tag::vendorEffectTag>();
             std::optional<DefaultExtension> cmdDefaultExtension;
             if (vendorEffectTag.extension.getParcelable(&cmdDefaultExtension) != STATUS_OK || !cmdDefaultExtension.has_value()) {
                 ALOGE("getParameter: vendorEffectTag: failed to get default extension");
                 return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
             }
 
-            VendorExtension replyVendorExtension;
-            DefaultExtension replyDefaultExtension;
-            replyDefaultExtension.bytes.resize(sizeof(effect_param_t) + 2 * sizeof(int32_t));
-            
-            auto cmdData = cmdDefaultExtension->bytes;
-            auto replyData = replyDefaultExtension.bytes;
-            uint32_t replySize = replyData.size();
-
-            if (viperContext.handleCommand(
-                EFFECT_CMD_GET_PARAM,
-                cmdData.size(),
-                cmdData.data(),
-                &replySize,
-                replyData.data()
-            ) != 0) {
-                ALOGE("getParameter: vendorEffectTag: failed to handle command");
-                return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
-            }
-
-            replyData.resize(replySize);
-
-            if (replyVendorExtension.extension.setParcelable(replyDefaultExtension) != STATUS_OK) {
-                ALOGE("getParameter: vendorEffectTag: failed to set default extension");
-                return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
-            }
-
-            Parameter::Specific specific;
-            specific.set<Parameter::Specific::Tag::vendorEffect>(replyVendorExtension);
-            param->set<Parameter::Tag::specific>(specific);
-
-            return ndk::ScopedAStatus::ok();
+            ALOGW("getParameter: vendorEffectTag: getParameter not implemented");
+            return ndk::ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
         }
         default:
-            ALOGD("getParameter: unsupported parameter tag %d", static_cast<int32_t>(tag));
+            ALOGD("getParameter: unsupported parameter tag (%s)", toString(tag).c_str());
             return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
     }
 }
 
 #if VIPER_AIDL_VERSION >= 2
-ndk::ScopedAStatus ViPER4AIDL::reopen(IEffect::OpenEffectReturn *ret) {
+ndk::ScopedAStatus ViPER4AIDL::reopen(IEffect::OpenEffectReturn *oer) {
     std::lock_guard lg(mImplMutex);
 
     if (mState == State::INIT) {
@@ -405,9 +337,7 @@ ndk::ScopedAStatus ViPER4AIDL::reopen(IEffect::OpenEffectReturn *ret) {
         return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_STATE);
     }
 
-    ALOGD("reopen: reopening effect");
-
-    dupeFmqWithReopen(ret);
+    dupeFmqWithReopen(oer);
 
     return ndk::ScopedAStatus::ok();
 }
@@ -419,8 +349,9 @@ void ViPER4AIDL::process() {
      * in the life cycle of workerThread (threadLoop).
      */
     uint32_t efState = 0;
-    if (!mEventFlag || mEventFlag->wait(mDataMqNotEmptyEf, &efState, 0 /* no timeout */, true /* retry */) != ::android::OK || !(efState & mDataMqNotEmptyEf)) {
-        ALOGE("process: mEventFlag - %p, efState - %x", mEventFlag, efState);
+    if (!mEventFlag ||
+        mEventFlag->wait(mDataMqNotEmptyEf, &efState, 0 /* no timeout */, true /* retry */) != ::android::OK ||
+        !(efState & mDataMqNotEmptyEf)) {
         return;
     }
 
@@ -431,45 +362,37 @@ void ViPER4AIDL::process() {
 #else
         if (mState != State::PROCESSING) {
 #endif
-            ALOGD("process: skip process in state: %s", toString(mState).c_str());
             return;
         }
 
-        ALOGD("process: processing in state: %s, mInputMQ - %p, mOutputMQ - %p",
-              toString(mState).c_str(), mInputMQ.get(), mOutputMQ.get());
-
         if (!mInputMQ || !mOutputMQ) {
-            ALOGE("process: mInputMQ or mOutputMQ is null");
             return;
         }
 
         assert(mWorkBuffer.size() >= std::max(mInputMQ->availableToRead(), mOutputMQ->availableToWrite()));
+
         auto processSamples = std::min(mInputMQ->availableToRead(), mOutputMQ->availableToWrite());
         if (processSamples) {
-            auto buffer = static_cast<float*>(mWorkBuffer.data());
+            auto buffer = static_cast<float *>(mWorkBuffer.data());
             mInputMQ->read(buffer, processSamples);
-            IEffect::Status status = effectProcessImpl(buffer, buffer, processSamples);
+            IEffect::Status status = effectProcessImpl(buffer, buffer, static_cast<int32_t>(processSamples));
             mOutputMQ->write(buffer, status.fmqProduced);
             mStatusMQ->writeBlocking(&status, 1);
         }
     }
 }
 
-void ViPER4AIDL::dupeFmq(IEffect::OpenEffectReturn* ret) {
-    ALOGD("dupeFmq: mStatusMQ - %p, mInputMQ - %p, mOutputMQ - %p",
-          mStatusMQ.get(), mInputMQ.get(), mOutputMQ.get());
-    if (ret && mStatusMQ && mInputMQ && mOutputMQ) {
-        ret->statusMQ = mStatusMQ->dupeDesc();
-        ret->inputDataMQ = mInputMQ->dupeDesc();
-        ret->outputDataMQ = mOutputMQ->dupeDesc();
+void ViPER4AIDL::dupeFmq(IEffect::OpenEffectReturn* oer) {
+    if (oer && mStatusMQ && mInputMQ && mOutputMQ) {
+        oer->statusMQ = mStatusMQ->dupeDesc();
+        oer->inputDataMQ = mInputMQ->dupeDesc();
+        oer->outputDataMQ = mOutputMQ->dupeDesc();
     }
 }
 
-void ViPER4AIDL::dupeFmqWithReopen(IEffect::OpenEffectReturn* ret) {
-    size_t inputFrameSize = getFrameSizeInBytes(
-            mCommon.input.base.format, mCommon.input.base.channelMask);
-    size_t outputFrameSize = getFrameSizeInBytes(
-            mCommon.output.base.format, mCommon.output.base.channelMask);
+void ViPER4AIDL::dupeFmqWithReopen(IEffect::OpenEffectReturn* oer) {
+    size_t inputFrameSize = getFrameSizeInBytes(mCommon.input.base.format, mCommon.input.base.channelMask);
+    size_t outputFrameSize = getFrameSizeInBytes(mCommon.output.base.format, mCommon.output.base.channelMask);
     const size_t inBufferSizeInFloat = mCommon.input.frameCount * inputFrameSize / sizeof(float);
     const size_t outBufferSizeInFloat = mCommon.output.frameCount * outputFrameSize / sizeof(float);
     const size_t bufferSize = std::max(inBufferSizeInFloat, outBufferSizeInFloat);
@@ -482,7 +405,7 @@ void ViPER4AIDL::dupeFmqWithReopen(IEffect::OpenEffectReturn* ret) {
     if (mWorkBuffer.size() != bufferSize) {
         mWorkBuffer.resize(bufferSize);
     }
-    dupeFmq(ret);
+    dupeFmq(oer);
 }
 
 RetCode ViPER4AIDL::notifyEventFlag(uint32_t flag) {
@@ -490,17 +413,18 @@ RetCode ViPER4AIDL::notifyEventFlag(uint32_t flag) {
         ALOGE("notifyEventFlag: StatusEventFlag invalid");
         return RetCode::ERROR_EVENT_FLAG_ERROR;
     }
-    if (const auto ret = mEventFlag->wake(flag); ret != ::android::OK) {
-        ALOGE("notifyEventFlag: wake failure with ret %d", ret);
+    if (mEventFlag->wake(flag) != ::android::OK) {
+        ALOGE("notifyEventFlag: failed to wake event flag");
         return RetCode::ERROR_EVENT_FLAG_ERROR;
     }
     return RetCode::SUCCESS;
 }
 
-// reset buffer status by abandon input data in FMQ
 void ViPER4AIDL::resetBuffer() {
+    // reset buffer status by abandon input data in FMQ
     if (mStatusMQ) {
         std::vector<IEffect::Status> status(mStatusMQ->availableToRead());
+        mStatusMQ->read(status.data(), status.size());
     }
     if (mInputMQ) {
         auto buffer = static_cast<float*>(mWorkBuffer.data());
@@ -508,18 +432,21 @@ void ViPER4AIDL::resetBuffer() {
     }
 }
 
-// A placeholder processing implementation to copy samples from input to output
-IEffect::Status ViPER4AIDL::effectProcessImpl(float* in, float* out, int samples) {
+IEffect::Status ViPER4AIDL::effectProcessImpl(float *in, float *out, int32_t samples) {
     viperContext.process(in, out, samples);
-    return {STATUS_OK, samples, samples};
+    return {
+        .status = STATUS_OK,
+        .fmqConsumed = samples,
+        .fmqProduced = samples
+    };
 }
 
-extern "C" binder_exception_t queryEffect(const AudioUuid *audio_uuid, Descriptor *descriptor) {
-    if (audio_uuid == nullptr || descriptor == nullptr) {
-        ALOGE("queryEffect: audio_uuid or descriptor is null");
+extern "C" binder_exception_t queryEffect(const AudioUuid *audioUuid, Descriptor *descriptor) {
+    if (audioUuid == nullptr || descriptor == nullptr) {
+        ALOGE("queryEffect: audioUuid or descriptor is null");
         return EX_ILLEGAL_ARGUMENT;
     }
-    if (*audio_uuid != kUuid) {
+    if (*audioUuid != kUuid) {
         ALOGE("queryEffect: invalid uuid");
         return EX_ILLEGAL_ARGUMENT;
     }
@@ -527,9 +454,10 @@ extern "C" binder_exception_t queryEffect(const AudioUuid *audio_uuid, Descripto
     return EX_NONE;
 }
 
-extern "C" binder_exception_t createEffect(const AudioUuid *audio_uuid, std::shared_ptr<IEffect> *instanceSp) {
-    if (audio_uuid == nullptr || instanceSp == nullptr) {
-        ALOGE("createEffect: audio_uuid or instanceSp is null");
+extern "C" binder_exception_t createEffect(const AudioUuid *audioUuid,
+                                           std::shared_ptr<IEffect> *instanceSp) {
+    if (audioUuid == nullptr || instanceSp == nullptr) {
+        ALOGE("createEffect: audioUuid or instanceSp is null");
         return EX_ILLEGAL_ARGUMENT;
     }
     *instanceSp = ndk::SharedRefBase::make<ViPER4AIDL>();
@@ -542,8 +470,8 @@ extern "C" binder_exception_t destroyEffect(const std::shared_ptr<IEffect> &inst
         return EX_ILLEGAL_ARGUMENT;
     }
 
-    Descriptor desc;
-    ndk::ScopedAStatus status = instanceSp->getDescriptor(&desc);
+    Descriptor descriptor;
+    ndk::ScopedAStatus status = instanceSp->getDescriptor(&descriptor);
     if (!status.isOk()) {
         ALOGE("destroyEffect: failed to get descriptor, status: %s", status.getDescription().c_str());
         return EX_ILLEGAL_STATE;

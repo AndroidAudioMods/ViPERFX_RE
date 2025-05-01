@@ -6,7 +6,7 @@
 #include "viper/ViPER.h"
 #include <string>
 
-class ViperContext {
+class ViPERContext {
 public:
     enum class DisableReason : int32_t {
         UNKNOWN = -1,
@@ -17,7 +17,7 @@ public:
         INVALID_FORMAT,
     };
 
-    ViperContext();
+    ViPERContext();
 
     int32_t handleCommand(uint32_t cmdCode, uint32_t cmdSize, void *pCmdData, uint32_t *replySize, void *pReplyData);
     int32_t process(audio_buffer_t *inBuffer, audio_buffer_t *outBuffer);

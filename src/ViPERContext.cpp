@@ -1,22 +1,22 @@
 #include <cerrno>
 #include <cstring>
 #include <cmath>
-#include "ViperContext.h"
+#include "ViPERContext.h"
 #include <log/log.h>
 #include <constants.h>
 
 #define SET(type, ptr, value) (*(type *) (ptr) = (value))
 
-ViperContext::ViperContext() :
+ViPERContext::ViPERContext() :
         config({}),
         disableReason(DisableReason::UNKNOWN),
         buffer(std::vector<float>()),
         bufferFrameCount(0),
         enabled(false) {
-    ALOGI("ViperContext created");
+    ALOGI("ViPERContext created");
 }
 
-void ViperContext::copyBufferConfig(buffer_config_t *dest, buffer_config_t *src) {
+void ViPERContext::copyBufferConfig(buffer_config_t *dest, buffer_config_t *src) {
     if (src->mask & EFFECT_CONFIG_BUFFER) {
         dest->buffer = src->buffer;
     }
@@ -44,7 +44,7 @@ void ViperContext::copyBufferConfig(buffer_config_t *dest, buffer_config_t *src)
     dest->mask |= src->mask;
 }
 
-void ViperContext::handleSetConfig(effect_config_t *newConfig) {
+void ViPERContext::handleSetConfig(effect_config_t *newConfig) {
     ALOGI("Checking input and output configuration ...");
 
     ALOGI("Input mask: 0x%04X", newConfig->inputCfg.mask);
@@ -129,7 +129,7 @@ void ViperContext::handleSetConfig(effect_config_t *newConfig) {
     viper.reset();
 }
 
-int32_t ViperContext::handleSetParam(effect_param_t *pCmdParam, void *pReplyData) {
+int32_t ViPERContext::handleSetParam(effect_param_t *pCmdParam, void *pReplyData) {
     // The value offset of an effect parameter is computed by rounding up
     // the parameter size to the next 32 bit alignment.
     uint32_t vOffset = ((pCmdParam->psize + sizeof(int32_t) - 1) / sizeof(int32_t)) * sizeof(int32_t);
@@ -608,7 +608,7 @@ int32_t ViperContext::handleSetParam(effect_param_t *pCmdParam, void *pReplyData
     }
 }
 
-int32_t ViperContext::handleGetParam(effect_param_t *pCmdParam, effect_param_t *pReplyParam, uint32_t *pReplySize) {
+int32_t ViPERContext::handleGetParam(effect_param_t *pCmdParam, effect_param_t *pReplyParam, uint32_t *pReplySize) {
     // The value offset of an effect parameter is computed by rounding up
     // the parameter size to the next 32 bit alignment.
     uint32_t vOffset = ((pCmdParam->psize + sizeof(int32_t) - 1) / sizeof(int32_t)) * sizeof(int32_t);
@@ -684,7 +684,7 @@ int32_t ViperContext::handleGetParam(effect_param_t *pCmdParam, effect_param_t *
     }
 }
 
-int32_t ViperContext::handleCommand(uint32_t cmdCode, uint32_t cmdSize, void *pCmdData, uint32_t *pReplySize, void *pReplyData) {
+int32_t ViPERContext::handleCommand(uint32_t cmdCode, uint32_t cmdSize, void *pCmdData, uint32_t *pReplySize, void *pReplyData) {
     uint32_t replySize = pReplySize == nullptr ? 0 : *pReplySize;
     switch (cmdCode) {
         case EFFECT_CMD_INIT: {
@@ -801,7 +801,7 @@ static audio_buffer_t *getBuffer(buffer_config_s *config, audio_buffer_t *buffer
     return nullptr;
 }
 
-int32_t ViperContext::process(audio_buffer_t *inBuffer, audio_buffer_t *outBuffer) {
+int32_t ViPERContext::process(audio_buffer_t *inBuffer, audio_buffer_t *outBuffer) {
     if (disableReason != DisableReason::NONE) {
         return -EINVAL;
     }
@@ -860,7 +860,7 @@ int32_t ViperContext::process(audio_buffer_t *inBuffer, audio_buffer_t *outBuffe
     return 0;
 }
 
-int32_t ViperContext::process(float *inBuffer, float *outBuffer, size_t count) {
+int32_t ViPERContext::process(float *inBuffer, float *outBuffer, size_t count) {
     memcpy(outBuffer, inBuffer, count * sizeof(float));
     // The viper process function expects the count to be the number of
     // stereo frames, not the number of samples. Thus, we divide by 2.
@@ -868,6 +868,6 @@ int32_t ViperContext::process(float *inBuffer, float *outBuffer, size_t count) {
     return 0;
 }
 
-void ViperContext::setDisableReason(DisableReason reason) {
+void ViPERContext::setDisableReason(DisableReason reason) {
     this->disableReason = reason;
 }

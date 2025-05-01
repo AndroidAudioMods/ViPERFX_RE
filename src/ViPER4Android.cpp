@@ -2,12 +2,15 @@
 #include <hardware/audio_effect.h>
 #include "viper/ViPER.h"
 #include <constants.h>
-#include "ViperContext.h"
+#include "ViPERContext.h"
+
+#define VIPER_NAME "ViPER4Android"
+#define VIPER_IMPLEMENTOR "Iscle, Martmists, ViPER ACOUSTIC"
 
 extern "C" {
 struct ViperHandle {
     const struct effect_interface_s *iface; // Always keep as first member
-    ViperContext *context;
+    ViPERContext *context;
 };
 
 static const effect_descriptor_t viperDescriptor = {
@@ -19,7 +22,7 @@ static const effect_descriptor_t viperDescriptor = {
         .cpuLoad = 8, // In 0.1 MIPS units as estimated on an ARM9E core (ARMv5TE) with 0 WS
         .memoryUsage = 1, // In KB and includes only dynamically allocated memory
         .name = VIPER_NAME,
-        .implementor = VIPER_AUTHORS
+        .implementor = VIPER_IMPLEMENTOR
 };
 
 static int32_t viperInterfaceProcess(effect_handle_t self, audio_buffer_t *inBuffer, audio_buffer_t *outBuffer) {
@@ -58,7 +61,7 @@ viperLibraryCreate(const effect_uuid_t *uuid, int32_t sessionId __unused, int32_
 
     ViperHandle *viperHandle = new ViperHandle();
     viperHandle->iface = &viperInterface;
-    viperHandle->context = new ViperContext();
+    viperHandle->context = new ViPERContext();
     *pHandle = reinterpret_cast<effect_handle_t>(viperHandle);
     return 0;
 }
@@ -83,8 +86,8 @@ __attribute__ ((visibility ("default")))
 audio_effect_library_t AUDIO_EFFECT_LIBRARY_INFO_SYM = {
         .tag = AUDIO_EFFECT_LIBRARY_TAG,
         .version = EFFECT_LIBRARY_API_VERSION,
-        .name = VIPER_NAME,
-        .implementor = VIPER_AUTHORS,
+        .name = ViPER4Android::kName,
+        .implementor = ViPER4Android::kImplementor,
         .create_effect = viperLibraryCreate,
         .release_effect = viperLibraryRelease,
         .get_descriptor = viperLibraryGetDescriptor,

@@ -4,7 +4,7 @@ cc_defaults {
     srcs: [
         // Main
         "src/viper/ViPER.cpp",
-        "src/ViperContext.cpp",
+        "src/ViPERContext.cpp",
         "src/ViPER4Aidl.cpp",
         "src/ViPER4Android.cpp",
         "src/EffectThread.cpp",
