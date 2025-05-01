@@ -636,13 +636,13 @@ int32_t ViPERContext::handleGetParam(effect_param_t *pCmdParam, effect_param_t *
             *pReplySize = sizeof(effect_param_t) + pReplyParam->psize + vOffset + pReplyParam->vsize;
             return 0;
         }
-        case PARAM_GET_VERSION: {
-            pReplyParam->status = 0;
-            pReplyParam->vsize = sizeof(uint32_t);
-            *(uint32_t *) (pReplyParam->data + vOffset) = VIPER_VERSION;
-            *pReplySize = sizeof(effect_param_t) + pReplyParam->psize + vOffset + pReplyParam->vsize;
-            return 0;
-        }
+//        case PARAM_GET_VERSION: {
+//            pReplyParam->status = 0;
+//            pReplyParam->vsize = sizeof(uint32_t);
+//            *(uint32_t *) (pReplyParam->data + vOffset) = VIPER_VERSION;
+//            *pReplySize = sizeof(effect_param_t) + pReplyParam->psize + vOffset + pReplyParam->vsize;
+//            return 0;
+//        }
         case PARAM_GET_DISABLE_REASON: {
             pReplyParam->status = 0;
             pReplyParam->vsize = sizeof(int32_t);

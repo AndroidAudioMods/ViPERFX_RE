@@ -1,7 +1,11 @@
 #pragma once
 
+#ifndef VIPER_VERSION
+#define VIPER_VERSION "vX.X.X"
+#endif
+
 namespace ViPER4Android {
-    static const char *const kName = "ViPER4Android";
+    static const char *const kName = "ViPER4Android " VIPER_VERSION;
     static const char *const kImplementor = "Iscle, Martmists, ViPER ACOUSTIC";
 
     static const char *const kTypeString = "b9bc100c-26cd-42e6-acb6-cad8c3f778de";

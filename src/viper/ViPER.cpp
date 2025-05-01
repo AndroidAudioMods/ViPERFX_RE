@@ -12,7 +12,7 @@ ViPER::ViPER() :
     gainL(1.0),
     gainR(1.0) {
     ALOGI("Welcome to ViPER FX");
-    ALOGI("Current version is %d", VIPER_VERSION);
+//    ALOGI("Current version is %d", VIPER_VERSION);
 
     this->convolver.SetEnable(false);
     this->convolver.SetSamplingRate(this->samplingRate);
